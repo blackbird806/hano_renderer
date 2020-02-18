@@ -1,0 +1,40 @@
+cmake_minimum_required(VERSION 3.7.2)
+
+project(hano_renderer)
+
+find_package(Vulkan REQUIRED FATAL_ERROR)
+
+# https://stackoverflow.com/questions/42834844/how-to-get-cmake-to-pass-either-std-c14-c1y-or-c17-c1z-based-on-gcc-vers
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
+endif(MSVC)
+
+include_directories("source/libraries")
+include_directories(${Vulkan_INCLUDE_DIRS})
+link_directories(${CMAKE_SOURCE_DIR}/libraryBin)
+
+file(GLOB_RECURSE SRCS
+	"*.c"
+	"*.cpp"
+	)
+
+set(GLOB_RECURSE HEADERS
+	"*.h"
+	"*.hpp"
+    )
+	
+if(WIN32)
+	set(EXE_NAME hano_renderer)
+else()
+	set(EXE_NAME hano_renderer.out)
+endif()
+
+add_executable(${EXE_NAME} ${SRCS} ${HEADERS})
+target_link_libraries (${EXE_NAME} ${Vulkan_LIBRARIES})
+
+if(WIN32)
+	target_link_libraries(${EXE_NAME} "glfw/glfw3")
+endif()
