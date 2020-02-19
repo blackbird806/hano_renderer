@@ -1,5 +1,5 @@
 #define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -7,11 +7,13 @@
 #include <glm/mat4x4.hpp>
 
 #include <iostream>
+#include "core/logger.hpp"
 
-int main() {
-    glfwInit();
+int main()
+{
+	glfwInit();
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
 
     uint32_t extensionCount = 0;
@@ -19,8 +21,8 @@ int main() {
 
     std::cout << extensionCount << " extensions supported" << std::endl;
 
-    glm::mat4 matrix;
-    glm::vec4 vec;
+    glm::mat4 const matrix;
+    glm::vec4 const vec;
     auto test = matrix * vec;
 
     while (!glfwWindowShouldClose(window)) {
