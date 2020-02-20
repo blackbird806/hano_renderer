@@ -57,6 +57,9 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\vkhImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

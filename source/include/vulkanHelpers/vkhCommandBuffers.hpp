@@ -56,24 +56,36 @@ namespace hano::vkh
 
 	struct SingleTimeCommands
 	{
+		VULKAN_NON_COPIABLE(SingleTimeCommands);
+		
 		SingleTimeCommands(CommandPool& pool)
-			: buffer(pool, 1), commandPool(pool)
+			: commandBuffers(pool, 1), commandPool(pool)
 		{
 
 			VkCommandBufferBeginInfo beginInfo = {};
 			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 			beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-			vkBeginCommandBuffer(buffer[0], &beginInfo);
+			vkBeginCommandBuffer(commandBuffers[0], &beginInfo);
 		}
 
+		operator vk::CommandBuffer()
+		{
+			return commandBuffers[0];
+		}
+
+		vk::CommandBuffer& buffer()
+		{
+			return commandBuffers[0];
+		}
+		
 		void end()
 		{
-			vkEndCommandBuffer(buffer[0]);
+			vkEndCommandBuffer(commandBuffers[0]);
 
 			vk::SubmitInfo submitInfo = {};
 			submitInfo.commandBufferCount = 1;
-			submitInfo.pCommandBuffers = &buffer[0];
+			submitInfo.pCommandBuffers = &commandBuffers[0];
 
 			const auto graphicsQueue = commandPool.device.graphicsQueue;
 			VKH_CHECK(
@@ -86,7 +98,7 @@ namespace hano::vkh
 			end();
 		}
 		
-		CommandBuffers buffer;
+		CommandBuffers commandBuffers;
 		CommandPool& commandPool;
 	};
 }

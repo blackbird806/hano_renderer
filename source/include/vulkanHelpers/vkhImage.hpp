@@ -14,7 +14,10 @@ namespace hano::vkh
 		Image(const Image&) = delete;
 		Image& operator = (const Image&) = delete;
 
-		Image(vkh::Device const& idevice, vk::Extent2D ext, vk::Format fmt);
+		Image(vkh::Device const& idevice, vk::Extent2D ext, vk::Format fmt,
+			vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
+			vk::ImageUsageFlags usageFlags = vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
+		
 		~Image();
 
 		void transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newLayout);
