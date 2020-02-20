@@ -33,8 +33,8 @@ namespace hano::vkh
 	{
 		VULKAN_NON_COPIABLE(Device);
 
-		Device(vk::PhysicalDevice physDevice, Surface const& isurface, std::vector<const char*> irequiredExtensions)
-			: physicalDevice(physDevice), surface(isurface), requiredExtensions(irequiredExtensions)
+		Device(vk::PhysicalDevice physDevice, Surface const& isurface, std::vector<const char*> irequiredExtensions, vk::AllocationCallbacks* alloc)
+			: physicalDevice(physDevice), surface(isurface), requiredExtensions(irequiredExtensions), allocator(alloc)
 		{
 			checkRequiredExtensions(physicalDevice);
 
@@ -115,7 +115,7 @@ namespace hano::vkh
 
 		~Device()
 		{
-			if (handle != VK_NULL_HANDLE)
+			if (handle)
 			{
 				handle.destroy(allocator);
 				handle = nullptr;

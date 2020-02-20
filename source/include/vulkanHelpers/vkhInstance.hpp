@@ -9,7 +9,7 @@
 
 namespace hano::vkh
 {
-	std::vector<const char*> getGlfwRequiredExtensions(bool validationLayersEnabled)
+	inline std::vector<const char*> getGlfwRequiredExtensions(bool validationLayersEnabled)
 	{
 		uint32 glfwExtensionCount = 0;
 		const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -48,10 +48,10 @@ namespace hano::vkh
 			createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 			createInfo.pApplicationInfo = &appInfo;
 
-			auto extensions = getGlfwRequiredExtensions(validationLayersEnabled());
+			auto glfwExtensions = getGlfwRequiredExtensions(validationLayersEnabled());
 			
-			createInfo.enabledExtensionCount = static_cast<uint32>(extensions.size());
-			createInfo.ppEnabledExtensionNames = extensions.data();
+			createInfo.enabledExtensionCount = static_cast<uint32>(glfwExtensions.size());
+			createInfo.ppEnabledExtensionNames = glfwExtensions.data();
 
 			VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
 
@@ -73,6 +73,9 @@ namespace hano::vkh
 			}
 
 			handle = vk::createInstance(createInfo, allocator);
+
+			physicalDevices = handle.enumeratePhysicalDevices();
+			extensions = vk::enumerateInstanceExtensionProperties(nullptr);
 		}
 
 		HANO_NODISCARD bool validationLayersEnabled() const noexcept
@@ -82,7 +85,7 @@ namespace hano::vkh
 
 		~Instance()
 		{
-			if (handle != VK_NULL_HANDLE)
+			if (handle)
 			{
 				handle.destroy(allocator);
 				handle = nullptr;
@@ -91,6 +94,8 @@ namespace hano::vkh
 		
 		vk::Instance handle;
 		vk::AllocationCallbacks* allocator;
+		std::vector<vk::PhysicalDevice> physicalDevices;
+		std::vector<vk::ExtensionProperties> extensions;
 		std::vector<const char*> validationLayers;
 		
 		private:

@@ -48,10 +48,16 @@
     <ClCompile Include="source\libraries\imgui\imgui_widgets.cpp">
       <Filter>libraries\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\hanoRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\vkhSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -63,6 +69,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\core\logger.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\hanoRenderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp">

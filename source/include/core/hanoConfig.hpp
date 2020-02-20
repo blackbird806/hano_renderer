@@ -51,7 +51,7 @@ namespace hano
 namespace hano
 {
 	std::array constexpr c_vulkanValidationLayers = { "VK_LAYER_KHRONOS_validation", "VK_LAYER_LUNARG_standard_validation" };
-	std::array constexpr c_vulkanDefaultRequiredExtentions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+	std::array constexpr c_vulkanDefaultRequiredExtentions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_NV_RAY_TRACING_EXTENSION_NAME, VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME };
 
 #if HANO_RENDERER_DEBUG
 	inline bool constexpr c_vulkanEnableValidationsLayers = true;

@@ -133,13 +133,17 @@
     <ClCompile Include="source\libraries\imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_impl_vulkan.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="source\src\hanoRenderer.cpp" />
     <ClCompile Include="source\src\main.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhSurface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\include\core\hanoConfig.hpp" />
     <ClInclude Include="source\include\core\hanoException.hpp" />
     <ClInclude Include="source\include\core\logger.hpp" />
+    <ClInclude Include="source\include\hanoRenderer.hpp" />
+    <ClInclude Include="source\include\vulkanHelper.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDebug.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDevice.hpp" />
