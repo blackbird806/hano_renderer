@@ -80,6 +80,9 @@
     <ClInclude Include="source\include\vulkanHelpers\vkhInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhSurface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhUtility.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

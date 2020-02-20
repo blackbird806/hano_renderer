@@ -143,6 +143,7 @@
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDebug.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDevice.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhSurface.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhUtility.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhImage.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhInstance.hpp" />

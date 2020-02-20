@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string_view>
-#include <array>
 #include <vulkan/vulkan.hpp>
 #include <glfw/glfw3.h>
 
@@ -31,7 +29,7 @@ namespace hano::vkh
 	{
 		VULKAN_NON_COPIABLE(Instance);
 
-		Instance(const char* appName, const char* engineName, std::vector<std::string_view> ivalidationLayers, vk::AllocationCallbacks alloc)
+		Instance(const char* appName, const char* engineName, std::vector<const char*> ivalidationLayers, vk::AllocationCallbacks* alloc)
 			: allocator(alloc), validationLayers(ivalidationLayers)
 		{
 			// disable validation layers if none provided
@@ -59,8 +57,8 @@ namespace hano::vkh
 
 			if (validationLayersEnabled())
 			{
-				createInfo.enabledLayerCount = static_cast<uint32>(c_vulkanValidationLayers.size());
-				createInfo.ppEnabledLayerNames = c_vulkanValidationLayers.data();
+				createInfo.enabledLayerCount = static_cast<uint32>(validationLayers.size());
+				createInfo.ppEnabledLayerNames = validationLayers.data();
 				createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 				debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 				debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
@@ -74,7 +72,7 @@ namespace hano::vkh
 				createInfo.pNext = nullptr;
 			}
 
-			instance = vk::createInstance(createInfo, &allocator);
+			handle = vk::createInstance(createInfo, allocator);
 		}
 
 		HANO_NODISCARD bool validationLayersEnabled() const noexcept
@@ -84,15 +82,16 @@ namespace hano::vkh
 
 		~Instance()
 		{
-			if (instance != VK_NULL_HANDLE)
+			if (handle != VK_NULL_HANDLE)
 			{
-				instance.destroy(allocator);
-				instance = nullptr;
+				handle.destroy(allocator);
+				handle = nullptr;
 			}
 		}
 		
-		vk::Instance instance;
-		vk::AllocationCallbacks allocator;
+		vk::Instance handle;
+		vk::AllocationCallbacks* allocator;
+		std::vector<const char*> validationLayers;
 		
 		private:
 
@@ -108,7 +107,7 @@ namespace hano::vkh
 				bool layerFound = false;
 				for (auto const& layerProperties : availablesLayers)
 				{
-					if (layerName.compare(layerProperties.layerName) == 0)
+					if (strcmp(layerName, layerProperties.layerName) == 0)
 					{
 						layerFound = true;
 						break;
@@ -120,6 +119,5 @@ namespace hano::vkh
 			return true;
 		}
 
-		std::vector<std::string_view> validationLayers;
 	};
 }
