@@ -80,6 +80,12 @@
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhCommandBuffers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhCommandPool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhDebug.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

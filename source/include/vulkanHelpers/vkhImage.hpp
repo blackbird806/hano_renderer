@@ -5,17 +5,25 @@
 
 namespace hano::vkh
 {
+	struct Device;
+	struct CommandPool;
+	struct Buffer;
+	
 	struct Image
 	{
-		vk::Device device;
-		vk::Image image;
-		vk::DeviceMemory memory;
+		Image(const Image&) = delete;
+		Image& operator = (const Image&) = delete;
 
-		void create(vk::ImageCreateInfo const& imageInfo, vk::AllocationCallbacks allocator, vk::MemoryPropertyFlags props)
-		{
-			VKH_CHECK(device.createImage(&imageInfo, &allocator, &image), "failed to create Image !");
+		Image(vkh::Device const& idevice, vk::Extent2D ext, vk::Format fmt);
+		~Image();
 
-			VkMemoryRequirements memRequirements = device.getImageMemoryRequirements(image, &memRequirements);
-		}
+		void transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newLayout);
+		void copyFrom(CommandPool& commandPool, vkh::Buffer const& buffer);
+		
+		vk::Image handle;
+		vkh::Device const& device;
+		vk::Extent2D const extent;
+		vk::Format const format;
+		vk::ImageLayout imageLayout;
 	};
 }

@@ -38,7 +38,7 @@ std::vector<vk::ExtensionProperties> const& Renderer::getExtensions() const
 vk::PhysicalDevice Renderer::getSuitableDevice() const
 {
 	auto const& physicalDevices = getPhysicalDevices();
-	auto const result = std::find_if(physicalDevices.begin(), physicalDevices.end(), [](const vk::PhysicalDevice& device)
+	auto const result = std::find_if(physicalDevices.begin(), physicalDevices.end(), [](vk::PhysicalDevice const& device)
 		{
 			// We want a device with geometry shader support.
 			VkPhysicalDeviceFeatures deviceFeatures;
@@ -52,7 +52,7 @@ vk::PhysicalDevice Renderer::getSuitableDevice() const
 			// We want a device with a graphics queue.
 			auto const queueFamilies = device.getQueueFamilyProperties();
 			
-			const auto hasGraphicsQueue = std::find_if(queueFamilies.begin(), queueFamilies.end(), [](const vk::QueueFamilyProperties& queueFamily)
+			auto const hasGraphicsQueue = std::find_if(queueFamilies.begin(), queueFamilies.end(), [](const vk::QueueFamilyProperties& queueFamily)
 				{
 					return queueFamily.queueCount > 0 && queueFamily.queueFlags & vk::QueueFlagBits::eGraphics;
 				});

@@ -145,6 +145,8 @@
     <ClInclude Include="source\include\hanoRenderer.hpp" />
     <ClInclude Include="source\include\vulkanHelper.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhCommandBuffers.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhCommandPool.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDebug.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDevice.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhSurface.hpp" />
