@@ -30,7 +30,7 @@ namespace hano
 #define HANO_RENDERER_ENABLE_RAYTRACING 1
 #else
 #define HANO_RENDERER_ENABLE_RAYTRACING 0
-#error "non raytracing gpu aren not supported yet !"
+#error "non rtx gpu aren not supported yet !"
 #endif
 
 #define HANO_FORCE_NODISCARD
@@ -51,9 +51,7 @@ namespace hano
 namespace hano
 {
 	std::array constexpr c_vulkanValidationLayers = { "VK_LAYER_KHRONOS_validation", "VK_LAYER_LUNARG_standard_validation" };
-	std::array constexpr c_vulkanDefaultRequiredExtentions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-																	VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME // used to debug vk device lost
-	};
+	std::array constexpr c_vulkanDefaultRequiredExtentions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
 #if HANO_RENDERER_DEBUG
 	inline bool constexpr c_vulkanEnableValidationsLayers = true;

@@ -51,15 +51,36 @@
     <ClCompile Include="source\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\include\core\hanoConfig.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\core\hanoException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\core\logger.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhDebug.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhDevice.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhImage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhInstance.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhUtility.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\libraries\glfw\glfw3.h">

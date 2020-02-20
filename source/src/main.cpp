@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "core/logger.hpp"
+#include "core/hanoException.hpp"
 
 int main()
 {
@@ -18,14 +19,15 @@ int main()
 
     uint32_t extensionCount = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-    std::cout << extensionCount << " extensions supported" << std::endl;
-
+	
+    info_stream << extensionCount << " extensions supported" << std::endl;
+	
     glm::mat4 const matrix;
     glm::vec4 const vec;
     auto test = matrix * vec;
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window)) 
+    {
         glfwPollEvents();
     }
 
