@@ -34,6 +34,15 @@ Image::~Image()
 	}
 }
 
+DeviceMemory Image::allocateMemory(vk::MemoryPropertyFlags propertyFlags) const
+{
+	auto const requirements = device.handle.getImageMemoryRequirements(handle);
+	DeviceMemory memory(device, requirements.size, requirements.memoryTypeBits, propertyFlags);
+	device.handle.bindImageMemory(handle, memory.handle, 0);
+	return memory;
+}
+
+#if 0
 void Image::transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newLayout)
 {
 	SingleTimeCommands singleTimeCommands(commandPool);
@@ -93,9 +102,11 @@ void Image::transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newL
 	{
 		throw HanoException("unsupported layout transition");
 	}
+	
 	singleTimeCommands.buffer().pipelineBarrier(sourceStage, destinationStage, );
 	vkCmdPipelineBarrier(, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 });
 
 layout = newLayout;
 }
+#endif

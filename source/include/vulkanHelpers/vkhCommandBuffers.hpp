@@ -98,7 +98,8 @@ namespace hano::vkh
 			end();
 		}
 		
-		CommandBuffers commandBuffers;
 		CommandPool& commandPool;
+	private:
+		CommandBuffers commandBuffers;
 	};
 }

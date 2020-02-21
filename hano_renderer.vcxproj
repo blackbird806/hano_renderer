@@ -136,7 +136,10 @@
     <ClCompile Include="source\src\hanoRenderer.cpp" />
     <ClCompile Include="source\src\main.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhDepthBuffer.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhDeviceMemory.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhImage.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhImageView.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhSurface.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -149,7 +152,10 @@
     <ClInclude Include="source\include\vulkanHelpers\vkhCommandBuffers.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhCommandPool.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDebug.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhDepthBuffer.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDevice.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhDeviceMemory.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhImageView.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhSurface.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhUtility.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhImage.hpp" />

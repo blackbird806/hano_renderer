@@ -9,14 +9,14 @@ namespace hano::vkh
 	{
 		VULKAN_NON_COPIABLE(CommandPool);
 
-		CommandPool(vkh::Device const& idevice, vk::AllocationCallbacks* alloc, uint32 queueFamilyIndex, bool allowReset)
-			: device(idevice), allocator(alloc)
+		CommandPool(vkh::Device const& idevice, uint32 queueFamilyIndex, bool allowReset)
+			: device(idevice)
 		{
 			vk::CommandPoolCreateInfo poolInfo = {};
 			poolInfo.queueFamilyIndex = queueFamilyIndex;
 			poolInfo.flags = allowReset ? vk::CommandPoolCreateFlagBits::eResetCommandBuffer : vk::CommandPoolCreateFlags();
 			VKH_CHECK(
-				device.handle.createCommandPool(&poolInfo, allocator, &handle), 
+				device.handle.createCommandPool(&poolInfo, device.allocator, &handle),
 				"failed to create command Pool !");
 		}
 		
@@ -24,13 +24,12 @@ namespace hano::vkh
 		{
 			if (handle)
 			{
-				device.handle.destroyCommandPool(handle, allocator);
+				device.handle.destroyCommandPool(handle, device.allocator);
 				handle = nullptr;
 			}
 		}
 
 		vkh::Device const& device;
 		vk::CommandPool handle;
-		vk::AllocationCallbacks* allocator;
 	};
 }

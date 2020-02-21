@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 #include "vkhUtility.hpp"
+#include "vkhDeviceMemory.hpp"
 
 namespace hano::vkh
 {
@@ -20,6 +21,8 @@ namespace hano::vkh
 		
 		~Image();
 
+		DeviceMemory allocateMemory(vk::MemoryPropertyFlags propertyFlags) const;
+		
 		void transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newLayout);
 		void copyFrom(CommandPool& commandPool, vkh::Buffer const& buffer);
 		
