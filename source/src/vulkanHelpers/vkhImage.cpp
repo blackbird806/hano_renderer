@@ -1,6 +1,8 @@
 #include <vulkanHelpers/vkhImage.hpp>
 #include <vulkanHelpers/vkhDevice.hpp>
 #include <vulkanHelpers/vkhCommandBuffers.hpp>
+#include <vulkanHelpers/vkhDepthBuffer.hpp>
+#include <vulkanHelpers/vkhBuffer.hpp>
 
 using namespace hano::vkh;
 
@@ -42,7 +44,6 @@ DeviceMemory Image::allocateMemory(vk::MemoryPropertyFlags propertyFlags) const
 	return memory;
 }
 
-#if 0
 void Image::transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newLayout)
 {
 	SingleTimeCommands singleTimeCommands(commandPool);
@@ -61,7 +62,7 @@ void Image::transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newL
 	{
 		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth;
 
-		if (DepthBuffer::HasStencilComponent(format))
+		if (DepthBuffer::hasStencilComponent(format))
 		{
 			barrier.subresourceRange.aspectMask |= vk::ImageAspectFlagBits::eStencil;
 		}
@@ -79,34 +80,49 @@ void Image::transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newL
 		barrier.srcAccessMask = vk::AccessFlags();
 		barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
 
-		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		sourceStage = vk::PipelineStageFlagBits::eTopOfPipe;
+		destinationStage = vk::PipelineStageFlagBits::eTransfer;
 	}
-	else if (imageLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+	else if (imageLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal)
 	{
-		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+		barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+		
+		sourceStage = vk::PipelineStageFlagBits::eTransfer;
+		destinationStage = vk::PipelineStageFlagBits::eFragmentShader;
 	}
-	else if (imageLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+	else if (imageLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eDepthAttachmentOptimal)
 	{
-		barrier.srcAccessMask = 0;
-		barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		barrier.srcAccessMask = vk::AccessFlags();
+		barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
 
-		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		sourceStage = vk::PipelineStageFlagBits::eTopOfPipe;
+		destinationStage = vk::PipelineStageFlagBits::eEarlyFragmentTests;
 	}
 	else
 	{
 		throw HanoException("unsupported layout transition");
 	}
 	
-	singleTimeCommands.buffer().pipelineBarrier(sourceStage, destinationStage, );
-	vkCmdPipelineBarrier(, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
-});
+	singleTimeCommands.buffer().pipelineBarrier(sourceStage, destinationStage, vk::DependencyFlags(), 0, nullptr, 0, nullptr, 1, &barrier);
 
-layout = newLayout;
+	imageLayout = newLayout;
 }
-#endif
+
+void Image::copyFrom(CommandPool& commandPool, vkh::Buffer const& buffer)
+{
+	SingleTimeCommands singleTimeCommands(commandPool);
+
+	vk::BufferImageCopy region = {};
+	region.bufferOffset = 0;
+	region.bufferRowLength = 0;
+	region.bufferImageHeight = 0;
+	region.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+	region.imageSubresource.mipLevel = 0;
+	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.layerCount = 1;
+	region.imageOffset = vk::Offset3D{ 0, 0, 0 };
+	region.imageExtent = vk::Extent3D{ extent.width, extent.height, 1 };
+
+	singleTimeCommands.buffer().copyBufferToImage(buffer.handle, handle, vk::ImageLayout::eTransferDstOptimal, { region });
+}

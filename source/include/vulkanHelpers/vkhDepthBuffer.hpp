@@ -14,7 +14,6 @@ namespace hano::vkh
 		VULKAN_NON_COPIABLE(DepthBuffer);
 
 		DepthBuffer(CommandPool& commandPool, vk::Extent2D extent);
-		~DepthBuffer();
 		
 		HANO_NODISCARD static bool hasStencilComponent(vk::Format format) noexcept;
 		
