@@ -59,14 +59,12 @@ namespace hano::vkh
 		VULKAN_NON_COPIABLE(SingleTimeCommands);
 		
 		SingleTimeCommands(CommandPool& pool)
-			: commandBuffers(pool, 1), commandPool(pool)
+			: commandPool(pool), commandBuffers(pool, 1)
 		{
-
-			VkCommandBufferBeginInfo beginInfo = {};
-			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-			beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-			vkBeginCommandBuffer(commandBuffers[0], &beginInfo);
+			vk::CommandBufferBeginInfo beginInfo = {};
+			beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+			
+			commandBuffers[0].begin(beginInfo);
 		}
 
 		operator vk::CommandBuffer()
@@ -87,7 +85,7 @@ namespace hano::vkh
 			submitInfo.commandBufferCount = 1;
 			submitInfo.pCommandBuffers = &commandBuffers[0];
 
-			const auto graphicsQueue = commandPool.device.graphicsQueue;
+			const auto graphicsQueue = commandPool.device.graphicsQueue();
 			VKH_CHECK(
 				graphicsQueue.submit(1, &submitInfo, nullptr), "failed to submit single time Command !");
 			graphicsQueue.waitIdle();

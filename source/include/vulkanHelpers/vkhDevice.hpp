@@ -57,18 +57,18 @@ namespace hano::vkh
 			if (presentFamily == queueFamilies.end())
 				throw HanoException("found no presentation queue");
 
-			graphicsFamilyIndex = static_cast<uint32>(graphicsFamily - queueFamilies.begin());
-			computeFamilyIndex = static_cast<uint32>(computeFamily - queueFamilies.begin());
-			presentFamilyIndex = static_cast<uint32>(presentFamily - queueFamilies.begin());
-			transferFamilyIndex = static_cast<uint32>(transferFamily - queueFamilies.begin());
+			m_graphicsFamilyIndex = static_cast<uint32>(graphicsFamily - queueFamilies.begin());
+			m_computeFamilyIndex = static_cast<uint32>(computeFamily - queueFamilies.begin());
+			m_presentFamilyIndex = static_cast<uint32>(presentFamily - queueFamilies.begin());
+			m_transferFamilyIndex = static_cast<uint32>(transferFamily - queueFamilies.begin());
 
 			// Queues can be the same
 			const std::set<uint32> uniqueQueueFamilies =
 			{
-				graphicsFamilyIndex,
-				computeFamilyIndex,
-				presentFamilyIndex,
-				transferFamilyIndex
+				m_graphicsFamilyIndex,
+				m_computeFamilyIndex,
+				m_presentFamilyIndex,
+				m_transferFamilyIndex
 			};
 
 			// Create queues
@@ -107,10 +107,10 @@ namespace hano::vkh
 
 			handle = physicalDevice.createDevice(createInfo, allocator);
 
-			handle.getQueue(graphicsFamilyIndex, 0, &graphicsQueue);
-			handle.getQueue(computeFamilyIndex, 0, &computeQueue);
-			handle.getQueue(presentFamilyIndex, 0, &presentQueue);
-			handle.getQueue(transferFamilyIndex, 0, &transferQueue);
+			handle.getQueue(m_graphicsFamilyIndex, 0, &m_graphicsQueue);
+			handle.getQueue(m_computeFamilyIndex, 0, &m_computeQueue);
+			handle.getQueue(m_presentFamilyIndex, 0, &m_presentQueue);
+			handle.getQueue(m_transferFamilyIndex, 0, &m_transferQueue);
 		}
 
 		~Device()
@@ -151,19 +151,30 @@ namespace hano::vkh
 		vk::Device handle;
 		vk::PhysicalDevice const physicalDevice;
 		vk::AllocationCallbacks* allocator;
-
 		Surface const& surface;
-		
-		uint32 graphicsFamilyIndex;
-		uint32 computeFamilyIndex;
-		uint32 presentFamilyIndex;
-		uint32 transferFamilyIndex;
-		
-		vk::Queue graphicsQueue;
-		vk::Queue computeQueue;
-		vk::Queue transferQueue;
-		vk::Queue presentQueue;
-
 		std::vector<const char*> requiredExtensions;
+
+		uint32 graphicsFamilyIndex() const { return m_graphicsFamilyIndex; }
+		uint32 computeFamilyIndex() const { return m_computeFamilyIndex; }
+		uint32 presentFamilyIndex() const { return m_presentFamilyIndex; }
+		uint32 transferFamilyIndex() const { return m_transferFamilyIndex; }
+
+		vk::Queue graphicsQueue() const { return m_graphicsQueue; }
+		vk::Queue computeQueue() const { return m_computeQueue; }
+		vk::Queue presentQueue() const { return m_presentQueue; }
+		vk::Queue transferQueue() const { return m_transferQueue; }
+		
+	private:
+		
+		uint32 m_graphicsFamilyIndex;
+		uint32 m_computeFamilyIndex;
+		uint32 m_presentFamilyIndex;
+		uint32 m_transferFamilyIndex;
+		
+		vk::Queue m_graphicsQueue;
+		vk::Queue m_computeQueue;
+		vk::Queue m_presentQueue;
+		vk::Queue m_transferQueue;
+
 	};
 }

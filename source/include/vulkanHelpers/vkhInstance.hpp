@@ -29,9 +29,10 @@ namespace hano::vkh
 	{
 		VULKAN_NON_COPIABLE(Instance);
 
-		Instance(const char* appName, const char* engineName, std::vector<const char*> ivalidationLayers, vk::AllocationCallbacks* alloc)
-			: allocator(alloc), validationLayers(ivalidationLayers)
+		Instance(const char* appName, const char* engineName, std::vector<const char*> ivalidationLayers, vk::AllocationCallbacks* alloc, GLFWwindow* win)
+			: allocator(alloc), validationLayers(ivalidationLayers), window(win)
 		{
+			assert(window);
 			// disable validation layers if none provided
 			if (validationLayersEnabled() && !checkValidationLayerSupport())
 				throw hano::HanoException("validation layers requested, but not available!");
@@ -97,6 +98,9 @@ namespace hano::vkh
 		std::vector<vk::PhysicalDevice> physicalDevices;
 		std::vector<vk::ExtensionProperties> extensions;
 		std::vector<const char*> validationLayers;
+
+		// @Review
+		GLFWwindow* window;
 		
 		private:
 

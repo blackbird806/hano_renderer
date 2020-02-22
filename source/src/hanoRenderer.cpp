@@ -13,7 +13,7 @@ Renderer::Renderer()
 	
 	m_instance = std::make_unique<vkh::Instance>("testApp", "hanoRendererEngine", 
 		std::vector(c_vulkanValidationLayers.begin(), c_vulkanValidationLayers.end()),
-		m_vkAllocator);
+		m_vkAllocator, m_window);
 
 	m_surface = std::make_unique<vkh::Surface>(*m_instance, m_window, m_vkAllocator);
 	m_device = std::make_unique<vkh::Device>(getSuitableDevice(), *m_surface, std::vector(c_vulkanDefaultRequiredExtentions.begin(), c_vulkanDefaultRequiredExtentions.end()), m_vkAllocator);

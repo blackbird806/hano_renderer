@@ -142,6 +142,7 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhImage.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhImageView.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhSurface.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhSwapchain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\include\core\hanoConfig.hpp" />
