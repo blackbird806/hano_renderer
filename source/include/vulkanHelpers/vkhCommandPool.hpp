@@ -7,7 +7,7 @@ namespace hano::vkh
 {
 	struct CommandPool
 	{
-		VULKAN_NON_COPIABLE(CommandPool);
+		VULKAN_NON_COPIABLE_NON_MOVABLE(CommandPool);
 
 		CommandPool(vkh::Device const& idevice, uint32 queueFamilyIndex, bool allowReset)
 			: device(idevice)

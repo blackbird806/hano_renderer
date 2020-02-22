@@ -24,5 +24,9 @@ namespace hano
 			std::unique_ptr<vkh::Instance> m_instance;
 			std::unique_ptr<vkh::Surface> m_surface;
 			std::unique_ptr<vkh::Device> m_device;
+			std::unique_ptr<vkh::Swapchain> m_swapchain;
+			std::unique_ptr<vkh::CommandPool> m_commandPool;
+			std::unique_ptr<vkh::CommandBuffers> m_commandBuffers;
+			std::unique_ptr<vkh::DepthBuffer> m_depthBuffer;
 	};
 }

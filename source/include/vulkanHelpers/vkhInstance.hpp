@@ -27,7 +27,7 @@ namespace hano::vkh
 	
 	struct Instance
 	{
-		VULKAN_NON_COPIABLE(Instance);
+		VULKAN_NON_COPIABLE_NON_MOVABLE(Instance);
 
 		Instance(const char* appName, const char* engineName, std::vector<const char*> ivalidationLayers, vk::AllocationCallbacks* alloc, GLFWwindow* win)
 			: allocator(alloc), validationLayers(ivalidationLayers), window(win)

@@ -39,11 +39,20 @@ namespace
 }
 
 DepthBuffer::DepthBuffer(CommandPool& commandPool, vk::Extent2D extent)
-	:	image(commandPool.device, extent, findDepthFormat(commandPool.device), vk::ImageTiling::eOptimal, vk::ImageUsageFlagBits::eDepthStencilAttachment),
-		imageView(commandPool.device, image.handle, image.format, vk::ImageAspectFlagBits::eDepth),
-		imageMemory(image.allocateMemory(vk::MemoryPropertyFlagBits::eDeviceLocal))
+	:	image(std::in_place, commandPool.device, extent, findDepthFormat(commandPool.device), vk::ImageTiling::eOptimal, vk::ImageUsageFlagBits::eDepthStencilAttachment),
+		imageMemory(std::in_place, image->allocateMemory(vk::MemoryPropertyFlagBits::eDeviceLocal)),
+		imageView(std::in_place, commandPool.device, image->handle, image->format, vk::ImageAspectFlagBits::eDepth)
 {
-	image.transitionImageLayout(commandPool, vk::ImageLayout::eDepthAttachmentOptimal);
+	image->transitionImageLayout(commandPool, vk::ImageLayout::eDepthStencilAttachmentOptimal);
+}
+
+DepthBuffer::~DepthBuffer()
+{
+	// @TODO code smell
+	// order of destruction is important
+	imageView.reset();
+	image.reset();
+	imageMemory.reset();
 }
 
 bool DepthBuffer::hasStencilComponent(vk::Format format) noexcept

@@ -70,6 +70,8 @@ Swapchain::~Swapchain()
 {
 	if (handle)
 	{
+		// images must be destroyed before the swapchain
+		imageViews.clear();
 		device.handle.destroySwapchainKHR(handle, device.allocator);
 	}
 }
@@ -157,7 +159,7 @@ vk::Extent2D Swapchain::chooseSwapExtent(GLFWwindow* window, const vk::SurfaceCa
 	}
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
-	vk::Extent2D actualExtent = {w, h};
+	vk::Extent2D actualExtent = {static_cast<uint32>(w), static_cast<uint32>(h)};
 
 	actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
 	actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));

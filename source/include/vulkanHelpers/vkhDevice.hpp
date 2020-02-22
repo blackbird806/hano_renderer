@@ -31,7 +31,7 @@ namespace hano::vkh
 	
 	struct Device
 	{
-		VULKAN_NON_COPIABLE(Device);
+		VULKAN_NON_COPIABLE_NON_MOVABLE(Device);
 
 		Device(vk::PhysicalDevice physDevice, Surface const& isurface, std::vector<const char*> irequiredExtensions, vk::AllocationCallbacks* alloc)
 			: physicalDevice(physDevice), surface(isurface), requiredExtensions(irequiredExtensions), allocator(alloc)

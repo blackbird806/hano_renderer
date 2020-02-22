@@ -2,7 +2,7 @@
 #include <vulkanHelpers/vkhDevice.hpp>
 
 hano::vkh::ImageView::ImageView(Device const& idevice, vk::Image img, vk::Format fmt,
-	vk::ImageAspectFlagBits aspectFlags)
+                                vk::ImageAspectFlagBits aspectFlags)
 	: device(idevice), image(img)
 {
 	vk::ImageViewCreateInfo createInfo = {};
@@ -18,18 +18,15 @@ hano::vkh::ImageView::ImageView(Device const& idevice, vk::Image img, vk::Format
 	createInfo.subresourceRange.levelCount = 1;
 	createInfo.subresourceRange.baseArrayLayer = 0;
 	createInfo.subresourceRange.layerCount = 1;
-
-	VKH_CHECK(
-		device.handle.createImageView(&createInfo, device.allocator, &handle)
-		, "failed to create ImageView !");
+	
+	handle = device.handle.createImageView(createInfo, device.allocator);
 }
 
 hano::vkh::ImageView::~ImageView()
 {
 	if (handle)
 	{
-		device.handle.destroyImageView(handle);
+		device.handle.destroyImageView(handle, device.allocator);
 		handle = nullptr;
 	}
 }
-

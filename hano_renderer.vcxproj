@@ -124,7 +124,11 @@
     <ClCompile>
       <AdditionalIncludeDirectories>;$(SolutionDir)source\include;$(SolutionDir)source\libraries;%VULKAN_SDK%\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\libraries\imgui\imgui.cpp" />
