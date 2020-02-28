@@ -137,11 +137,14 @@
     <ClCompile Include="source\libraries\imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_impl_vulkan.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="source\src\core\hanoFile.cpp" />
     <ClCompile Include="source\src\hanoRenderer.cpp" />
     <ClCompile Include="source\src\main.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhBuffer.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDepthBuffer.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorPool.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorSetLayout.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDeviceMemory.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhFence.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhFrameBuffer.cpp" />
@@ -149,12 +152,14 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhImageView.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhRenderPass.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhSemaphore.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhShaderModule.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhSurface.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhSwapchain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\include\core\hanoConfig.hpp" />
     <ClInclude Include="source\include\core\hanoException.hpp" />
+    <ClInclude Include="source\include\core\hanoFile.hpp" />
     <ClInclude Include="source\include\core\logger.hpp" />
     <ClInclude Include="source\include\hanoRenderer.hpp" />
     <ClInclude Include="source\include\vulkanHelper.hpp" />
@@ -163,13 +168,18 @@
     <ClInclude Include="source\include\vulkanHelpers\vkhCommandPool.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDebug.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDepthBuffer.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorBinding.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorPool.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorSetLayout.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDevice.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDeviceMemory.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhFence.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhFrameBuffer.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhGraphicsPipeline.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhImageView.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhRenderPass.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhSemaphore.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhShaderModule.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhSurface.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhSwapchain.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhUtility.hpp" />

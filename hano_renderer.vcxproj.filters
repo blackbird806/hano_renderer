@@ -48,6 +48,9 @@
     <ClCompile Include="source\libraries\imgui\imgui_widgets.cpp">
       <Filter>libraries\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\core\hanoFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\hanoRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -61,6 +64,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhDepthBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorSetLayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhDeviceMemory.cpp">
@@ -84,6 +93,9 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhSemaphore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\vkhShaderModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -96,6 +108,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\core\hanoException.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\core\hanoFile.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\core\logger.hpp">
@@ -122,6 +137,15 @@
     <ClInclude Include="source\include\vulkanHelpers\vkhDepthBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorBinding.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorPool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorSetLayout.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhDevice.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -132,6 +156,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhFrameBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhGraphicsPipeline.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhImage.hpp">
@@ -147,6 +174,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhSemaphore.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhShaderModule.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhSurface.hpp">
