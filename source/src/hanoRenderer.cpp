@@ -1,6 +1,7 @@
 #include <glfw/glfw3.h>
 #include <hanoRenderer.hpp>
 #include <map>
+#include <core/logger.hpp>
 
 using namespace hano;
 
@@ -25,15 +26,6 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-	// order of destruction is important
-	m_depthBuffer.reset();
-	m_swapchain.reset();
-	
-	m_commandPool.reset();
-	m_device.reset();
-	m_surface.reset();
-	m_instance.reset();
-	
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
 }

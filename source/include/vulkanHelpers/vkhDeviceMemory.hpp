@@ -6,8 +6,12 @@
 
 namespace hano::vkh
 {
+	// @Deprecated used only for static func findMemoryType
+	// may be recylcled later
 	struct DeviceMemory
 	{
+		static uint32 findMemoryType(vkh::Device const& device, uint32 typeFilter, vk::MemoryPropertyFlags props);
+
 		DeviceMemory(const DeviceMemory&) = delete;
 		DeviceMemory& operator = (const DeviceMemory&) = delete;
 		DeviceMemory& operator = (DeviceMemory&&) = delete;;
@@ -22,9 +26,5 @@ namespace hano::vkh
 		
 		vkh::Device const& device;
 		vk::DeviceMemory handle;
-
-		private:
-
-			uint32 findMemoryType(uint32 typeFilter, vk::MemoryPropertyFlags props) const;
 	};
 }

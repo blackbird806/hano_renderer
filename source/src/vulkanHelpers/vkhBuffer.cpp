@@ -5,7 +5,7 @@
 
 using namespace hano::vkh;
 
-Buffer::Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage)
+Buffer::Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memoryProps)
 	: device(idevice)
 {
 	vk::BufferCreateInfo bufferInfo = {};
@@ -16,23 +16,28 @@ Buffer::Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usa
 	VKH_CHECK(
 		device.handle.createBuffer(&bufferInfo, device.allocator, &handle),
 		"failed to create buffer !");
+
+	auto const requirements = device.handle.getBufferMemoryRequirements(handle);
+
+	vk::MemoryAllocateInfo allocInfo = {};
+	allocInfo.allocationSize = requirements.size;
+	allocInfo.memoryTypeIndex = vkh::DeviceMemory::findMemoryType(device, requirements.memoryTypeBits, memoryProps);
+	VKH_CHECK(
+		device.handle.allocateMemory(&allocInfo, device.allocator, &memory),
+		"failed to allocate device memory !");
+	device.handle.bindBufferMemory(handle, memory, 0);
 }
 
 Buffer::~Buffer()
 {
 	if (handle)
 	{
+		assert(memory);
 		device.handle.destroyBuffer(handle, device.allocator);
+		device.handle.freeMemory(memory, device.allocator);
 		handle = nullptr;
+		memory = nullptr;
 	}
-}
-
-DeviceMemory Buffer::allocateMemory(vk::MemoryPropertyFlags props)
-{
-	auto const requirements = device.handle.getBufferMemoryRequirements(handle);
-	DeviceMemory memory(device, requirements.size, requirements.memoryTypeBits, props);
-	device.handle.bindBufferMemory(handle, memory.handle, 0);
-	return memory;
 }
 
 void Buffer::copyFrom(CommandPool& commandPool, Buffer const& buffer, vk::DeviceSize size)

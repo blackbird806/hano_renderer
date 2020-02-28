@@ -13,8 +13,7 @@ DeviceMemory::DeviceMemory(vkh::Device const& idevice, size_t size, uint32 memor
 {
 	vk::MemoryAllocateInfo allocInfo = {};
 	allocInfo.allocationSize = size;
-	allocInfo.memoryTypeIndex = findMemoryType(memoryType, properties);
-
+	allocInfo.memoryTypeIndex = findMemoryType(device, memoryType, properties);
 	VKH_CHECK(
 		device.handle.allocateMemory(&allocInfo, device.allocator, &handle), 
 		"failed to allocate device memory !");
@@ -39,7 +38,7 @@ void DeviceMemory::unmap()
 	device.handle.unmapMemory(handle);
 }
 
-hano::uint32 DeviceMemory::findMemoryType(uint32 typeFilter, vk::MemoryPropertyFlags props) const
+hano::uint32 DeviceMemory::findMemoryType(vkh::Device const& device, uint32 typeFilter, vk::MemoryPropertyFlags props)
 {
 	vk::PhysicalDeviceMemoryProperties memProperties;
 	device.physicalDevice.getMemoryProperties(&memProperties);

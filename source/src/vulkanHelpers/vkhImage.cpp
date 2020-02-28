@@ -3,11 +3,12 @@
 #include <vulkanHelpers/vkhCommandBuffers.hpp>
 #include <vulkanHelpers/vkhDepthBuffer.hpp>
 #include <vulkanHelpers/vkhBuffer.hpp>
+#include <vulkanHelpers/vkhDeviceMemory.hpp>
 
 using namespace hano::vkh;
 
-Image::Image(vkh::Device const& idevice, vk::Extent2D ext, vk::Format fmt, vk::ImageTiling tiling,
-	vk::ImageUsageFlags usageFlags)
+Image::Image(vkh::Device const& idevice, vk::Extent2D ext, vk::Format fmt, vk::MemoryPropertyFlags memoryPropertyFlags, 
+	vk::ImageTiling tiling, vk::ImageUsageFlags usageFlags)
 	: device(idevice), extent(ext), format(fmt), imageLayout(vk::ImageLayout::eUndefined)
 {
 	vk::ImageCreateInfo imageInfo = {};
@@ -25,23 +26,31 @@ Image::Image(vkh::Device const& idevice, vk::Extent2D ext, vk::Format fmt, vk::I
 	imageInfo.samples = vk::SampleCountFlagBits::e1;
 
 	handle = device.handle.createImage(imageInfo, device.allocator);
+
+	auto const requirements = device.handle.getImageMemoryRequirements(handle);
+
+	vk::MemoryAllocateInfo allocInfo = {};
+	allocInfo.allocationSize = requirements.size;
+	allocInfo.memoryTypeIndex = vkh::DeviceMemory::findMemoryType(device, requirements.memoryTypeBits, memoryPropertyFlags);
+	VKH_CHECK(
+		device.handle.allocateMemory(&allocInfo, device.allocator, &memory),
+		"failed to allocate device memory !");
+
+	device.handle.bindImageMemory(handle, memory, 0);
 }
 
 Image::~Image()
 {
 	if (handle)
 	{
-		device.handle.destroy(device.allocator);
-		handle = nullptr;
-	}
-}
+		// if image is valid memory must also be
+		assert(memory);
 
-DeviceMemory Image::allocateMemory(vk::MemoryPropertyFlags propertyFlags) const
-{
-	auto const requirements = device.handle.getImageMemoryRequirements(handle);
-	DeviceMemory memory(device, requirements.size, requirements.memoryTypeBits, propertyFlags);
-	device.handle.bindImageMemory(handle, memory.handle, 0);
-	return memory;
+		device.handle.destroyImage(handle, device.allocator);
+		device.handle.freeMemory(memory, device.allocator);
+		handle = nullptr;
+		memory = nullptr;
+	}
 }
 
 void Image::transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newLayout)
