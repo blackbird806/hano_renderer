@@ -20,7 +20,7 @@ Renderer::Renderer()
 	m_device = std::make_unique<vkh::Device>(getSuitableDevice(), *m_surface, std::vector(c_vulkanDefaultRequiredExtentions.begin(), c_vulkanDefaultRequiredExtentions.end()), m_vkAllocator);
 	m_swapchain = std::make_unique<vkh::Swapchain>(*m_device, true/* @TODO user config */);
 	m_commandPool = std::make_unique<vkh::CommandPool>(*m_device, m_device->graphicsFamilyIndex(), true);
-	//m_commandBuffers = std::make_unique<vkh::CommandBuffers>(*m_commandPool, )
+	// m_commandBuffers = std::make_unique<vkh::CommandBuffers>(*m_commandPool, );
 	m_depthBuffer = std::make_unique<vkh::DepthBuffer>(*m_commandPool, m_swapchain->extent);
 }
 
