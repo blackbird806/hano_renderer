@@ -145,6 +145,7 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhDepthBuffer.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorPool.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorSetLayout.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorSets.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDeviceMemory.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhFence.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhFrameBuffer.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorBinding.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorPool.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorSetLayout.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorSets.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDevice.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDeviceMemory.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhFence.hpp" />
