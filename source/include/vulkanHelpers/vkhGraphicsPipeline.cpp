@@ -12,7 +12,7 @@
 using namespace hano::vkh;
 
 GraphicsPipeline::GraphicsPipeline(Swapchain const& swapChain_, DepthBuffer const& depthBuffer, bool isWireframe_)
-    : swapchain(&swapChain_), renderPass(*swapchain, depthBuffer, true, true), isWireframe(isWireframe_)
+    : swapchain(&swapChain_), renderPass(swapChain_, depthBuffer, true, true), isWireframe(isWireframe_)
 {
 	auto const& device = swapchain->device;
 	auto const bindingDescription = Vertex::getBindingDescription();
@@ -121,10 +121,9 @@ GraphicsPipeline::GraphicsPipeline(Swapchain const& swapChain_, DepthBuffer cons
 
 	pipelineLayout = device.handle.createPipelineLayoutUnique(pipelineLayoutInfo, device.allocator);
 
-	// Load shaders.
-	assert(false); // TODO shaders
-	ShaderModule const vertShader(device, "../assets/shaders/Graphics.vert.spv");
-	ShaderModule const fragShader(device, "../assets/shaders/Graphics.frag.spv");
+	// Load shaders
+	ShaderModule const vertShader(device, "assets/shaders/vertex.spv");
+	ShaderModule const fragShader(device, "assets/shaders/fragment.spv");
 
 	vk::PipelineShaderStageCreateInfo shaderStages[] =
 	{

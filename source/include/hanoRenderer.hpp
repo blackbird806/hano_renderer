@@ -13,6 +13,8 @@ namespace hano
 			Renderer();
 			~Renderer();
 		
+			void renderFrame();
+
 		private:
 
 			struct GLFWwindow* m_window;

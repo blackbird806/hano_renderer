@@ -7,7 +7,7 @@
 
 using namespace hano::vkh;
 
-Swapchain::Swapchain(Device const& idevice, bool vsync)
+Swapchain::Swapchain(Device const& idevice, bool vsync, Swapchain* oldSwapchain)
 	: device(idevice)
 {
 	auto const details = querySwapchainSupport(device.physicalDevice, device.surface.handle);
@@ -36,7 +36,7 @@ Swapchain::Swapchain(Device const& idevice, bool vsync)
 	createInfo.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
-	createInfo.oldSwapchain = nullptr;
+	createInfo.oldSwapchain = oldSwapchain ? oldSwapchain->handle : nullptr;
 
 	if (device.graphicsFamilyIndex() != device.presentFamilyIndex())
 	{

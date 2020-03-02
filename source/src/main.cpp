@@ -2,7 +2,12 @@
 
 int main()
 {
-	hano::Renderer renderer;
-	
+	{
+		hano::Renderer renderer;
+		while (true)
+		{
+			renderer.renderFrame();
+		}
+	}
     return 0;
 }

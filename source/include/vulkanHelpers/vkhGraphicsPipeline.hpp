@@ -1,12 +1,12 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
+#include "vkhDescriptorSetManager.hpp"
 #include "vkhRenderPass.hpp"
 
 namespace hano::vkh
 {
 	struct Swapchain;
-	struct DescriptorSetManager;
 
 	struct GraphicsPipeline
 	{
@@ -15,12 +15,12 @@ namespace hano::vkh
 							DepthBuffer const& depthBuffer,
 							bool isWireFrame);
 
-		vk::UniquePipeline handle;
-		vkh::RenderPass renderPass;
-		vk::UniquePipelineLayout pipelineLayout;
-		std::unique_ptr<DescriptorSetManager> descriptorSetManager;
-
 		Swapchain const* swapchain;
+		vkh::RenderPass renderPass;
+		std::unique_ptr<vkh::DescriptorSetManager> descriptorSetManager;
+		vk::UniquePipelineLayout pipelineLayout;
+		vk::UniquePipeline handle;
+
 		bool const isWireframe;
 	};
 }

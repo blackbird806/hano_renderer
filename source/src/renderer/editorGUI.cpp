@@ -13,7 +13,7 @@ namespace
 	void checkVulkanResultCallback(const VkResult err)
 	{
 		if (err != VK_SUCCESS)
-			HanoException(std::string("ImGui Vulkan error (") + to_string(vk::Result(err)) + ")");
+			throw HanoException(std::string("ImGui Vulkan error (") + to_string(vk::Result(err)) + ")");
 	}
 }
 
@@ -54,7 +54,7 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	vulkanInit.CheckVkResultFn = checkVulkanResultCallback;
 
 	if (!ImGui_ImplVulkan_Init(&vulkanInit, renderPass->handle.get()))
-		HanoException("failed to initialise ImGui vulkan adapter");
+		throw HanoException("failed to initialise ImGui vulkan adapter");
 
 	auto& io = ImGui::GetIO();
 	// No ini file.
@@ -75,7 +75,7 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	{
 		vkh::SingleTimeCommands commands(*vkContext->commandPool);
 		if (!ImGui_ImplVulkan_CreateFontsTexture(commands.buffer()))
-			HanoException("failed to create ImGui font textures");
+			throw HanoException("failed to create ImGui font textures");
 	}
 
 	//ImGui_ImplVulkan_DestroyFontUploadObjects();
@@ -88,13 +88,15 @@ EditorGUI::~EditorGUI()
 	ImGui::DestroyContext();
 }
 
-void EditorGUI::Render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer)
+void EditorGUI::render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer)
 {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui_ImplVulkan_NewFrame();
 	ImGui::NewFrame();
 
 	ImGui::ShowStyleEditor();
+	ImGui::ShowDemoWindow();
+	ImGui::ShowMetricsWindow();
 	ImGui::Render();
 
 	std::array<vk::ClearValue, 2> clearValues = {};
@@ -111,5 +113,5 @@ void EditorGUI::Render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& 
 
 	commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
-	commandBuffer.end();
+	commandBuffer.endRenderPass();
 }

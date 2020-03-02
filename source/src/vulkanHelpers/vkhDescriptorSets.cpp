@@ -18,13 +18,13 @@ DescriptorSets::DescriptorSets(DescriptorPool const& idescriptorPool, Descriptor
 	allocInfo.pSetLayouts = layouts.data();
 
 	descriptorSets.resize(size);
-	descriptorSets = descriptorPool->device->handle.allocateDescriptorSetsUnique(allocInfo);
+	descriptorSets = descriptorPool->device->handle.allocateDescriptorSets(allocInfo);
 }
 
 vk::WriteDescriptorSet DescriptorSets::bind(uint32_t index, uint32_t binding, const vk::DescriptorBufferInfo& bufferInfo, uint32_t count) const 
 {
 	vk::WriteDescriptorSet descriptorWrite = {};
-	descriptorWrite.dstSet = descriptorSets[index].get();
+	descriptorWrite.dstSet = descriptorSets[index];
 	descriptorWrite.dstBinding = binding;
 	descriptorWrite.dstArrayElement = 0;
 	descriptorWrite.descriptorType = bindigTypes.at(index);
@@ -37,7 +37,7 @@ vk::WriteDescriptorSet DescriptorSets::bind(uint32_t index, uint32_t binding, co
 vk::WriteDescriptorSet DescriptorSets::bind(uint32_t index, uint32_t binding, const vk::DescriptorImageInfo& imageInfo, uint32_t count) const 
 {
 	vk::WriteDescriptorSet descriptorWrite = {};
-	descriptorWrite.dstSet = descriptorSets[index].get();
+	descriptorWrite.dstSet = descriptorSets[index];
 	descriptorWrite.dstBinding = binding;
 	descriptorWrite.dstArrayElement = 0;
 	descriptorWrite.descriptorType = bindigTypes.at(index);
@@ -50,7 +50,7 @@ vk::WriteDescriptorSet DescriptorSets::bind(uint32_t index, uint32_t binding, co
 vk::WriteDescriptorSet DescriptorSets::bind(uint32_t index, uint32_t binding, const vk::WriteDescriptorSetAccelerationStructureNV& structureInfo, uint32_t count) const 
 {
 	vk::WriteDescriptorSet descriptorWrite = {};
-	descriptorWrite.dstSet = descriptorSets[index].get();
+	descriptorWrite.dstSet = descriptorSets[index];
 	descriptorWrite.dstBinding = binding;
 	descriptorWrite.dstArrayElement = 0;
 	descriptorWrite.descriptorType = bindigTypes.at(index);
@@ -67,5 +67,5 @@ void DescriptorSets::UpdateDescriptors(uint32_t index, std::vector<vk::WriteDesc
 
 vk::DescriptorSet DescriptorSets::handle(uint32_t index)
 {
-	return descriptorSets[index].get();
+	return descriptorSets[index];
 }

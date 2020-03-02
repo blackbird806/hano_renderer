@@ -10,3 +10,7 @@
 #include <vulkanHelpers/vkhImageView.hpp>
 #include <vulkanHelpers/vkhCommandPool.hpp>
 #include <vulkanHelpers/vkhCommandBuffers.hpp>
+#include <vulkanHelpers/vkhSemaphore.hpp>
+#include <vulkanHelpers/vkhFence.hpp>
+#include <vulkanHelpers/vkhFrameBuffer.hpp>
+#include <vulkanHelpers/vkhGraphicsPipeline.hpp>

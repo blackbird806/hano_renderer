@@ -14,7 +14,7 @@ namespace hano
 			EditorGUI(VulkanContext const& vkContext_);
 			~EditorGUI();
 
-			void Render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer);
+			void render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer);
 
 		private:
 

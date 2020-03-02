@@ -16,7 +16,7 @@ namespace hano::vkh
 	{
 		VULKAN_NON_COPIABLE_NON_MOVABLE(Swapchain);
 
-		Swapchain(Device const& idevice, bool vsync);
+		Swapchain(Device const& idevice, bool vsync, Swapchain* oldSwapChain = nullptr);
 		~Swapchain();
 		
 		struct SupportDetails

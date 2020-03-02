@@ -19,3 +19,14 @@ Renderer::~Renderer()
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
 }
+
+void Renderer::renderFrame()
+{
+	glfwPollEvents();
+	auto commandBuffer = vkContext.beginFrame();
+	if (commandBuffer)
+	{
+		editorGUI->render(*commandBuffer, vkContext.getCurrentFrameBuffer());
+		vkContext.endFrame();
+	}
+}

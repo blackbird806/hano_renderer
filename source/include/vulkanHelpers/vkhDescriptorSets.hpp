@@ -25,6 +25,6 @@ namespace hano::vkh
 
 			DescriptorPool const* descriptorPool;
 			std::unordered_map<uint32_t, vk::DescriptorType> bindigTypes;
-			std::vector<vk::UniqueDescriptorSet> descriptorSets;
+			std::vector<vk::DescriptorSet> descriptorSets;
 	};
 }
