@@ -64,3 +64,8 @@ void DescriptorSets::UpdateDescriptors(uint32_t index, std::vector<vk::WriteDesc
 {
 	descriptorPool->device->handle.updateDescriptorSets(descriptorWrites, {});
 }
+
+vk::DescriptorSet DescriptorSets::handle(uint32_t index)
+{
+	return descriptorSets[index].get();
+}
