@@ -15,6 +15,9 @@ namespace hano
 
 	struct VulkanContext
 	{
+		static vkh::Device& getDevice();
+		static vkh::CommandPool& getCommandPool();
+
 		void init(GLFWwindow* window, VulkanConfig const& config);
 
 		std::vector<vk::PhysicalDevice> const& getPhysicalDevices() const;
@@ -29,5 +32,9 @@ namespace hano
 		std::unique_ptr<vkh::CommandPool> commandPool;
 		std::unique_ptr<vkh::CommandBuffers> commandBuffers;
 		std::unique_ptr<vkh::DepthBuffer> depthBuffer;
+
+		private:
+			static vkh::Device* global_device;
+			static vkh::CommandPool* global_commandPool;
 	};
 }

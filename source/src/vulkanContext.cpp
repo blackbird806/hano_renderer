@@ -2,6 +2,21 @@
 
 using namespace hano;
 
+vkh::Device* VulkanContext::global_device = nullptr;
+vkh::CommandPool* VulkanContext::global_commandPool = nullptr;
+
+vkh::Device& VulkanContext::getDevice()
+{
+	assert(global_device);
+	return *global_device;
+}
+
+vkh::CommandPool& VulkanContext::getCommandPool()
+{
+	assert(global_commandPool);
+	return *global_commandPool;
+}
+
 void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
 {
 	assert(window);
@@ -15,6 +30,8 @@ void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
 	commandPool = std::make_unique<vkh::CommandPool>(*device, device->graphicsFamilyIndex(), true);
 	// commandBuffers = std::make_unique<vkh::CommandBuffers>(*commandPool, );
 	depthBuffer = std::make_unique<vkh::DepthBuffer>(*commandPool, swapchain->extent);
+
+	global_device = device.get();
 }
 
 std::vector<vk::PhysicalDevice> const& hano::VulkanContext::getPhysicalDevices() const

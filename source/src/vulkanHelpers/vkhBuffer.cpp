@@ -6,7 +6,7 @@
 using namespace hano::vkh;
 
 Buffer::Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memoryProps)
-	: device(idevice)
+	: device(idevice), m_size(size)
 {
 	vk::BufferCreateInfo bufferInfo = {};
 	bufferInfo.size = size;
@@ -45,6 +45,15 @@ void Buffer::copyFrom(CommandPool& commandPool, Buffer const& buffer, vk::Device
 	SingleTimeCommands singleTimeCommands(commandPool);
 	vk::BufferCopy copyRegion;
 	copyRegion.size = size;
-
 	singleTimeCommands.buffer().copyBuffer(buffer.handle, handle, 1, &copyRegion);
+}
+
+void* Buffer::map(vk::DeviceSize offset)
+{
+	return device.handle.mapMemory(memory, offset, m_size, vk::MemoryMapFlagBits());
+}
+
+void Buffer::unMap()
+{
+	device.handle.unmapMemory(memory);
 }

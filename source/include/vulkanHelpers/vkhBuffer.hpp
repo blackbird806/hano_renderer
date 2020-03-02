@@ -16,10 +16,17 @@ namespace hano::vkh
 		Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags props);
 		~Buffer();
 
-		void copyFrom(CommandPool& commandPool, Buffer const& buffer, vk::DeviceSize);
+		void* map(vk::DeviceSize offset = 0);
+		void  unMap();
+
+		void copyFrom(CommandPool& commandPool, Buffer const& buffer, vk::DeviceSize size);
 		
 		vkh::Device const& device;
 		vk::Buffer handle;
 		vk::DeviceMemory memory;
+
+		private:
+
+		vk::DeviceSize m_size;
 	};
 }

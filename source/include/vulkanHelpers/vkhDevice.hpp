@@ -175,6 +175,5 @@ namespace hano::vkh
 		vk::Queue m_computeQueue;
 		vk::Queue m_presentQueue;
 		vk::Queue m_transferQueue;
-
 	};
 }
