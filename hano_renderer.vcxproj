@@ -141,6 +141,7 @@
     <ClCompile Include="source\src\core\hanoFile.cpp" />
     <ClCompile Include="source\src\hanoRenderer.cpp" />
     <ClCompile Include="source\src\main.cpp" />
+    <ClCompile Include="source\src\renderer\editorGUI.cpp" />
     <ClCompile Include="source\src\renderer\mesh.cpp" />
     <ClCompile Include="source\src\vulkanContext.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhBuffer.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="source\include\core\hanoFile.hpp" />
     <ClInclude Include="source\include\core\logger.hpp" />
     <ClInclude Include="source\include\hanoRenderer.hpp" />
+    <ClInclude Include="source\include\renderer\editorGUI.hpp" />
     <ClInclude Include="source\include\renderer\mesh.hpp" />
     <ClInclude Include="source\include\renderer\vertex.hpp" />
     <ClInclude Include="source\include\vulkanContext.hpp" />

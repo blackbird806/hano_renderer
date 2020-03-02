@@ -4,6 +4,7 @@
 #include <imgui/imgui_impl_vulkan.h>
 #include <core/hanoException.hpp>
 #include <vulkanHelpers/vkhDescriptorBinding.hpp>
+#include <vulkanHelpers/vkhSwapchain.hpp>
 
 using namespace hano;
 
@@ -19,17 +20,16 @@ namespace
 EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	: vkContext(&vkContext_)
 {
-	const auto& device = vkContext->device;
-	const auto& window = vkContext->surface->instance.window;
+	auto const& device = *vkContext->device;
+	auto const& window = vkContext->surface->instance.window;
 
 	// Initialise descriptor pool and render pass for ImGui.
-	std::vector<vkh::DescriptorBinding> const descriptorBindings =
-	{
+	std::vector<vkh::DescriptorBinding> const descriptorBindings = {
 		{0, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlags()},
 	};
 
 	descriptorPool = std::make_unique<vkh::DescriptorPool>(device, descriptorBindings, 1);
-	renderPass = std::make_unique<vkh::RenderPass>(vkContext->swapchain, vkContext->depthBuffer, false, false);
+	renderPass = std::make_unique<vkh::RenderPass>(*vkContext->swapchain, *vkContext->depthBuffer, false, false);
 
 	// Initialise ImGui
 	IMGUI_CHECKVERSION();
@@ -41,11 +41,11 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 
 	// Initialise ImGui Vulkan adapter
 	ImGui_ImplVulkan_InitInfo vulkanInit = {};
-	vulkanInit.Instance = device->surface.instance.handle;
-	vulkanInit.PhysicalDevice = device->physicalDevice;
-	vulkanInit.Device = device->handle;
-	vulkanInit.QueueFamily = device->graphicsFamilyIndex();
-	vulkanInit.Queue = device->graphicsQueue();
+	vulkanInit.Instance = device.surface.instance.handle;
+	vulkanInit.PhysicalDevice = device.physicalDevice;
+	vulkanInit.Device = device.handle;
+	vulkanInit.QueueFamily = device.graphicsFamilyIndex();
+	vulkanInit.Queue = device.graphicsQueue();
 	vulkanInit.PipelineCache = nullptr;
 	vulkanInit.DescriptorPool = descriptorPool->handle.get();
 	vulkanInit.MinImageCount = vkContext->swapchain->minImageCount;
@@ -90,5 +90,26 @@ EditorGUI::~EditorGUI()
 
 void EditorGUI::Render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer)
 {
+	ImGui_ImplGlfw_NewFrame();
+	ImGui_ImplVulkan_NewFrame();
+	ImGui::NewFrame();
 
+	ImGui::ShowStyleEditor();
+	ImGui::Render();
+
+	std::array<vk::ClearValue, 2> clearValues = {};
+	clearValues[0].color = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
+	clearValues[1].depthStencil = { 1.0f, 0 };
+
+	vk::RenderPassBeginInfo renderPassInfo = {};
+	renderPassInfo.renderPass = renderPass->handle.get();
+	renderPassInfo.framebuffer = framebuffer.handle.get();
+	renderPassInfo.renderArea.offset = { 0, 0 };
+	renderPassInfo.renderArea.extent = renderPass->swapchain->extent;
+	renderPassInfo.clearValueCount = 0;// static_cast<uint32_t>(clearValues.size());
+	renderPassInfo.pClearValues = clearValues.data();
+
+	commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+	commandBuffer.end();
 }

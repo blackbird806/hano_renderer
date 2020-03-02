@@ -10,10 +10,11 @@ namespace hano
 {
 	class EditorGUI
 	{
-		EditorGUI(VulkanContext const& vkContext_);
-		~EditorGUI();
+		public:
+			EditorGUI(VulkanContext const& vkContext_);
+			~EditorGUI();
 
-		void Render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer);
+			void Render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer);
 
 		private:
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <renderer/editorGUI.hpp>
 #include "vulkanContext.hpp"
 
 namespace hano
@@ -16,5 +17,6 @@ namespace hano
 
 			struct GLFWwindow* m_window;
 			VulkanContext vkContext;
+			std::unique_ptr<EditorGUI> editorGUI;
 	};
 }
