@@ -131,6 +131,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\include\vulkanHelpers\vkhGraphicsPipeline.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_demo.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_draw.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorBinding.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorPool.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorSetLayout.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorSetManager.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorSets.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDevice.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDeviceMemory.hpp" />

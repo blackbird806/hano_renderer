@@ -111,9 +111,6 @@ GraphicsPipeline::GraphicsPipeline(Swapchain const& swapChain_, DepthBuffer cons
 
 	// Create pipeline layout and render pass.
 
-
-	//pipelineLayout_.reset(new class PipelineLayout(device, descriptorSetManager_->DescriptorSetLayout()));
-
 	vk::DescriptorSetLayout descriptorSetLayouts[] = { descriptorSetManager->descriptorSetLayout->handle.get()};
 
 	vk::PipelineLayoutCreateInfo pipelineLayoutInfo = {};
