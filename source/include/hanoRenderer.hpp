@@ -4,6 +4,8 @@
 #include <renderer/editorGUI.hpp>
 #include "vulkanContext.hpp"
 
+struct GLFWwindow;
+
 namespace hano
 {
 	class Renderer
@@ -17,7 +19,9 @@ namespace hano
 
 		private:
 
-			struct GLFWwindow* m_window;
+			static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+
+			GLFWwindow* m_window;
 			VulkanContext vkContext;
 			std::unique_ptr<EditorGUI> editorGUI;
 	};

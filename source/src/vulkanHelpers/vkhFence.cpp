@@ -19,5 +19,5 @@ void Fence::reset()
 
 void Fence::wait(uint64 timeout)
 {
-    device->handle.waitForFences(handle.get(), timeout, VK_TRUE);
+    device->handle.waitForFences(handle.get(), VK_TRUE, timeout);
 }

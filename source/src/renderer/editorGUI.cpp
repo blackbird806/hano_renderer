@@ -10,7 +10,7 @@ using namespace hano;
 
 namespace 
 {
-	void checkVulkanResultCallback(const VkResult err)
+	void checkVulkanResultCallback(VkResult err)
 	{
 		if (err != VK_SUCCESS)
 			throw HanoException(std::string("ImGui Vulkan error (") + to_string(vk::Result(err)) + ")");
@@ -50,7 +50,7 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	vulkanInit.DescriptorPool = descriptorPool->handle.get();
 	vulkanInit.MinImageCount = vkContext->swapchain->minImageCount;
 	vulkanInit.ImageCount = static_cast<uint32_t>(vkContext->swapchain->images.size());
-	vulkanInit.Allocator = nullptr;
+	vulkanInit.Allocator = reinterpret_cast<VkAllocationCallbacks const*>(device.allocator);
 	vulkanInit.CheckVkResultFn = checkVulkanResultCallback;
 
 	if (!ImGui_ImplVulkan_Init(&vulkanInit, renderPass->handle.get()))
@@ -108,7 +108,7 @@ void EditorGUI::render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& 
 	renderPassInfo.framebuffer = framebuffer.handle.get();
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = renderPass->swapchain->extent;
-	renderPassInfo.clearValueCount = 0;// static_cast<uint32_t>(clearValues.size());
+	renderPassInfo.clearValueCount = static_cast<uint32>(clearValues.size());
 	renderPassInfo.pClearValues = clearValues.data();
 
 	commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);

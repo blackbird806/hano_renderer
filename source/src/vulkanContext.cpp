@@ -1,4 +1,8 @@
 #include <vulkanContext.hpp>
+
+// @Review
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_vulkan.h>
 #undef max
 
 using namespace hano;
@@ -21,6 +25,7 @@ vkh::CommandPool& VulkanContext::getCommandPool()
 void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
 {
 	assert(window);
+	m_window = window;
 	instance = std::make_unique<vkh::Instance>(config.appName, config.engineName,
 		std::vector(c_vulkanValidationLayers.begin(), c_vulkanValidationLayers.end()),
 		vkAllocator, window);
@@ -109,15 +114,25 @@ void VulkanContext::deleteSwapchain()
 
 void VulkanContext::recreateSwapchain()
 {
+	// @Review
+	int width = 0, height = 0;
+	glfwGetFramebufferSize(m_window, &width, &height);
+	while (width == 0 || height == 0) 
+	{
+		glfwGetFramebufferSize(m_window, &width, &height);
+		glfwWaitEvents();
+	}
+
 	device->handle.waitIdle();
 	deleteSwapchain();
 	createSwapchain();
+	onRecreateSwapchain();
 }
 
 std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
 {
-	auto const noTimeout = std::numeric_limits<uint64_t>::max();
-
+	auto constexpr noTimeout = std::numeric_limits<uint64>::max();
+	
 	auto& inFlightFence = m_inFlightFences[m_currentFrame];
 	auto imageAvailableSemaphore = m_imageAvailableSemaphores[m_currentFrame].handle.get();
 	auto renderFinishedSemaphore = m_renderFinishedSemaphores[m_currentFrame].handle.get();
@@ -128,14 +143,15 @@ std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
 	imageIndex = result.value;
 	m_result = result.result;
 
-	if (result.result == vk::Result::eErrorOutOfDateKHR)
+	if (result.result == vk::Result::eErrorOutOfDateKHR || result.result == vk::Result::eSuboptimalKHR || frameBufferResized)
 	{
+		frameBufferResized = false;
 		recreateSwapchain();
-		// TODO
-		return {};
-	}
 
-	if (result.result != vk::Result::eSuccess && result.result != vk::Result::eSuboptimalKHR)
+		// @TODO
+		return {};
+	} 
+	else if (result.result != vk::Result::eSuccess)
 	{
 		throw HanoException(std::string("failed to acquire next image (") + to_string(result.result) + ")");
 	}
@@ -175,12 +191,12 @@ void VulkanContext::endFrame()
 	vk::CommandBuffer cmdBuff[] = { commandBuffer };
 
 	vk::SubmitInfo submitInfo = {};
-	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.waitSemaphoreCount = std::size(waitSemaphores);
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = std::size(cmdBuff);
 	submitInfo.pCommandBuffers = cmdBuff;
-	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.signalSemaphoreCount = std::size(signalSemaphores);
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
 	inFlightFence.reset();
@@ -189,9 +205,9 @@ void VulkanContext::endFrame()
 
 	vk::SwapchainKHR swapchains[] = { swapchain->handle };
 	vk::PresentInfoKHR presentInfo = {};
-	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.waitSemaphoreCount = std::size(signalSemaphores);
 	presentInfo.pWaitSemaphores = signalSemaphores;
-	presentInfo.swapchainCount = 1;
+	presentInfo.swapchainCount = std::size(swapchains);
 	presentInfo.pSwapchains = swapchains;
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr; // Optional

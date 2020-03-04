@@ -3,6 +3,7 @@
 #define WIN32_LEAN_AND_MEAN // avoid unecessary includes and macros
 #include <memory>
 #include <optional>
+#include <functional>
 #include <glfw/glfw3.h>
 #include "vulkanHelpers.hpp"
 
@@ -46,6 +47,9 @@ namespace hano
 		std::unique_ptr<vkh::DepthBuffer> depthBuffer;
 		std::unique_ptr<vkh::GraphicsPipeline> graphicsPipeline;
 
+		bool frameBufferResized = false;
+		std::function<void()> onRecreateSwapchain;
+
 		private:
 			
 			uint64 m_currentFrame = 0;
@@ -53,6 +57,7 @@ namespace hano
 			vk::CommandBuffer commandBuffer;
 			vk::Result m_result;
 
+			GLFWwindow* m_window = nullptr;
 			std::vector<vkh::Semaphore> m_imageAvailableSemaphores;
 			std::vector<vkh::Semaphore> m_renderFinishedSemaphores;
 			std::vector<vkh::Fence> m_inFlightFences;

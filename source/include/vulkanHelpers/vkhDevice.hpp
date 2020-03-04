@@ -150,7 +150,7 @@ namespace hano::vkh
 		
 		vk::Device handle;
 		vk::PhysicalDevice const physicalDevice;
-		vk::AllocationCallbacks* allocator;
+		vk::AllocationCallbacks const* allocator;
 		Surface const& surface;
 		std::vector<const char*> requiredExtensions;
 

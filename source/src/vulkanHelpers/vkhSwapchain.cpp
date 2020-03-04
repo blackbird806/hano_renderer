@@ -149,14 +149,9 @@ vk::PresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<vk::Presen
 
 vk::Extent2D Swapchain::chooseSwapExtent(GLFWwindow* window, const vk::SurfaceCapabilitiesKHR& capabilities)
 {
-	// Vulkan tells us to match the resolution of the window by setting the width and height in the currentExtent member.
-	// However, some window managers do allow us to differ here and this is indicated by setting the width and height in
-	// currentExtent to a special value: the maximum value of uint32_t. In that case we'll pick the resolution that best 
-	// matches the window within the minImageExtent and maxImageExtent bounds.
-	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
-	{
+	if (capabilities.currentExtent.width != std::numeric_limits<uint32>::max())
 		return capabilities.currentExtent;
-	}
+
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
 	vk::Extent2D actualExtent = {static_cast<uint32>(w), static_cast<uint32>(h)};
