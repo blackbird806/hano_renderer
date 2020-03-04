@@ -15,6 +15,7 @@ namespace hano
 			~EditorGUI();
 
 			void render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer);
+			void handleSwapchainRecreation();
 
 		private:
 

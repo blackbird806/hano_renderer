@@ -52,7 +52,7 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	vulkanInit.ImageCount = static_cast<uint32_t>(vkContext->swapchain->images.size());
 	vulkanInit.Allocator = reinterpret_cast<VkAllocationCallbacks const*>(device.allocator);
 	vulkanInit.CheckVkResultFn = checkVulkanResultCallback;
-
+	
 	if (!ImGui_ImplVulkan_Init(&vulkanInit, renderPass->handle.get()))
 		throw HanoException("failed to initialise ImGui vulkan adapter");
 
@@ -86,6 +86,12 @@ EditorGUI::~EditorGUI()
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void EditorGUI::handleSwapchainRecreation()
+{
+	renderPass = std::make_unique<vkh::RenderPass>(*vkContext->swapchain, *vkContext->depthBuffer, false, false);
+	ImGui_ImplVulkan_SetMinImageCount(vkContext->swapchain->minImageCount);
 }
 
 void EditorGUI::render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer)

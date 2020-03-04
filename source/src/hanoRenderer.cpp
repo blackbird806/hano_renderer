@@ -22,8 +22,7 @@ Renderer::Renderer()
 	vkContext.init(m_window, { .appName = "hanoRtx", .engineName = "hanoRenderer" });
 	editorGUI = std::make_unique<EditorGUI>(vkContext);
 	vkContext.onRecreateSwapchain = [&]() {
-		editorGUI.reset();
-		editorGUI = std::make_unique<EditorGUI>(vkContext);
+		editorGUI->handleSwapchainRecreation();
 	};
 }
 
