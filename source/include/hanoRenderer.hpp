@@ -17,6 +17,8 @@ namespace hano
 		
 			void renderFrame();
 
+			bool isRunning() const noexcept;
+
 		private:
 
 			static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
@@ -24,5 +26,6 @@ namespace hano
 			GLFWwindow* m_window;
 			VulkanContext vkContext;
 			std::unique_ptr<EditorGUI> editorGUI;
+			bool m_isRunning;
 	};
 }

@@ -11,6 +11,7 @@ namespace hano
 	class EditorGUI
 	{
 		public:
+
 			EditorGUI(VulkanContext const& vkContext_);
 			~EditorGUI();
 

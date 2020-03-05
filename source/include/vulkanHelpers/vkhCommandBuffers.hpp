@@ -25,10 +25,7 @@ namespace hano::vkh
 		~CommandBuffers()
 		{
 			if (!commandBuffers.empty())
-			{
 				commandPool.device.handle.freeCommandBuffers(commandPool.handle, commandBuffers);
-				commandBuffers.clear();
-			}
 		}
 
 		HANO_NODISCARD vk::CommandBuffer begin(size_t i)

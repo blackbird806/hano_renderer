@@ -102,7 +102,7 @@ GraphicsPipeline::GraphicsPipeline(Swapchain const& swapChain_, DepthBuffer cons
 	{
 		{0, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eVertex},
 		{1, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment},
-		{2, 1 , vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment}
+		{2, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment}
 	};
 
 	descriptorSetManager = std::make_unique<DescriptorSetManager>(device, descriptorBindings, 8192);

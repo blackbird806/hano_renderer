@@ -2,6 +2,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_vulkan.h>
+#include <imguizmo/ImGuizmo.h>
 #include <core/hanoException.hpp>
 #include <vulkanHelpers/vkhDescriptorBinding.hpp>
 #include <vulkanHelpers/vkhSwapchain.hpp>
@@ -59,6 +60,19 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	auto& io = ImGui::GetIO();
 	// No ini file.
 	io.IniFilename = nullptr;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+
+	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
+
 	// Window scaling and style.
 	float xscale;
 	float yscale;
@@ -100,7 +114,8 @@ void EditorGUI::render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& 
 	ImGui_ImplVulkan_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::ShowStyleEditor();
+	ImGuizmo::BeginFrame();
+
 	ImGui::ShowDemoWindow();
 	ImGui::ShowMetricsWindow();
 	ImGui::Render();

@@ -132,6 +132,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\include\vulkanHelpers\vkhGraphicsPipeline.cpp" />
+    <ClCompile Include="source\libraries\imguizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="source\libraries\imguizmo\ImGradient.cpp" />
+    <ClCompile Include="source\libraries\imguizmo\ImGuizmo.cpp" />
+    <ClCompile Include="source\libraries\imguizmo\ImSequencer.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_demo.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_draw.cpp" />
@@ -144,12 +148,14 @@
     <ClCompile Include="source\src\renderer\editorGUI.cpp" />
     <ClCompile Include="source\src\renderer\mesh.cpp" />
     <ClCompile Include="source\src\vulkanContext.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhNvRTXExtension.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhBuffer.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDepthBuffer.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorPool.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorSetLayout.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorSets.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhDevice.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDeviceMemory.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhFence.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhFrameBuffer.cpp" />
@@ -169,9 +175,12 @@
     <ClInclude Include="source\include\hanoRenderer.hpp" />
     <ClInclude Include="source\include\renderer\editorGUI.hpp" />
     <ClInclude Include="source\include\renderer\mesh.hpp" />
+    <ClInclude Include="source\include\renderer\scene.hpp" />
+    <ClInclude Include="source\include\renderer\UniformBuffer.hpp" />
     <ClInclude Include="source\include\renderer\vertex.hpp" />
     <ClInclude Include="source\include\vulkanContext.hpp" />
     <ClInclude Include="source\include\vulkanHelpers.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhNvRTXExtension.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhCommandBuffers.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhCommandPool.hpp" />
@@ -343,6 +352,10 @@
     <ClInclude Include="source\libraries\glm\vec3.hpp" />
     <ClInclude Include="source\libraries\glm\vec4.hpp" />
     <ClInclude Include="source\libraries\glm\vector_relational.hpp" />
+    <ClInclude Include="source\libraries\imguizmo\ImCurveEdit.h" />
+    <ClInclude Include="source\libraries\imguizmo\ImGradient.h" />
+    <ClInclude Include="source\libraries\imguizmo\ImGuizmo.h" />
+    <ClInclude Include="source\libraries\imguizmo\ImSequencer.h" />
     <ClInclude Include="source\libraries\imgui\imconfig.h" />
     <ClInclude Include="source\libraries\imgui\imgui.h" />
     <ClInclude Include="source\libraries\imgui\imgui_impl_glfw.h" />

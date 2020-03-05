@@ -38,12 +38,12 @@ void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
 	global_device = device.get();
 }
 
-std::vector<vk::PhysicalDevice> const& hano::VulkanContext::getPhysicalDevices() const
+std::vector<vk::PhysicalDevice> const& VulkanContext::getPhysicalDevices() const
 {
 	return instance->physicalDevices;
 }
 
-std::vector<vk::ExtensionProperties> const& hano::VulkanContext::getExtensions() const
+std::vector<vk::ExtensionProperties> const& VulkanContext::getExtensions() const
 {
 	return instance->extensions;
 }

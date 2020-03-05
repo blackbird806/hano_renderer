@@ -4,7 +4,7 @@ int main()
 {
 	{
 		hano::Renderer renderer;
-		while (true)
+		while (renderer.isRunning())
 		{
 			renderer.renderFrame();
 		}

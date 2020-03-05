@@ -3,6 +3,8 @@
 #include <vulkan/vulkan.hpp>
 #include <array>
 #include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 
 namespace hano
 {
@@ -47,6 +49,23 @@ namespace hano
 			attributeDescriptions[3].offset = offsetof(Vertex, matIndex);
 
 			return attributeDescriptions;
+		}
+
+		bool operator==(Vertex const& other) const
+		{
+			return pos == other.pos && normal == other.normal && texCoord == other.texCoord && matIndex == other.matIndex;
+		}
+	};
+}
+
+namespace std {
+	template<> struct hash<hano::Vertex> {
+		size_t operator()(hano::Vertex const& vertex) const {
+			return (
+				(hash<glm::vec3>()(vertex.pos) ^
+				(hash<glm::vec3>()(vertex.normal) << 1)) >> 1) ^
+				(hash<glm::vec2>()(vertex.texCoord) << 1) ^
+				vertex.matIndex;
 		}
 	};
 }
