@@ -122,13 +122,13 @@ GraphicsPipeline::GraphicsPipeline(Swapchain const& swapChain_, DepthBuffer cons
 	pipelineLayout = device.handle.createPipelineLayoutUnique(pipelineLayoutInfo, device.allocator);
 
 	// Load shaders
-	ShaderModule const vertShader(device, "assets/shaders/vertex.spv");
-	ShaderModule const fragShader(device, "assets/shaders/fragment.spv");
+	ShaderModule const vertShader(device, "assets/shaders/vertex.spv", vk::ShaderStageFlagBits::eVertex);
+	ShaderModule const fragShader(device, "assets/shaders/fragment.spv", vk::ShaderStageFlagBits::eFragment);
 
 	vk::PipelineShaderStageCreateInfo shaderStages[] =
 	{
-		vertShader.createShaderStageInfo(vk::ShaderStageFlagBits::eVertex),
-		fragShader.createShaderStageInfo(vk::ShaderStageFlagBits::eFragment)
+		vertShader.createShaderStageInfo(),
+		fragShader.createShaderStageInfo()
 	};
 
 	// Create graphic pipeline

@@ -80,13 +80,13 @@ void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances)
 {
 	if (m_indexCount > 0)
 	{
-		commandBuffer.bindIndexBuffer(m_indexBuffer->handle, 0, vk::IndexType::eUint32);
-		commandBuffer.bindVertexBuffers(0, { m_vertexBuffer->handle }, { 0 });
+		commandBuffer.bindIndexBuffer(m_indexBuffer->handle.get(), 0, vk::IndexType::eUint32);
+		commandBuffer.bindVertexBuffers(0, { m_vertexBuffer->handle.get() }, { 0 });
 		commandBuffer.drawIndexed(m_indexCount, instances, 0, 0, 0);
 	}
 	else
 	{
-		commandBuffer.bindVertexBuffers(0, { m_vertexBuffer->handle }, { 0 });
+		commandBuffer.bindVertexBuffers(0, { m_vertexBuffer->handle.get() }, { 0 });
 		commandBuffer.draw(m_vertexCount, instances, 0, 0);
 	}
 }

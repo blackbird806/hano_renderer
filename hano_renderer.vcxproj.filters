@@ -78,6 +78,9 @@
     <ClCompile Include="source\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\renderer\camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\renderer\editorGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,7 +90,16 @@
     <ClCompile Include="source\src\vulkanContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhAccelerationStructure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhNvRTXExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhRaytracingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhShaderBindingTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhBuffer.cpp">
@@ -158,7 +170,16 @@
     <ClInclude Include="source\include\hanoRenderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\renderer\camera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\renderer\editorGUI.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\renderer\light.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\renderer\material.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\renderer\mesh.hpp">
@@ -179,7 +200,19 @@
     <ClInclude Include="source\include\vulkanHelpers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhAccelerationStructure.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhBottomLevelAS.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhNvRTXExtension.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhRaytracingPipeline.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhShaderBindingTable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp">

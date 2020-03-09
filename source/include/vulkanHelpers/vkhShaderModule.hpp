@@ -10,12 +10,13 @@ namespace hano::vkh
 
 	struct ShaderModule
 	{
-		ShaderModule(Device const& device, std::string const& filename);
-		ShaderModule(Device const& device, std::vector<char> const& code);
+		ShaderModule(Device const& device, std::string const& filename, vk::ShaderStageFlagBits shaderStage_);
+		ShaderModule(Device const& device, std::vector<char> const& code, vk::ShaderStageFlagBits shaderStage_);
 
-		vk::PipelineShaderStageCreateInfo createShaderStageInfo(vk::ShaderStageFlagBits stageBits) const;
+		vk::PipelineShaderStageCreateInfo createShaderStageInfo() const;
 
 		vkh::Device const* device;
+		vk::ShaderStageFlagBits shaderStage;
 		vk::UniqueShaderModule handle;
 	};
 }

@@ -6,38 +6,23 @@
 using namespace hano::vkh;
 
 Buffer::Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memoryProps)
-	: device(idevice), m_size(size)
+	: device(&idevice), m_size(size)
 {
 	vk::BufferCreateInfo bufferInfo = {};
 	bufferInfo.size = size;
 	bufferInfo.usage = usage;
 	bufferInfo.sharingMode = vk::SharingMode::eExclusive;
 
-	VKH_CHECK(
-		device.handle.createBuffer(&bufferInfo, device.allocator, &handle),
-		"failed to create buffer !");
+	handle = device->handle.createBufferUnique(bufferInfo, device->allocator);
 
-	auto const requirements = device.handle.getBufferMemoryRequirements(handle);
+	auto const requirements = device->handle.getBufferMemoryRequirements(handle.get());
 
 	vk::MemoryAllocateInfo allocInfo = {};
 	allocInfo.allocationSize = requirements.size;
-	allocInfo.memoryTypeIndex = vkh::DeviceMemory::findMemoryType(device, requirements.memoryTypeBits, memoryProps);
-	VKH_CHECK(
-		device.handle.allocateMemory(&allocInfo, device.allocator, &memory),
-		"failed to allocate device memory !");
-	device.handle.bindBufferMemory(handle, memory, 0);
-}
-
-Buffer::~Buffer()
-{
-	if (handle)
-	{
-		assert(memory);
-		device.handle.destroyBuffer(handle, device.allocator);
-		device.handle.freeMemory(memory, device.allocator);
-		handle = nullptr;
-		memory = nullptr;
-	}
+	allocInfo.memoryTypeIndex = vkh::DeviceMemory::findMemoryType(*device, requirements.memoryTypeBits, memoryProps);
+	
+	memory = device->handle.allocateMemoryUnique(allocInfo, device->allocator);
+	device->handle.bindBufferMemory(handle.get(), memory.get(), 0);
 }
 
 void Buffer::copyFrom(CommandPool& commandPool, Buffer const& buffer, vk::DeviceSize size)
@@ -45,15 +30,15 @@ void Buffer::copyFrom(CommandPool& commandPool, Buffer const& buffer, vk::Device
 	SingleTimeCommands singleTimeCommands(commandPool);
 	vk::BufferCopy copyRegion;
 	copyRegion.size = size;
-	singleTimeCommands.buffer().copyBuffer(buffer.handle, handle, 1, &copyRegion);
+	singleTimeCommands.buffer().copyBuffer(buffer.handle.get(), handle.get(), 1, &copyRegion);
 }
 
 void* Buffer::map(vk::DeviceSize offset)
 {
-	return device.handle.mapMemory(memory, offset, m_size, vk::MemoryMapFlagBits());
+	return device->handle.mapMemory(memory.get(), offset, m_size, vk::MemoryMapFlagBits());
 }
 
 void Buffer::unMap()
 {
-	device.handle.unmapMemory(memory);
+	device->handle.unmapMemory(memory.get());
 }

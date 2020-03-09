@@ -4,8 +4,8 @@
 
 using namespace hano::vkh;
 
-ShaderModule::ShaderModule(Device const& idevice, std::vector<char> const& code)
-	: device(&idevice)
+ShaderModule::ShaderModule(Device const& idevice, std::vector<char> const& code, vk::ShaderStageFlagBits shaderStage_)
+	: device(&idevice), shaderStage(shaderStage_)
 {
 	vk::ShaderModuleCreateInfo shaderInfo = {};
 	shaderInfo.codeSize = code.size();
@@ -14,15 +14,15 @@ ShaderModule::ShaderModule(Device const& idevice, std::vector<char> const& code)
 	handle = device->handle.createShaderModuleUnique(shaderInfo, device->allocator);
 }
 
-ShaderModule::ShaderModule(Device const& idevice, std::string const& filename)
-	: ShaderModule(idevice, readFile(filename))
+ShaderModule::ShaderModule(Device const& idevice, std::string const& filename, vk::ShaderStageFlagBits shaderStage_)
+	: ShaderModule(idevice, readFile(filename), shaderStage_)
 {
 }
 
-vk::PipelineShaderStageCreateInfo ShaderModule::createShaderStageInfo(vk::ShaderStageFlagBits stageBits) const
+vk::PipelineShaderStageCreateInfo ShaderModule::createShaderStageInfo() const
 {
 	vk::PipelineShaderStageCreateInfo createInfo = {};
-	createInfo.stage = stageBits;
+	createInfo.stage = shaderStage;
 	createInfo.module = handle.get();
 	createInfo.pName = "main";
 
