@@ -115,7 +115,7 @@ void EditorGUI::render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& 
 	ImGui::NewFrame();
 
 	ImGuizmo::BeginFrame();
-
+	
 	ImGui::ShowDemoWindow();
 	ImGui::ShowMetricsWindow();
 	ImGui::Render();
@@ -136,3 +136,4 @@ void EditorGUI::render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& 
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 	commandBuffer.endRenderPass();
 }
+

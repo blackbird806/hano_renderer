@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vector>
+#include "camera.hpp"
+#include "light.hpp"
+#include "mesh.hpp"
 
 namespace hano
 {
@@ -7,7 +11,10 @@ namespace hano
 	{
 		public:
 
-		private:
+			void render(vk::CommandBuffer commandBuffer);
 
+			Camera camera;
+			std::vector<Mesh> meshes;
+			std::vector<PointLight> lights;
 	};
 }

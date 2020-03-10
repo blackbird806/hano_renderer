@@ -20,7 +20,7 @@ namespace hano
 			void setVertices(std::vector<Vertex> const& vertices);
 			void setIndices(std::vector<uint32> const& indices);
 
-			void render(vk::CommandBuffer commandBuffer, uint32 instances = 1);
+			void render(vk::CommandBuffer commandBuffer, uint32 instances = 1) const;
 
 			// get vertices from GPU memory
 			std::vector<Vertex> getVertices();

@@ -1,6 +1,11 @@
 #pragma once
+#define WIN32_LEAN_AND_MEAN
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
+
+// windows.h <3
+#undef near
+#undef far
 
 namespace hano
 {

@@ -35,6 +35,7 @@ namespace hano
 		std::vector<vk::PhysicalDevice> const& getPhysicalDevices() const;
 		std::vector<vk::ExtensionProperties> const& getExtensions() const;
 		vk::PhysicalDevice getSuitableDevice() const;
+		uint32 getCurrentImageIndex() const noexcept;
 
 		vk::AllocationCallbacks* vkAllocator = nullptr;
 		std::unique_ptr<vkh::Instance> instance;

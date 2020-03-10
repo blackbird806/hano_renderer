@@ -11,6 +11,8 @@ Mesh::Mesh(std::filesystem::path const& filePath)
 {
 	if (filePath.extension() == ".obj")
 		loadObj(filePath);
+	else
+		assert(false);
 }
 
 Mesh::Mesh(std::vector<Vertex> const& vertices, std::vector<uint32> const& indices)
@@ -76,7 +78,7 @@ std::vector<Vertex> Mesh::getVertices()
 	return std::vector<Vertex>();
 }
 
-void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances)
+void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances) const
 {
 	if (m_indexCount > 0)
 	{
@@ -131,4 +133,7 @@ void Mesh::loadObj(std::filesystem::path const& filePath)
 			indices.push_back(uniqueVertices[vertex]);
 		}
 	}
+
+	setVertices(vertices);
+	setIndices(indices);
 }

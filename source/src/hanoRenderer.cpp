@@ -27,6 +27,8 @@ Renderer::Renderer()
 	};
 
 	m_isRunning = true;
+
+	currentScene.meshes.emplace_back("assets/obj/cube.obj");
 }
 
 Renderer::~Renderer()
@@ -44,6 +46,24 @@ void Renderer::renderFrame()
 	auto commandBuffer = vkContext.beginFrame();
 	if (commandBuffer)
 	{
+		std::array<vk::ClearValue, 2> clearValues = {};
+		auto e = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
+		clearValues[0].color = { e };
+		clearValues[1].depthStencil = { 1.0f, 0 };
+
+		vk::RenderPassBeginInfo renderPassInfo = {};
+		renderPassInfo.renderPass = vkContext.graphicsPipeline->renderPass.handle.get();
+		renderPassInfo.framebuffer = vkContext.swapchainFrameBuffers[vkContext.getCurrentImageIndex()].handle.get();
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = vkContext.swapchain->extent;
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
+
+		commandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+		commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, vkContext.graphicsPipeline->handle.get());
+		currentScene.render(*commandBuffer);
+		commandBuffer->endRenderPass();
+
 		editorGUI->render(*commandBuffer, vkContext.getCurrentFrameBuffer());
 		vkContext.endFrame();
 	}

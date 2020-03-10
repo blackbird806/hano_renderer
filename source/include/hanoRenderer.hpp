@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <renderer/editorGUI.hpp>
+#include <renderer/scene.hpp>
 #include "vulkanContext.hpp"
 
 struct GLFWwindow;
@@ -26,6 +27,7 @@ namespace hano
 			GLFWwindow* m_window;
 			VulkanContext vkContext;
 			std::unique_ptr<EditorGUI> editorGUI;
+			Scene currentScene;
 			bool m_isRunning;
 	};
 }

@@ -1,8 +1,4 @@
 #include <vulkanContext.hpp>
-
-// @Review
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_vulkan.h>
 #undef max
 
 using namespace hano;
@@ -36,6 +32,7 @@ void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
 	createSwapchain();
 
 	global_device = device.get();
+	global_commandPool = commandPool.get();
 }
 
 std::vector<vk::PhysicalDevice> const& VulkanContext::getPhysicalDevices() const
@@ -158,21 +155,21 @@ std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
 
 	commandBuffer = commandBuffers->begin(imageIndex);
 
-	std::array<vk::ClearValue, 2> clearValues = {};
-	auto e = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
-	clearValues[0].color = { e };
-	clearValues[1].depthStencil = { 1.0f, 0 };
+	//std::array<vk::ClearValue, 2> clearValues = {};
+	//auto e = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
+	//clearValues[0].color = { e };
+	//clearValues[1].depthStencil = { 1.0f, 0 };
 
-	vk::RenderPassBeginInfo renderPassInfo = {};
-	renderPassInfo.renderPass = graphicsPipeline->renderPass.handle.get();
-	renderPassInfo.framebuffer = swapchainFrameBuffers[imageIndex].handle.get();
-	renderPassInfo.renderArea.offset = { 0, 0 };
-	renderPassInfo.renderArea.extent = swapchain->extent;
-	renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-	renderPassInfo.pClearValues = clearValues.data();
-	
-	commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-	commandBuffer.endRenderPass();
+	//vk::RenderPassBeginInfo renderPassInfo = {};
+	//renderPassInfo.renderPass = graphicsPipeline->renderPass.handle.get();
+	//renderPassInfo.framebuffer = swapchainFrameBuffers[imageIndex].handle.get();
+	//renderPassInfo.renderArea.offset = { 0, 0 };
+	//renderPassInfo.renderArea.extent = swapchain->extent;
+	//renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+	//renderPassInfo.pClearValues = clearValues.data();
+	//
+	//commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+	//commandBuffer.endRenderPass();
 
 	return { commandBuffer };
 }
@@ -231,4 +228,9 @@ void VulkanContext::endFrame()
 vkh::FrameBuffer const& VulkanContext::getCurrentFrameBuffer() const
 {
 	return swapchainFrameBuffers[imageIndex];
+}
+
+uint32 VulkanContext::getCurrentImageIndex() const noexcept
+{
+	return imageIndex;
 }
