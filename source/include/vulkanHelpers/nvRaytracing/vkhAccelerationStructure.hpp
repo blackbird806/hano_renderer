@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
-#include <vulkanHelpers/vkhUtility.hpp>
 
 namespace hano::vkh
 {
@@ -15,8 +14,6 @@ namespace hano::vkh
 			vk::MemoryRequirements build;
 			vk::MemoryRequirements update;
 		};
-
-		VULKAN_NON_COPIABLE(AccelerationStructure);
 
 		MemoryRequirements getMemoryRequirements() const;
 		static void memoryBarrier(vk::CommandBuffer commandBuffer);

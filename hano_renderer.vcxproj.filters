@@ -93,6 +93,9 @@
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhAccelerationStructure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhBottomLevelAS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhNvRTXExtension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -100,6 +103,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhShaderBindingTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhTopLevelAS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhBuffer.cpp">
@@ -213,6 +219,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhShaderBindingTable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhTopLevelAS.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp">

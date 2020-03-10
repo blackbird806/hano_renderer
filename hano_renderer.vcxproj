@@ -150,9 +150,11 @@
     <ClCompile Include="source\src\renderer\mesh.cpp" />
     <ClCompile Include="source\src\vulkanContext.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhAccelerationStructure.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhBottomLevelAS.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhNvRTXExtension.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhRaytracingPipeline.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhShaderBindingTable.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhTopLevelAS.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhBuffer.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDepthBuffer.cpp" />
@@ -192,6 +194,7 @@
     <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhNvRTXExtension.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhRaytracingPipeline.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhShaderBindingTable.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\nvRaytracing\vkhTopLevelAS.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhBuffer.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhCommandBuffers.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhCommandPool.hpp" />
