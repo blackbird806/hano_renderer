@@ -133,5 +133,5 @@ void Image::copyFrom(CommandPool& commandPool, vkh::Buffer const& buffer)
 	region.imageOffset = vk::Offset3D{ 0, 0, 0 };
 	region.imageExtent = vk::Extent3D{ extent.width, extent.height, 1 };
 
-	singleTimeCommands.buffer().copyBufferToImage(buffer.handle, handle, vk::ImageLayout::eTransferDstOptimal, { region });
+	singleTimeCommands.buffer().copyBufferToImage(buffer.handle.get(), handle, vk::ImageLayout::eTransferDstOptimal, { region });
 }

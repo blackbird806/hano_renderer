@@ -1,4 +1,5 @@
 #include <glfw/glfw3.h>
+#include <imgui/imgui.h>
 #include <hanoRenderer.hpp>
 #include <core/logger.hpp>
 
@@ -7,7 +8,7 @@ using namespace hano;
 void Renderer::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
 	auto app = reinterpret_cast<Renderer*>(glfwGetWindowUserPointer(window));
-	app->vkContext.frameBufferResized = true;
+	app->m_vkContext.frameBufferResized = true;
 }
 
 Renderer::Renderer()
@@ -19,16 +20,27 @@ Renderer::Renderer()
 	glfwSetWindowUserPointer(m_window, this);
 
 	glfwSetFramebufferSizeCallback(m_window, &framebufferResizeCallback);
-	vkContext.init(m_window, { .appName = "hanoRtx", .engineName = "hanoRenderer" });
-	editorGUI = std::make_unique<EditorGUI>(vkContext);
+	m_vkContext.init(m_window, { .appName = "hanoRtx", .engineName = "hanoRenderer" });
+	m_editorGUI = std::make_unique<EditorGUI>(m_vkContext);
 	
-	vkContext.onRecreateSwapchain = [&]() {
-		editorGUI->handleSwapchainRecreation();
+	m_vkContext.onRecreateSwapchain = [&]() {
+		m_editorGUI->handleSwapchainRecreation();
+	};
+
+	m_editorGUI->onGUI = []() {
+		ImGui::ShowDemoWindow();
+		ImGui::ShowMetricsWindow();
+		
+		ImGui::Begin("my window");
+		
+		ImGui::Button("yikes");
+		ImGui::Text("OUI");
+
+		ImGui::End();
 	};
 
 	m_isRunning = true;
 
-	currentScene.meshes.emplace_back("assets/obj/cube.obj");
 }
 
 Renderer::~Renderer()
@@ -37,13 +49,18 @@ Renderer::~Renderer()
 	glfwTerminate();
 }
 
+void Renderer::setRenderScene(Scene const& scene)
+{
+	m_currentScene = &scene;
+}
+
 void Renderer::renderFrame()
 {
 	// @Review
 	m_isRunning = !((bool)glfwWindowShouldClose(m_window));
 	glfwPollEvents();
 
-	auto commandBuffer = vkContext.beginFrame();
+	auto commandBuffer = m_vkContext.beginFrame();
 	if (commandBuffer)
 	{
 		std::array<vk::ClearValue, 2> clearValues = {};
@@ -52,20 +69,23 @@ void Renderer::renderFrame()
 		clearValues[1].depthStencil = { 1.0f, 0 };
 
 		vk::RenderPassBeginInfo renderPassInfo = {};
-		renderPassInfo.renderPass = vkContext.graphicsPipeline->renderPass.handle.get();
-		renderPassInfo.framebuffer = vkContext.swapchainFrameBuffers[vkContext.getCurrentImageIndex()].handle.get();
+		renderPassInfo.renderPass = m_vkContext.graphicsPipeline->renderPass.handle.get();
+		renderPassInfo.framebuffer = m_vkContext.swapchainFrameBuffers[m_vkContext.getCurrentImageIndex()].handle.get();
 		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = vkContext.swapchain->extent;
+		renderPassInfo.renderArea.extent = m_vkContext.swapchain->extent;
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 		renderPassInfo.pClearValues = clearValues.data();
 
 		commandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-		commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, vkContext.graphicsPipeline->handle.get());
-		currentScene.render(*commandBuffer);
+		commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->handle.get());
+		commandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->pipelineLayout.get(), 0, 
+			{ m_vkContext.graphicsPipeline->descriptorSetManager->descriptorSets->handle(m_vkContext.getCurrentImageIndex()) }, {});
+
+		m_currentScene->render(*commandBuffer);
 		commandBuffer->endRenderPass();
 
-		editorGUI->render(*commandBuffer, vkContext.getCurrentFrameBuffer());
-		vkContext.endFrame();
+		m_editorGUI->render(*commandBuffer, m_vkContext.getCurrentFrameBuffer());
+		m_vkContext.endFrame();
 	}
 }
 

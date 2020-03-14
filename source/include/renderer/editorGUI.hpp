@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <functional>
 #include <vulkanContext.hpp>
 #include <vulkanHelpers/vkhFrameBuffer.hpp>
 #include <vulkanHelpers/vkhDescriptorPool.hpp>
@@ -17,6 +18,8 @@ namespace hano
 
 			void render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer);
 			void handleSwapchainRecreation();
+
+			std::function<void()> onGUI;
 
 		private:
 

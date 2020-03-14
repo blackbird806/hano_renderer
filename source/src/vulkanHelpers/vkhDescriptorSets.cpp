@@ -60,7 +60,7 @@ vk::WriteDescriptorSet DescriptorSets::bind(uint32_t index, uint32_t binding, co
 	return descriptorWrite;
 }
 
-void DescriptorSets::UpdateDescriptors(uint32_t index, std::vector<vk::WriteDescriptorSet> const& descriptorWrites)
+void DescriptorSets::updateDescriptors(uint32_t index, std::vector<vk::WriteDescriptorSet> const& descriptorWrites)
 {
 	descriptorPool->device->handle.updateDescriptorSets(descriptorWrites, {});
 }

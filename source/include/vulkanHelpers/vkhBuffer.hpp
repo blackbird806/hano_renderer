@@ -11,9 +11,13 @@ namespace hano::vkh
 	
 	struct Buffer
 	{
-		VULKAN_NON_COPIABLE_NON_MOVABLE(Buffer);
-
+		Buffer();
 		Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags props);
+
+		void create(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags props);
+		void destroy();
+
+		operator bool() const noexcept;
 
 		void* map(vk::DeviceSize offset = 0);
 		void  unMap();

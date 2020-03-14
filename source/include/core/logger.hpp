@@ -11,14 +11,14 @@ namespace hano
 	}
 }
 
-//@bug ? some of theses macros may overrides identifiers or other macros
+//@review ? some of theses macros may overrides identifiers or other macros
 
 #define info_stream		std::clog << "[info] "
 #define warn_stream		std::clog << "[warn] " << __FUNCTION__":" <<  __LINE__  << ": "
 #define error_stream	std::cerr << "[error] " << __FUNCTION__":" <<  __LINE__  << ": "
 
-#define info(msg, ...)	hano::log(std::clog,  "[info] " msg, __VA_ARGS__, "\n") 
-#define warn(msg, ...)	hano::log(std::clog,  "[warn] " __FUNCTION__":" , __LINE__ , " " msg, __VA_ARGS__, "\n")
+#define info(msg, ...)	hano::log(std::clog, "[info] " msg, __VA_ARGS__, "\n") 
+#define warn(msg, ...)	hano::log(std::clog, "[warn] " __FUNCTION__":" , __LINE__ , " " msg, __VA_ARGS__, "\n")
 #define error(msg, ...)	hano::log(std::cerr, "[error] " __FUNCTION__":" , __LINE__ , " " msg, __VA_ARGS__, "\n")
 
 #define infof(fmt, ...)		fprintf(stderr, "[info] " fmt "\n", __VA_ARGS__)

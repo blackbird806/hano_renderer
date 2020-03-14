@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 #include <filesystem>
 #include <vulkan/vulkan.hpp>
@@ -16,6 +15,9 @@ namespace hano
 
 			Mesh(std::filesystem::path const& objPath);
 			Mesh(std::vector<Vertex> const& vertices, std::vector<uint32> const& indices = {});
+			Mesh(Mesh&&) noexcept;
+
+			Mesh& operator=(Mesh&&) noexcept;
 
 			void setVertices(std::vector<Vertex> const& vertices);
 			void setIndices(std::vector<uint32> const& indices);
@@ -29,8 +31,8 @@ namespace hano
 
 			void loadObj(std::filesystem::path const& objPath);
 
-			std::unique_ptr<vkh::Buffer> m_vertexBuffer;
-			std::unique_ptr<vkh::Buffer> m_indexBuffer;
+			vkh::Buffer m_vertexBuffer;
+			vkh::Buffer m_indexBuffer;
 
 			uint32 m_vertexCount;
 			uint32 m_indexCount;

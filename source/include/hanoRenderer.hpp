@@ -15,7 +15,8 @@ namespace hano
 
 			Renderer();
 			~Renderer();
-		
+
+			void setRenderScene(Scene const& scene);
 			void renderFrame();
 
 			bool isRunning() const noexcept;
@@ -25,9 +26,9 @@ namespace hano
 			static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 			GLFWwindow* m_window;
-			VulkanContext vkContext;
-			std::unique_ptr<EditorGUI> editorGUI;
-			Scene currentScene;
+			VulkanContext m_vkContext;
+			std::unique_ptr<EditorGUI> m_editorGUI;
+			Scene const* m_currentScene;
 			bool m_isRunning;
 	};
 }

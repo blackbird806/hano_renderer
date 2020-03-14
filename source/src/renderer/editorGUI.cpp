@@ -36,8 +36,24 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
+	auto& io = ImGui::GetIO();
+	// No ini file.
+	io.IniFilename = nullptr;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+
+	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
+
 	// Initialise ImGui GLFW adapter
-	if (!ImGui_ImplGlfw_InitForVulkan(window, false))
+	if (!ImGui_ImplGlfw_InitForVulkan(window, true))
 		throw HanoException("failed to initialise ImGui GLFW adapter");
 
 	// Initialise ImGui Vulkan adapter
@@ -56,22 +72,6 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	
 	if (!ImGui_ImplVulkan_Init(&vulkanInit, renderPass->handle.get()))
 		throw HanoException("failed to initialise ImGui vulkan adapter");
-
-	auto& io = ImGui::GetIO();
-	// No ini file.
-	io.IniFilename = nullptr;
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-
-	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-	}
 
 	// Window scaling and style.
 	float xscale;
@@ -115,10 +115,18 @@ void EditorGUI::render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& 
 	ImGui::NewFrame();
 
 	ImGuizmo::BeginFrame();
-	
-	ImGui::ShowDemoWindow();
-	ImGui::ShowMetricsWindow();
+
+	onGUI();
+
 	ImGui::Render();
+
+	auto& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+	}
+
 
 	std::array<vk::ClearValue, 2> clearValues = {};
 	clearValues[0].color = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };

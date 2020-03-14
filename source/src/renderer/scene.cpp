@@ -2,7 +2,7 @@
 
 using namespace hano;
 
-void Scene::render(vk::CommandBuffer commandBuffer)
+void Scene::render(vk::CommandBuffer commandBuffer) const
 {
 	for (auto const& mesh : meshes)
 	{

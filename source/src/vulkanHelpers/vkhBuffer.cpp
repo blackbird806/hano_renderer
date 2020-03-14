@@ -5,9 +5,25 @@
 
 using namespace hano::vkh;
 
-Buffer::Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memoryProps)
-	: device(&idevice), m_size(size)
+Buffer::Buffer()
+	: handle(nullptr), memory(nullptr)
 {
+
+}
+
+Buffer::Buffer(vkh::Device const& device_, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memoryProps)
+{
+	create(device_, size, usage, memoryProps);
+}
+
+void Buffer::create(vkh::Device const& device_, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memoryProps)
+{
+	assert(!handle);
+	assert(!memory);
+
+	m_size = size;
+	device = &device_;
+
 	vk::BufferCreateInfo bufferInfo = {};
 	bufferInfo.size = size;
 	bufferInfo.usage = usage;
@@ -20,9 +36,20 @@ Buffer::Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usa
 	vk::MemoryAllocateInfo allocInfo = {};
 	allocInfo.allocationSize = requirements.size;
 	allocInfo.memoryTypeIndex = vkh::DeviceMemory::findMemoryType(*device, requirements.memoryTypeBits, memoryProps);
-	
+
 	memory = device->handle.allocateMemoryUnique(allocInfo, device->allocator);
 	device->handle.bindBufferMemory(handle.get(), memory.get(), 0);
+}
+
+void Buffer::destroy()
+{
+	handle.reset();
+	memory.reset();
+}
+
+Buffer::operator bool() const noexcept
+{
+	return static_cast<bool>(handle);
 }
 
 void Buffer::copyFrom(CommandPool& commandPool, Buffer const& buffer, vk::DeviceSize size)

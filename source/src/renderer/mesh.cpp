@@ -21,6 +21,23 @@ Mesh::Mesh(std::vector<Vertex> const& vertices, std::vector<uint32> const& indic
 	setIndices(indices);
 }
 
+Mesh::Mesh(Mesh&& other) noexcept :
+	m_vertexBuffer(std::move(other.m_vertexBuffer)), 
+	m_indexBuffer(std::move(other.m_indexBuffer)),
+	m_vertexCount(other.m_vertexCount),
+	m_indexCount(other.m_indexCount)
+{
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept
+{
+	m_vertexBuffer = std::move(other.m_vertexBuffer);
+	m_indexBuffer = std::move(other.m_indexBuffer);
+	m_vertexCount = other.m_vertexCount;
+	m_indexCount = other.m_indexCount;
+	return *this;
+}
+
 void Mesh::setVertices(std::vector<Vertex> const& vertices)
 {
 	if (vertices.empty())
@@ -41,11 +58,11 @@ void Mesh::setVertices(std::vector<Vertex> const& vertices)
 	memcpy(mappedMem, vertices.data(), bufferSize);
 	staging.unMap();
 
-	m_vertexBuffer = std::make_unique<vkh::Buffer>(VulkanContext::getDevice(), bufferSize,
+	m_vertexBuffer.create(VulkanContext::getDevice(), bufferSize,
 		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, // VK_IMAGE_USAGE_TRANSFER_SRC_BIT ?
 		vk::MemoryPropertyFlagBits::eDeviceLocal);
 
-	m_vertexBuffer->copyFrom(VulkanContext::getCommandPool(), staging, bufferSize);
+	m_vertexBuffer.copyFrom(VulkanContext::getCommandPool(), staging, bufferSize);
 }
 
 void Mesh::setIndices(std::vector<uint32> const& indices)
@@ -65,11 +82,11 @@ void Mesh::setIndices(std::vector<uint32> const& indices)
 	memcpy(mappedMem, indices.data(), bufferSize);
 	staging.unMap();
 
-	m_indexBuffer = std::make_unique<vkh::Buffer>(VulkanContext::getDevice(), bufferSize,
+	m_indexBuffer.create(VulkanContext::getDevice(), bufferSize,
 		vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, // VK_IMAGE_USAGE_TRANSFER_SRC_BIT ?
 		vk::MemoryPropertyFlagBits::eDeviceLocal);
 
-	m_indexBuffer->copyFrom(VulkanContext::getCommandPool(), staging, bufferSize);
+	m_indexBuffer.copyFrom(VulkanContext::getCommandPool(), staging, bufferSize);
 }
 
 std::vector<Vertex> Mesh::getVertices()
@@ -82,13 +99,13 @@ void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances) const
 {
 	if (m_indexCount > 0)
 	{
-		commandBuffer.bindIndexBuffer(m_indexBuffer->handle.get(), 0, vk::IndexType::eUint32);
-		commandBuffer.bindVertexBuffers(0, { m_vertexBuffer->handle.get() }, { 0 });
+		commandBuffer.bindIndexBuffer(m_indexBuffer.handle.get(), 0, vk::IndexType::eUint32);
+		commandBuffer.bindVertexBuffers(0, { m_vertexBuffer.handle.get() }, { 0 });
 		commandBuffer.drawIndexed(m_indexCount, instances, 0, 0, 0);
 	}
 	else
 	{
-		commandBuffer.bindVertexBuffers(0, { m_vertexBuffer->handle.get() }, { 0 });
+		commandBuffer.bindVertexBuffers(0, { m_vertexBuffer.handle.get() }, { 0 });
 		commandBuffer.draw(m_vertexCount, instances, 0, 0);
 	}
 }
