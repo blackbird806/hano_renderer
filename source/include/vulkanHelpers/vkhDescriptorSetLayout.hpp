@@ -9,9 +9,18 @@ namespace hano::vkh
 
 	struct DescriptorSetLayout
 	{
-		DescriptorSetLayout(Device const& device, std::vector<DescriptorBinding> const& descriptorBindings);
+		DescriptorSetLayout();
+		DescriptorSetLayout(Device const& device, std::vector<DescriptorBinding> const& descriptorBindings_);
+		
+		void init(Device const& device, std::vector<DescriptorBinding> const& descriptorBindings_);
+		void destroy();
+
+		std::vector<DescriptorBinding> const& getDescriptorBindings() const noexcept;
 
 		vkh::Device const* device;
 		vk::UniqueDescriptorSetLayout handle;
+
+		private:
+			std::vector<DescriptorBinding> m_descriptorBindings;
 	};
 }

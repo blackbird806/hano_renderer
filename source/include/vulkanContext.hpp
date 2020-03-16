@@ -18,9 +18,6 @@ namespace hano
 
 	struct VulkanContext
 	{
-		static vkh::Device& getDevice();
-		static vkh::CommandPool& getCommandPool();
-
 		void init(GLFWwindow* window, VulkanConfig const& config);
 
 		std::optional<vk::CommandBuffer> beginFrame();
@@ -47,6 +44,7 @@ namespace hano
 		std::unique_ptr<vkh::CommandBuffers> commandBuffers;
 		std::unique_ptr<vkh::DepthBuffer> depthBuffer;
 		std::unique_ptr<vkh::GraphicsPipeline> graphicsPipeline;
+		std::unique_ptr<vkh::DescriptorPool> descriptorPool;
 
 		bool frameBufferResized = false;
 		std::function<void()> onRecreateSwapchain;
@@ -62,8 +60,5 @@ namespace hano
 			std::vector<vkh::Semaphore> m_imageAvailableSemaphores;
 			std::vector<vkh::Semaphore> m_renderFinishedSemaphores;
 			std::vector<vkh::Fence> m_inFlightFences;
-
-			static vkh::Device* global_device;
-			static vkh::CommandPool* global_commandPool;
 	};
 }

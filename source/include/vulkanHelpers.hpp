@@ -13,4 +13,5 @@
 #include <vulkanHelpers/vkhSemaphore.hpp>
 #include <vulkanHelpers/vkhFence.hpp>
 #include <vulkanHelpers/vkhFrameBuffer.hpp>
+#include <vulkanHelpers/vkhDescriptorPool.hpp>
 #include <vulkanHelpers/vkhGraphicsPipeline.hpp>

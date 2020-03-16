@@ -3,8 +3,11 @@
 #include <vector>
 #include <filesystem>
 #include <vulkan/vulkan.hpp>
-#include <vulkanHelpers/vkhBuffer.hpp>
+
 #include <core/hanoConfig.hpp>
+#include <vulkanHelpers/vkhBuffer.hpp>
+#include <vulkanHelpers/vkhDescriptorSets.hpp>
+#include "vulkanContext.hpp"
 #include "vertex.hpp"
 
 namespace hano
@@ -13,8 +16,8 @@ namespace hano
 	{
 		public:
 
-			Mesh(std::filesystem::path const& objPath);
-			Mesh(std::vector<Vertex> const& vertices, std::vector<uint32> const& indices = {});
+			Mesh(VulkanContext& context, std::filesystem::path const& objPath);
+			Mesh(VulkanContext& context, std::vector<Vertex> const& vertices, std::vector<uint32> const& indices = {});
 			Mesh(Mesh&&) noexcept;
 
 			Mesh& operator=(Mesh&&) noexcept;
@@ -22,6 +25,7 @@ namespace hano
 			void setVertices(std::vector<Vertex> const& vertices);
 			void setIndices(std::vector<uint32> const& indices);
 
+			void updateUniformBuffer(uint32 currentFrame);
 			void render(vk::CommandBuffer commandBuffer, uint32 instances = 1) const;
 
 			// get vertices from GPU memory
@@ -29,10 +33,15 @@ namespace hano
 
 		private:
 
+			VulkanContext* m_vkContext;
+
 			void loadObj(std::filesystem::path const& objPath);
 
 			vkh::Buffer m_vertexBuffer;
 			vkh::Buffer m_indexBuffer;
+
+			std::vector<vkh::Buffer> m_uniformBuffers;
+			vkh::DescriptorSets m_descriptorSets;
 
 			uint32 m_vertexCount;
 			uint32 m_indexCount;

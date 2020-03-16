@@ -6,10 +6,18 @@
 
 using namespace hano::vkh;
 
-DescriptorSets::DescriptorSets(DescriptorPool const& idescriptorPool, DescriptorSetLayout const& layout,
-	std::unordered_map<uint32_t, vk::DescriptorType> const& bindingTypes, size_t size)
-	: descriptorPool(&idescriptorPool)
+DescriptorSets::DescriptorSets(DescriptorPool const& descriptorPool_, DescriptorSetLayout const& layout, size_t size)
+	: descriptorPool(&descriptorPool_)
 {
+	// Sanity check to avoid binding different resources to the same binding point.
+	for (auto const& binding : layout.getDescriptorBindings())
+	{
+		if (!bindingTypes.insert(std::make_pair(binding.binding, binding.type)).second)
+		{
+			throw HanoException("binding collision");
+		}
+	}
+
 	std::vector<vk::DescriptorSetLayout> layouts(size, layout.handle.get());
 
 	vk::DescriptorSetAllocateInfo allocInfo = {};
@@ -21,13 +29,29 @@ DescriptorSets::DescriptorSets(DescriptorPool const& idescriptorPool, Descriptor
 	descriptorSets = descriptorPool->device->handle.allocateDescriptorSets(allocInfo);
 }
 
+DescriptorSets::DescriptorSets(DescriptorSets&& other) noexcept
+	: descriptorPool(other.descriptorPool),
+	bindingTypes(std::move(other.bindingTypes)),
+	descriptorSets(std::move(other.descriptorSets))
+{
+
+}
+
+DescriptorSets& DescriptorSets::operator=(DescriptorSets&& other) noexcept
+{
+	descriptorPool = other.descriptorPool;
+	bindingTypes = std::move(other.bindingTypes);
+	descriptorSets = std::move(other.descriptorSets);
+	return *this;
+}
+
 vk::WriteDescriptorSet DescriptorSets::bind(uint32_t index, uint32_t binding, const vk::DescriptorBufferInfo& bufferInfo, uint32_t count) const 
 {
 	vk::WriteDescriptorSet descriptorWrite = {};
 	descriptorWrite.dstSet = descriptorSets[index];
 	descriptorWrite.dstBinding = binding;
 	descriptorWrite.dstArrayElement = 0;
-	descriptorWrite.descriptorType = bindigTypes.at(index);
+	descriptorWrite.descriptorType = bindingTypes.at(binding);
 	descriptorWrite.descriptorCount = count;
 	descriptorWrite.pBufferInfo = &bufferInfo;
 
@@ -40,7 +64,7 @@ vk::WriteDescriptorSet DescriptorSets::bind(uint32_t index, uint32_t binding, co
 	descriptorWrite.dstSet = descriptorSets[index];
 	descriptorWrite.dstBinding = binding;
 	descriptorWrite.dstArrayElement = 0;
-	descriptorWrite.descriptorType = bindigTypes.at(index);
+	descriptorWrite.descriptorType = bindingTypes.at(binding);
 	descriptorWrite.descriptorCount = count;
 	descriptorWrite.pImageInfo = &imageInfo;
 
@@ -53,14 +77,14 @@ vk::WriteDescriptorSet DescriptorSets::bind(uint32_t index, uint32_t binding, co
 	descriptorWrite.dstSet = descriptorSets[index];
 	descriptorWrite.dstBinding = binding;
 	descriptorWrite.dstArrayElement = 0;
-	descriptorWrite.descriptorType = bindigTypes.at(index);
+	descriptorWrite.descriptorType = bindingTypes.at(binding);
 	descriptorWrite.descriptorCount = count;
 	descriptorWrite.pNext = &structureInfo;
 
 	return descriptorWrite;
 }
 
-void DescriptorSets::updateDescriptors(uint32_t index, std::vector<vk::WriteDescriptorSet> const& descriptorWrites)
+void DescriptorSets::updateDescriptors(uint32_t index, std::vector<vk::WriteDescriptorSet> const& descriptorWrites) const
 {
 	descriptorPool->device->handle.updateDescriptorSets(descriptorWrites, {});
 }

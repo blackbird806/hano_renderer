@@ -21,12 +21,14 @@ namespace hano
 
 			bool isRunning() const noexcept;
 
+			// @TMP
+			VulkanContext m_vkContext;
+
 		private:
 
 			static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 			GLFWwindow* m_window;
-			VulkanContext m_vkContext;
 			std::unique_ptr<EditorGUI> m_editorGUI;
 			Scene const* m_currentScene;
 			bool m_isRunning;

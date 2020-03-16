@@ -3,8 +3,8 @@
 
 using namespace hano::vkh;
 
-DescriptorPool::DescriptorPool(Device const& idevice, std::vector<DescriptorBinding> const& descriptorBindings, size_t maxSets)
-	: device(&idevice)
+DescriptorPool::DescriptorPool(Device const& device_, std::vector<DescriptorBinding> const& descriptorBindings, size_t maxSets)
+	: device(&device_)
 {
 	std::vector<vk::DescriptorPoolSize> poolSizes;
 
@@ -15,6 +15,7 @@ DescriptorPool::DescriptorPool(Device const& idevice, std::vector<DescriptorBind
 	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = static_cast<uint32_t>(maxSets);
+	//poolInfo.flags = 
 
 	handle = device->handle.createDescriptorPoolUnique(poolInfo, device->allocator);
 }

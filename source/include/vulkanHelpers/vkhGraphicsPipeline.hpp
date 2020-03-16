@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
-#include "vkhDescriptorSetManager.hpp"
+#include "vkhDescriptorSetLayout.hpp"
 #include "vkhRenderPass.hpp"
 
 namespace hano::vkh
@@ -17,7 +17,7 @@ namespace hano::vkh
 
 		Swapchain const* swapchain;
 		vkh::RenderPass renderPass;
-		std::unique_ptr<vkh::DescriptorSetManager> descriptorSetManager;
+		vkh::DescriptorSetLayout descriptorSetLayout;
 		vk::UniquePipelineLayout pipelineLayout;
 		vk::UniquePipeline handle;
 

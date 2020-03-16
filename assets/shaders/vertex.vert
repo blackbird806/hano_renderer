@@ -3,11 +3,8 @@
 layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
-    mat4 proj;
+    mat4 projection;
 } ubo;
-
-
-// layout(binding = 1) readonly buffer MaterialArray { Material[] Materials; };
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
@@ -21,11 +18,10 @@ layout(location = 3) out flat int fragMaterialIndex;
 
 void main()
 {
-	// Material m = Materials[InMaterialIndex];
 
-   	gl_Position = ubo.projection * ubo.view * ubo.Model * vec4(inPosition, 1.0);
-   	fragColor = m.Diffuse.xyz;
-	fragNormal = vec3(ubo.view * ubo.Model * vec4(inNormal, 0.0)); // technically not correct, should be ModelInverseTranspose
-	fragTexCoord = inTexCoord;
-	fragMaterialIndex = inMaterialIndex;
+   	gl_Position = ubo.projection * ubo.view * ubo.model * vec4(inPosition, 1.0);
+	fragNormal = vec3(ubo.view * ubo.model * vec4(inNormal, 0.0)); // technically not correct, should be ModelInverseTranspose
+   	// fragColor = m.Diffuse.xyz;
+	// fragTexCoord = inTexCoord;
+	// fragMaterialIndex = inMaterialIndex;
 }

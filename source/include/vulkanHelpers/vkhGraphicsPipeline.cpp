@@ -105,13 +105,11 @@ GraphicsPipeline::GraphicsPipeline(Swapchain const& swapChain_, DepthBuffer cons
 		{/*binding point*/ 2, /*descriptorCount*/ 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment} // textures
 	};
 
-	descriptorSetManager = std::make_unique<DescriptorSetManager>(device, descriptorBindings, swapchain->images.size());
-
-	auto& descriptorSets = descriptorSetManager->descriptorSets;
+	descriptorSetLayout.init(device, descriptorBindings);
 
 	// Create pipeline layout and render pass.
 
-	vk::DescriptorSetLayout descriptorSetLayouts[] = { descriptorSetManager->descriptorSetLayout->handle.get()};
+	vk::DescriptorSetLayout descriptorSetLayouts[] = { descriptorSetLayout.handle.get()};
 
 	vk::PipelineLayoutCreateInfo pipelineLayoutInfo = {};
 	pipelineLayoutInfo.setLayoutCount = std::size(descriptorSetLayouts);

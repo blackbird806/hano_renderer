@@ -32,7 +32,7 @@ Renderer::Renderer()
 		ImGui::ShowMetricsWindow();
 		
 		ImGui::Begin("my window");
-		
+
 		ImGui::Button("yikes");
 		ImGui::Text("OUI");
 
@@ -80,8 +80,8 @@ void Renderer::renderFrame()
 		commandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 		commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->handle.get());
 		
-		commandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->pipelineLayout.get(), 0, 
-			{ m_vkContext.graphicsPipeline->descriptorSetManager->descriptorSets->handle(m_vkContext.getCurrentImageIndex()) }, {});
+		/*commandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->pipelineLayout.get(), 0, 
+			{ m_vkContext.graphicsPipeline->descriptorSetManager->descriptorSets->handle(m_vkContext.getCurrentImageIndex()) }, {});*/
 
 		m_currentScene->render(*commandBuffer);
 		commandBuffer->endRenderPass();

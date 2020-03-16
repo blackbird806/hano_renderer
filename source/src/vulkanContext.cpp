@@ -3,21 +3,6 @@
 
 using namespace hano;
 
-vkh::Device* VulkanContext::global_device = nullptr;
-vkh::CommandPool* VulkanContext::global_commandPool = nullptr;
-
-vkh::Device& VulkanContext::getDevice()
-{
-	assert(global_device);
-	return *global_device;
-}
-
-vkh::CommandPool& VulkanContext::getCommandPool()
-{
-	assert(global_commandPool);
-	return *global_commandPool;
-}
-
 void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
 {
 	assert(window);
@@ -30,9 +15,6 @@ void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
 	device = std::make_unique<vkh::Device>(getSuitableDevice(), *surface, std::vector(c_vulkanDefaultRequiredExtentions.begin(), c_vulkanDefaultRequiredExtentions.end()), vkAllocator);
 	commandPool = std::make_unique<vkh::CommandPool>(*device, device->graphicsFamilyIndex(), true);
 	createSwapchain();
-
-	global_device = device.get();
-	global_commandPool = commandPool.get();
 }
 
 std::vector<vk::PhysicalDevice> const& VulkanContext::getPhysicalDevices() const
@@ -88,6 +70,8 @@ void VulkanContext::createSwapchain()
 	}
 
 	graphicsPipeline = std::make_unique<vkh::GraphicsPipeline>(*swapchain, *depthBuffer, false);
+	
+	descriptorPool = std::make_unique<vkh::DescriptorPool>(*device, graphicsPipeline->descriptorSetLayout.getDescriptorBindings(), /*@TODO*/500);
 
 	for (auto const& imageView : swapchain->imageViews)
 	{
@@ -154,22 +138,6 @@ std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
 	}
 
 	commandBuffer = commandBuffers->begin(imageIndex);
-
-	//std::array<vk::ClearValue, 2> clearValues = {};
-	//auto e = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
-	//clearValues[0].color = { e };
-	//clearValues[1].depthStencil = { 1.0f, 0 };
-
-	//vk::RenderPassBeginInfo renderPassInfo = {};
-	//renderPassInfo.renderPass = graphicsPipeline->renderPass.handle.get();
-	//renderPassInfo.framebuffer = swapchainFrameBuffers[imageIndex].handle.get();
-	//renderPassInfo.renderArea.offset = { 0, 0 };
-	//renderPassInfo.renderArea.extent = swapchain->extent;
-	//renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-	//renderPassInfo.pClearValues = clearValues.data();
-	//
-	//commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-	//commandBuffer.endRenderPass();
 
 	return { commandBuffer };
 }
