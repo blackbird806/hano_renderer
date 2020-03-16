@@ -59,7 +59,8 @@ void Renderer::renderFrame()
 	// @Review
 	m_isRunning = !((bool)glfwWindowShouldClose(m_window));
 	glfwPollEvents();
-
+	
+	// @Review
 	auto commandBuffer = m_vkContext.beginFrame();
 	if (commandBuffer)
 	{
@@ -78,6 +79,7 @@ void Renderer::renderFrame()
 
 		commandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 		commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->handle.get());
+		
 		commandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->pipelineLayout.get(), 0, 
 			{ m_vkContext.graphicsPipeline->descriptorSetManager->descriptorSets->handle(m_vkContext.getCurrentImageIndex()) }, {});
 

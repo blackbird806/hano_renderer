@@ -58,7 +58,7 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 
 	// Initialise ImGui Vulkan adapter
 	ImGui_ImplVulkan_InitInfo vulkanInit = {};
-	vulkanInit.Instance = device.surface.instance.handle;
+	vulkanInit.Instance = device.surface.instance.handle.get();
 	vulkanInit.PhysicalDevice = device.physicalDevice;
 	vulkanInit.Device = device.handle;
 	vulkanInit.QueueFamily = device.graphicsFamilyIndex();

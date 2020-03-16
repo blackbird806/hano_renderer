@@ -168,6 +168,7 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhFrameBuffer.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhImage.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhImageView.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhInstance.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhRenderPass.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhSemaphore.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhShaderModule.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="source\include\renderer\material.hpp" />
     <ClInclude Include="source\include\renderer\mesh.hpp" />
     <ClInclude Include="source\include\renderer\scene.hpp" />
+    <ClInclude Include="source\include\renderer\texture.hpp" />
     <ClInclude Include="source\include\renderer\UniformBuffer.hpp" />
     <ClInclude Include="source\include\renderer\vertex.hpp" />
     <ClInclude Include="source\include\vulkanContext.hpp" />

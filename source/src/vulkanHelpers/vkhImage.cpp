@@ -25,32 +25,15 @@ Image::Image(vkh::Device const& idevice, vk::Extent2D ext, vk::Format fmt, vk::M
 	imageInfo.sharingMode = vk::SharingMode::eExclusive;
 	imageInfo.samples = vk::SampleCountFlagBits::e1;
 
-	handle = device.handle.createImage(imageInfo, device.allocator);
+	handle = device.handle.createImageUnique(imageInfo, device.allocator);
 
-	auto const requirements = device.handle.getImageMemoryRequirements(handle);
+	auto const requirements = device.handle.getImageMemoryRequirements(handle.get());
 
 	vk::MemoryAllocateInfo allocInfo = {};
 	allocInfo.allocationSize = requirements.size;
 	allocInfo.memoryTypeIndex = vkh::DeviceMemory::findMemoryType(device, requirements.memoryTypeBits, memoryPropertyFlags);
-	VKH_CHECK(
-		device.handle.allocateMemory(&allocInfo, device.allocator, &memory),
-		"failed to allocate device memory !");
-
-	device.handle.bindImageMemory(handle, memory, 0);
-}
-
-Image::~Image()
-{
-	if (handle)
-	{
-		// if image is valid memory must also be
-		assert(memory);
-
-		device.handle.destroyImage(handle, device.allocator);
-		device.handle.freeMemory(memory, device.allocator);
-		handle = nullptr;
-		memory = nullptr;
-	}
+	memory = device.handle.allocateMemoryUnique(allocInfo, device.allocator);
+	device.handle.bindImageMemory(handle.get(), memory.get(), 0);
 }
 
 void Image::transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newLayout)
@@ -61,7 +44,7 @@ void Image::transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newL
 	barrier.newLayout = newLayout;
 	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	barrier.image = handle;
+	barrier.image = handle.get();
 	barrier.subresourceRange.baseMipLevel = 0;
 	barrier.subresourceRange.levelCount = 1;
 	barrier.subresourceRange.baseArrayLayer = 0;
@@ -133,5 +116,5 @@ void Image::copyFrom(CommandPool& commandPool, vkh::Buffer const& buffer)
 	region.imageOffset = vk::Offset3D{ 0, 0, 0 };
 	region.imageExtent = vk::Extent3D{ extent.width, extent.height, 1 };
 
-	singleTimeCommands.buffer().copyBufferToImage(buffer.handle.get(), handle, vk::ImageLayout::eTransferDstOptimal, { region });
+	singleTimeCommands.buffer().copyBufferToImage(buffer.handle.get(), handle.get(), vk::ImageLayout::eTransferDstOptimal, { region });
 }

@@ -7,7 +7,7 @@ Surface::Surface(Instance& inst, GLFWwindow* window, vk::AllocationCallbacks* al
 {
 	assert(window);
 	VkSurfaceKHR tmpSurface;
-	glfwCreateWindowSurface(instance.handle, window, reinterpret_cast<VkAllocationCallbacks*>(allocator), &tmpSurface);
+	glfwCreateWindowSurface(instance.handle.get(), window, reinterpret_cast<VkAllocationCallbacks*>(allocator), &tmpSurface);
 	handle = tmpSurface;
 }
 
@@ -15,7 +15,7 @@ Surface::~Surface()
 {
 	if (handle)
 	{
-		instance.handle.destroySurfaceKHR(handle, allocator);
+		instance.handle.get().destroySurfaceKHR(handle, allocator);
 		handle = nullptr;
 	}
 }

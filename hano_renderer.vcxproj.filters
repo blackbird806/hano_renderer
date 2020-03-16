@@ -147,6 +147,9 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhImageView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\vkhInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -195,6 +198,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\renderer\scene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\renderer\texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\renderer\UniformBuffer.hpp">

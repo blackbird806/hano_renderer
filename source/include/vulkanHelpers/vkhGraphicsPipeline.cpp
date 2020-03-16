@@ -100,12 +100,12 @@ GraphicsPipeline::GraphicsPipeline(Swapchain const& swapChain_, DepthBuffer cons
 	// Create descriptor pool/sets.
 	std::vector<DescriptorBinding> descriptorBindings =
 	{
-		{0, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eVertex}, // ubo
-		{1, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment}, // materials
-		{2, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment} // textures
+		{/*binding point*/ 0, /*descriptorCount*/ 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eVertex}, // ubo
+		//{/*binding point*/ 1, /*descriptorCount*/ 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment}, // materials
+		{/*binding point*/ 2, /*descriptorCount*/ 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment} // textures
 	};
 
-	descriptorSetManager = std::make_unique<DescriptorSetManager>(device, descriptorBindings, 8192);
+	descriptorSetManager = std::make_unique<DescriptorSetManager>(device, descriptorBindings, swapchain->images.size());
 
 	auto& descriptorSets = descriptorSetManager->descriptorSets;
 
