@@ -149,6 +149,7 @@
     <ClCompile Include="source\src\renderer\editorGUI.cpp" />
     <ClCompile Include="source\src\renderer\mesh.cpp" />
     <ClCompile Include="source\src\renderer\scene.cpp" />
+    <ClCompile Include="source\src\renderer\texture.cpp" />
     <ClCompile Include="source\src\vulkanContext.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhAccelerationStructure.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhBottomLevelAS.cpp" />

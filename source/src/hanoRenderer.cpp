@@ -1,5 +1,7 @@
 #include <glfw/glfw3.h>
 #include <imgui/imgui.h>
+#include <imguizmo/ImGuizmo.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <hanoRenderer.hpp>
 #include <core/logger.hpp>
 
@@ -27,21 +29,22 @@ Renderer::Renderer()
 		m_editorGUI->handleSwapchainRecreation();
 		m_currentScene->handleResizing();
 	};
+	m_editorGUI->onGUI = [this]() mutable {
 
-	float speed = 0;
-
-	m_editorGUI->onGUI = [&, speed]() mutable {
-		ImGui::ShowDemoWindow();
 		ImGui::ShowMetricsWindow();
-		
+
 		ImGui::Begin("my window");
-		ImGui::DragFloat("speed", &speed);
-		if (ImGui::Button("yikes"))
+
+		ImGui::DragFloat3("camPos", (float*)&m_currentScene->camera.pos);
+
+		if (ImGui::DragFloat("fov", &m_currentScene->camera.fov))
 		{
-			m_currentScene->meshes[0].transform.pos.x += speed;
+			m_currentScene->camera.setPerspectiveProjection();
 		}
 
-		ImGui::Text("OUI");
+		if (ImGui::DragFloat3("yikes", (float*)&m_currentScene->meshes[0].transform.pos))
+		{
+		}
 
 		ImGui::End();
 	};
@@ -59,6 +62,9 @@ Renderer::~Renderer()
 void Renderer::setRenderScene(Scene& scene)
 {
 	m_currentScene = &scene;
+	scene.camera.view.x = 800;
+	scene.camera.view.y = 600;
+	scene.camera.setPerspectiveProjection();
 }
 
 void Renderer::renderFrame()
@@ -87,9 +93,6 @@ void Renderer::renderFrame()
 		commandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 		commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->handle.get());
 		
-		/*commandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->pipelineLayout.get(), 0, 
-			{ m_vkContext.graphicsPipeline->descriptorSetManager->descriptorSets->handle(m_vkContext.getCurrentImageIndex()) }, {});*/
-
 		m_currentScene->render(*commandBuffer);
 		commandBuffer->endRenderPass();
 

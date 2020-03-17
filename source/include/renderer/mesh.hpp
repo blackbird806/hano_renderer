@@ -10,6 +10,7 @@
 #include "vulkanContext.hpp"
 #include "vertex.hpp"
 #include "transform.hpp"
+#include "camera.hpp"
 
 namespace hano
 {
@@ -28,8 +29,8 @@ namespace hano
 
 			void handleResizing();
 
-			void updateUniformBuffer(uint32 currentFrame);
-			void render(vk::CommandBuffer commandBuffer, uint32 instances = 1);
+			void updateUniformBuffer(uint32 currentFrame, Camera const& camera);
+			void render(vk::CommandBuffer commandBuffer, Camera const& camera, uint32 instances = 1);
 
 			// get vertices from GPU memory
 			std::vector<Vertex> getVertices();

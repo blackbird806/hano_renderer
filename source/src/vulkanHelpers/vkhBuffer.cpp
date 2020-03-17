@@ -13,10 +13,10 @@ Buffer::Buffer()
 
 Buffer::Buffer(vkh::Device const& device_, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memoryProps)
 {
-	create(device_, size, usage, memoryProps);
+	init(device_, size, usage, memoryProps);
 }
 
-void Buffer::create(vkh::Device const& device_, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memoryProps)
+void Buffer::init(vkh::Device const& device_, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memoryProps)
 {
 	assert(!handle);
 	assert(!memory);

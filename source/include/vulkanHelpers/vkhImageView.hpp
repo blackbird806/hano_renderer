@@ -9,16 +9,17 @@ namespace hano::vkh
 	
 	struct ImageView
 	{
-		VULKAN_NON_COPIABLE(ImageView);
-
+		ImageView();
 		ImageView(ImageView&& other) noexcept = default;
-		ImageView& operator=(ImageView&& other) = delete;
-		~ImageView();
+		ImageView& operator=(ImageView&& other) = default;
 		
-		explicit ImageView(Device const& idevice, vk::Image img, vk::Format fmt, vk::ImageAspectFlagBits aspectFlags);
+		explicit ImageView(Device const& device_, vk::Image img, vk::Format fmt, vk::ImageAspectFlagBits aspectFlags);
 
-		vk::ImageView handle;
-		vkh::Device const& device;
+		void init(Device const& device_, vk::Image img, vk::Format fmt, vk::ImageAspectFlagBits aspectFlags);
+		void destroy();
+
+		vk::UniqueImageView handle;
+		vkh::Device const* device;
 		vk::Image image;
 	};
 }

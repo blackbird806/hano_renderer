@@ -90,6 +90,9 @@
     <ClCompile Include="source\src\renderer\scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\renderer\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\vulkanContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

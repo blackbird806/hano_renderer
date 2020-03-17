@@ -12,7 +12,6 @@
 #include <core/logger.hpp>
 #include <renderer/uniformBuffer.hpp>
 
-
 using namespace hano;
 
 // @Review
@@ -36,27 +35,10 @@ Mesh::Mesh(VulkanContext& context, std::vector<Vertex> const& vertices, std::vec
 	createUniformBuffers();
 }
 
-Mesh::Mesh(Mesh&& other) noexcept :
-	m_vkContext(other.m_vkContext),
-	m_vertexBuffer(std::move(other.m_vertexBuffer)), 
-	m_indexBuffer(std::move(other.m_indexBuffer)),
-	m_vertexCount(other.m_vertexCount),
-	m_indexCount(other.m_indexCount),
-	m_descriptorSets(std::move(other.m_descriptorSets))
-{
-}
+Mesh::Mesh(Mesh&& other) noexcept = default;
 
-Mesh& Mesh::operator=(Mesh&& other) noexcept
-{
-	m_vkContext = other.m_vkContext;
-	m_vertexBuffer = std::move(other.m_vertexBuffer);
-	m_indexBuffer = std::move(other.m_indexBuffer);
-	m_vertexCount = other.m_vertexCount;
-	m_indexCount = other.m_indexCount;
-	return *this;
-}
+Mesh& Mesh::operator=(Mesh&& other) noexcept = default;
 
-// @Review
 void Mesh::createUniformBuffers()
 {
 	m_uniformBuffers.reserve(m_vkContext->graphicsPipeline->swapchain->images.size());
@@ -84,7 +66,7 @@ void Mesh::setVertices(std::vector<Vertex> const& vertices)
 	memcpy(mappedMem, vertices.data(), bufferSize);
 	staging.unMap();
 
-	m_vertexBuffer.create(*m_vkContext->device, bufferSize,
+	m_vertexBuffer.init(*m_vkContext->device, bufferSize,
 		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, // VK_IMAGE_USAGE_TRANSFER_SRC_BIT ?
 		vk::MemoryPropertyFlagBits::eDeviceLocal);
 
@@ -108,7 +90,7 @@ void Mesh::setIndices(std::vector<uint32> const& indices)
 	memcpy(mappedMem, indices.data(), bufferSize);
 	staging.unMap();
 
-	m_indexBuffer.create(*m_vkContext->device, bufferSize,
+	m_indexBuffer.init(*m_vkContext->device, bufferSize,
 		vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, // VK_IMAGE_USAGE_TRANSFER_SRC_BIT ?
 		vk::MemoryPropertyFlagBits::eDeviceLocal);
 
@@ -121,12 +103,12 @@ std::vector<Vertex> Mesh::getVertices()
 	return std::vector<Vertex>();
 }
 
-void Mesh::updateUniformBuffer(uint32 currentFrame)
+void Mesh::updateUniformBuffer(uint32 currentFrame, Camera const& camera)
 {
 	UniformBufferObject ubo;
 	ubo.model = glm::translate(glm::mat4(), transform.pos) * glm::scale(glm::mat4(), transform.scale) * glm::toMat4(transform.rot);
-	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 10.0f);
+	ubo.view = camera.viewMtr;
+	ubo.projection = camera.projectionMtr;
 
 	void* data = m_uniformBuffers[currentFrame].map();
 
@@ -135,11 +117,11 @@ void Mesh::updateUniformBuffer(uint32 currentFrame)
 	m_uniformBuffers[currentFrame].unMap();
 }
 
-void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances)
+void Mesh::render(vk::CommandBuffer commandBuffer, Camera const& camera,uint32 instances)
 {
 	int currentFrame = m_vkContext->getCurrentImageIndex();
 	
-	updateUniformBuffer(currentFrame);
+	updateUniformBuffer(currentFrame, camera);
 
 	vk::DescriptorBufferInfo bufferInfo;
 	bufferInfo.buffer = m_uniformBuffers[currentFrame].handle.get();

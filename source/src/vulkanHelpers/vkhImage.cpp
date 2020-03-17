@@ -7,10 +7,26 @@
 
 using namespace hano::vkh;
 
-Image::Image(vkh::Device const& idevice, vk::Extent2D ext, vk::Format fmt, vk::MemoryPropertyFlags memoryPropertyFlags, 
-	vk::ImageTiling tiling, vk::ImageUsageFlags usageFlags)
-	: device(idevice), extent(ext), format(fmt), imageLayout(vk::ImageLayout::eUndefined)
+Image::Image()
+	: device(nullptr), handle(nullptr), memory(nullptr)
 {
+
+}
+
+Image::Image(vkh::Device const& device_, vk::Extent2D ext, vk::Format fmt, vk::MemoryPropertyFlags memoryPropertyFlags, 
+	vk::ImageTiling tiling, vk::ImageUsageFlags usageFlags)
+{
+	init(device_, ext, fmt, memoryPropertyFlags, tiling, usageFlags);
+}
+
+void Image::init(vkh::Device const& device_, vk::Extent2D ext, vk::Format fmt, vk::MemoryPropertyFlags memoryPropertyFlags,
+	vk::ImageTiling tiling, vk::ImageUsageFlags usageFlags)
+{
+	device = &device_;
+	extent = ext;
+	format = fmt;
+	imageLayout = vk::ImageLayout::eUndefined;
+
 	vk::ImageCreateInfo imageInfo = {};
 	imageInfo.imageType = vk::ImageType::e2D;
 	imageInfo.extent.width = extent.width;
@@ -25,15 +41,22 @@ Image::Image(vkh::Device const& idevice, vk::Extent2D ext, vk::Format fmt, vk::M
 	imageInfo.sharingMode = vk::SharingMode::eExclusive;
 	imageInfo.samples = vk::SampleCountFlagBits::e1;
 
-	handle = device.handle.createImageUnique(imageInfo, device.allocator);
+	handle = device->handle.createImageUnique(imageInfo, device->allocator);
 
-	auto const requirements = device.handle.getImageMemoryRequirements(handle.get());
+	auto const requirements = device->handle.getImageMemoryRequirements(handle.get());
 
 	vk::MemoryAllocateInfo allocInfo = {};
 	allocInfo.allocationSize = requirements.size;
-	allocInfo.memoryTypeIndex = vkh::DeviceMemory::findMemoryType(device, requirements.memoryTypeBits, memoryPropertyFlags);
-	memory = device.handle.allocateMemoryUnique(allocInfo, device.allocator);
-	device.handle.bindImageMemory(handle.get(), memory.get(), 0);
+	allocInfo.memoryTypeIndex = vkh::DeviceMemory::findMemoryType(*device, requirements.memoryTypeBits, memoryPropertyFlags);
+	memory = device->handle.allocateMemoryUnique(allocInfo, device->allocator);
+	device->handle.bindImageMemory(handle.get(), memory.get(), 0);
+}
+
+void Image::destroy()
+{
+	handle.reset();
+	memory.reset();
+	device = nullptr;
 }
 
 void Image::transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newLayout)

@@ -6,13 +6,13 @@
 
 using namespace hano::vkh;
 
-FrameBuffer::FrameBuffer(vkh::ImageView const& iimageView, vkh::RenderPass const& irenderPass)
-	: imageView(&iimageView), renderPass(&irenderPass)
+FrameBuffer::FrameBuffer(vkh::ImageView const& imageView_, vkh::RenderPass const& renderPass_)
+	: imageView(&imageView_), renderPass(&renderPass_)
 {
 	std::array<vk::ImageView, 2> attachments =
 	{
-		imageView->handle,
-		renderPass->depthBuffer->imageView.handle
+		imageView->handle.get(),
+		renderPass->depthBuffer->imageView.handle.get()
 	};
 
 	vk::FramebufferCreateInfo framebufferInfo = {};
@@ -23,5 +23,5 @@ FrameBuffer::FrameBuffer(vkh::ImageView const& iimageView, vkh::RenderPass const
 	framebufferInfo.height = renderPass->swapchain->extent.height;
 	framebufferInfo.layers = 1;
 
-	handle = imageView->device.handle.createFramebufferUnique(framebufferInfo, imageView->device.allocator);
+	handle = imageView->device->handle.createFramebufferUnique(framebufferInfo, imageView->device->allocator);
 }

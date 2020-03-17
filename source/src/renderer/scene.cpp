@@ -4,9 +4,10 @@ using namespace hano;
 
 void Scene::render(vk::CommandBuffer commandBuffer)
 {
+	camera.update();
 	for (auto& mesh : meshes)
 	{
-		mesh.render(commandBuffer);
+		mesh.render(commandBuffer, camera);
 	}
 }
 

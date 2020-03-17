@@ -1,10 +1,24 @@
 #include <vulkanHelpers/vkhImageView.hpp>
 #include <vulkanHelpers/vkhDevice.hpp>
 
-hano::vkh::ImageView::ImageView(Device const& idevice, vk::Image img, vk::Format fmt,
-                                vk::ImageAspectFlagBits aspectFlags)
-	: device(idevice), image(img)
+using namespace hano::vkh;
+
+ImageView::ImageView() : handle(nullptr), device(nullptr), image(nullptr)
 {
+
+}
+
+ImageView::ImageView(Device const& device_, vk::Image img, vk::Format fmt,
+                                vk::ImageAspectFlagBits aspectFlags)
+{
+	init(device_, img, fmt, aspectFlags);
+}
+
+void ImageView::init(Device const& device_, vk::Image img, vk::Format fmt, vk::ImageAspectFlagBits aspectFlags)
+{
+	device = &device_;
+	image = img;
+
 	vk::ImageViewCreateInfo createInfo = {};
 	createInfo.image = image;
 	createInfo.viewType = vk::ImageViewType::e2D;
@@ -18,15 +32,12 @@ hano::vkh::ImageView::ImageView(Device const& idevice, vk::Image img, vk::Format
 	createInfo.subresourceRange.levelCount = 1;
 	createInfo.subresourceRange.baseArrayLayer = 0;
 	createInfo.subresourceRange.layerCount = 1;
-	
-	handle = device.handle.createImageView(createInfo, device.allocator);
+
+	handle = device->handle.createImageViewUnique(createInfo, device->allocator);
 }
 
-hano::vkh::ImageView::~ImageView()
+void ImageView::destroy()
 {
-	if (handle)
-	{
-		device.handle.destroyImageView(handle, device.allocator);
-		handle = nullptr;
-	}
+	handle.reset();
+	device = nullptr;
 }

@@ -12,9 +12,9 @@ namespace hano::vkh
 	struct Buffer
 	{
 		Buffer();
-		Buffer(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags props);
+		Buffer(vkh::Device const& device_, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags props);
 
-		void create(vkh::Device const& idevice, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags props);
+		void init(vkh::Device const& device_, size_t size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags props);
 		void destroy();
 
 		operator bool() const noexcept;

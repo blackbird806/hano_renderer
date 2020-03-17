@@ -14,9 +14,11 @@ namespace hano
 		void setPerspectiveProjection() noexcept;
 		void setOrthographicProjection() noexcept;
 
-		float near, far;
+		void update() noexcept;
+
+		float near = 0.01f, far = 100.0f;
 		glm::vec2 view;
-		float fov;
+		float fov = 45.0f;
 
 		glm::vec3 pos;
 		glm::quat rot;
