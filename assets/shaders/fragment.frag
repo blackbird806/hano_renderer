@@ -21,5 +21,5 @@ void main()
 	// 	c *= texture(TextureSamplers[textureId], fragTexCoord).rgb;
 	// }
 
-    outColor = vec4(1, 0, 0, 1);
+    outColor = vec4(0, 1, 0, 1);
 }

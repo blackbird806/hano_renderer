@@ -25,15 +25,22 @@ Renderer::Renderer()
 	
 	m_vkContext.onRecreateSwapchain = [&]() {
 		m_editorGUI->handleSwapchainRecreation();
+		m_currentScene->handleResizing();
 	};
 
-	m_editorGUI->onGUI = []() {
+	float speed = 0;
+
+	m_editorGUI->onGUI = [&, speed]() mutable {
 		ImGui::ShowDemoWindow();
 		ImGui::ShowMetricsWindow();
 		
 		ImGui::Begin("my window");
+		ImGui::DragFloat("speed", &speed);
+		if (ImGui::Button("yikes"))
+		{
+			m_currentScene->meshes[0].transform.pos.x += speed;
+		}
 
-		ImGui::Button("yikes");
 		ImGui::Text("OUI");
 
 		ImGui::End();
@@ -49,7 +56,7 @@ Renderer::~Renderer()
 	glfwTerminate();
 }
 
-void Renderer::setRenderScene(Scene const& scene)
+void Renderer::setRenderScene(Scene& scene)
 {
 	m_currentScene = &scene;
 }

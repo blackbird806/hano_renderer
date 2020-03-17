@@ -2,10 +2,18 @@
 
 using namespace hano;
 
-void Scene::render(vk::CommandBuffer commandBuffer) const
+void Scene::render(vk::CommandBuffer commandBuffer)
 {
-	for (auto const& mesh : meshes)
+	for (auto& mesh : meshes)
 	{
 		mesh.render(commandBuffer);
+	}
+}
+
+void Scene::handleResizing()
+{
+	for (auto& mesh : meshes)
+	{
+		mesh.handleResizing();
 	}
 }

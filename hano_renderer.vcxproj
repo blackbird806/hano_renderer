@@ -189,6 +189,7 @@
     <ClInclude Include="source\include\renderer\renderInfo.hpp" />
     <ClInclude Include="source\include\renderer\scene.hpp" />
     <ClInclude Include="source\include\renderer\texture.hpp" />
+    <ClInclude Include="source\include\renderer\transform.hpp" />
     <ClInclude Include="source\include\renderer\UniformBuffer.hpp" />
     <ClInclude Include="source\include\renderer\vertex.hpp" />
     <ClInclude Include="source\include\vulkanContext.hpp" />

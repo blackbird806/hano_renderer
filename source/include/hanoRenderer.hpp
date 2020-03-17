@@ -16,7 +16,7 @@ namespace hano
 			Renderer();
 			~Renderer();
 
-			void setRenderScene(Scene const& scene);
+			void setRenderScene(Scene& scene);
 			void renderFrame();
 
 			bool isRunning() const noexcept;
@@ -30,7 +30,7 @@ namespace hano
 
 			GLFWwindow* m_window;
 			std::unique_ptr<EditorGUI> m_editorGUI;
-			Scene const* m_currentScene;
+			Scene* m_currentScene;
 			bool m_isRunning;
 	};
 }

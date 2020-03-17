@@ -206,6 +206,9 @@
     <ClInclude Include="source\include\renderer\texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\renderer\transform.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\renderer\UniformBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

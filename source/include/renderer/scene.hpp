@@ -12,7 +12,8 @@ namespace hano
 	{
 		public:
 
-			void render(vk::CommandBuffer commandBuffer) const;
+			void render(vk::CommandBuffer commandBuffer);
+			void handleResizing();
 
 			Camera camera;
 			std::vector<Mesh> meshes;

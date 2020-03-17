@@ -24,10 +24,7 @@ Mesh::Mesh(VulkanContext& context, std::filesystem::path const& filePath)
 		loadObj(filePath);
 	else
 		assert(false);
-
-	m_uniformBuffers.reserve(context.graphicsPipeline->swapchain->images.size());
-	for (int i = 0; i < context.graphicsPipeline->swapchain->images.size(); i++)
-		m_uniformBuffers.emplace_back(*context.device, sizeof(UniformBufferObject), vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+	createUniformBuffers();
 }
 
 Mesh::Mesh(VulkanContext& context, std::vector<Vertex> const& vertices, std::vector<uint32> const& indices)
@@ -36,6 +33,7 @@ Mesh::Mesh(VulkanContext& context, std::vector<Vertex> const& vertices, std::vec
 {
 	setVertices(vertices);
 	setIndices(indices);
+	createUniformBuffers();
 }
 
 Mesh::Mesh(Mesh&& other) noexcept :
@@ -56,6 +54,14 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept
 	m_vertexCount = other.m_vertexCount;
 	m_indexCount = other.m_indexCount;
 	return *this;
+}
+
+// @Review
+void Mesh::createUniformBuffers()
+{
+	m_uniformBuffers.reserve(m_vkContext->graphicsPipeline->swapchain->images.size());
+	for (int i = 0; i < m_vkContext->graphicsPipeline->swapchain->images.size(); i++)
+		m_uniformBuffers.emplace_back(*m_vkContext->device, sizeof(UniformBufferObject), vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 }
 
 void Mesh::setVertices(std::vector<Vertex> const& vertices)
@@ -118,7 +124,7 @@ std::vector<Vertex> Mesh::getVertices()
 void Mesh::updateUniformBuffer(uint32 currentFrame)
 {
 	UniformBufferObject ubo;
-	ubo.model = glm::mat4();
+	ubo.model = glm::translate(glm::mat4(), transform.pos) * glm::scale(glm::mat4(), transform.scale) * glm::toMat4(transform.rot);
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 10.0f);
 
@@ -129,19 +135,22 @@ void Mesh::updateUniformBuffer(uint32 currentFrame)
 	m_uniformBuffers[currentFrame].unMap();
 }
 
-void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances) const
+void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances)
 {
 	int currentFrame = m_vkContext->getCurrentImageIndex();
 	
+	updateUniformBuffer(currentFrame);
+
 	vk::DescriptorBufferInfo bufferInfo;
 	bufferInfo.buffer = m_uniformBuffers[currentFrame].handle.get();
 	bufferInfo.offset = 0;
 	bufferInfo.range = VK_WHOLE_SIZE;
 
-	auto write = m_descriptorSets.bind(currentFrame, 0, bufferInfo);
-	m_descriptorSets.updateDescriptors(currentFrame, {write});
+	m_descriptorSets.push(currentFrame, 0, bufferInfo);
+	m_descriptorSets.updateDescriptors(currentFrame);
+	m_descriptorSets.bindDescriptor(currentFrame, commandBuffer, vk::PipelineBindPoint::eGraphics, 
+		/* @Review */ m_vkContext->graphicsPipeline->pipelineLayout.get());
 
-	commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_vkContext->graphicsPipeline->pipelineLayout.get(), 0, m_descriptorSets.descriptorSets[currentFrame], {});
 	if (m_indexCount > 0)
 	{
 		commandBuffer.bindIndexBuffer(m_indexBuffer.handle.get(), 0, vk::IndexType::eUint32);
@@ -153,6 +162,14 @@ void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances) const
 		commandBuffer.bindVertexBuffers(0, { m_vertexBuffer.handle.get() }, { 0 });
 		commandBuffer.draw(m_vertexCount, instances, 0, 0);
 	}
+}
+
+void Mesh::handleResizing()
+{
+	m_uniformBuffers.clear();
+	createUniformBuffers();
+	m_descriptorSets.destroy();
+	m_descriptorSets.init(*m_vkContext->descriptorPool, m_vkContext->graphicsPipeline->descriptorSetLayout, m_vkContext->graphicsPipeline->swapchain->images.size());
 }
 
 void Mesh::loadObj(std::filesystem::path const& filePath)
