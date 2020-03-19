@@ -18,9 +18,8 @@ layout(location = 3) out flat int fragMaterialIndex;
 
 void main()
 {
-
    	gl_Position = ubo.projection * ubo.view * ubo.model * vec4(inPosition, 1.0);
-	fragNormal = vec3(ubo.view * ubo.model * vec4(inNormal, 0.0)); // technically not correct, should be ModelInverseTranspose
+	fragNormal = vec3(ubo.view * inverse(transpose(ubo.model)) * vec4(inNormal, 0.0)); 
    	// fragColor = m.Diffuse.xyz;
 	// fragTexCoord = inTexCoord;
 	// fragMaterialIndex = inMaterialIndex;

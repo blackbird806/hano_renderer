@@ -27,7 +27,9 @@ namespace hano::vkh
 
 		void transitionImageLayout(CommandPool& commandPool, vk::ImageLayout newLayout);
 		void copyFrom(CommandPool& commandPool, vkh::Buffer const& buffer);
-		
+		void insertBarrier(vk::CommandBuffer commandBuffer, vk::ImageSubresourceRange subresourceRange,
+			vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask, vk::ImageLayout newLayout);
+
 		vk::UniqueImage handle;
 		vk::UniqueDeviceMemory memory;
 

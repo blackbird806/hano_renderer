@@ -187,6 +187,7 @@
     <ClInclude Include="source\include\renderer\light.hpp" />
     <ClInclude Include="source\include\renderer\material.hpp" />
     <ClInclude Include="source\include\renderer\mesh.hpp" />
+    <ClInclude Include="source\include\renderer\model.hpp" />
     <ClInclude Include="source\include\renderer\renderInfo.hpp" />
     <ClInclude Include="source\include\renderer\scene.hpp" />
     <ClInclude Include="source\include\renderer\texture.hpp" />

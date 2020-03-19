@@ -15,6 +15,7 @@
 #include <vulkanHelpers/vkhFence.hpp>
 #include <vulkanHelpers/vkhFrameBuffer.hpp>
 #include <vulkanHelpers/vkhDescriptorPool.hpp>
+#include <vulkanHelpers/vkhDescriptorSets.hpp>
 #include <vulkanHelpers/vkhGraphicsPipeline.hpp>
 
 #if HANO_RENDERER_ENABLE_RAYTRACING

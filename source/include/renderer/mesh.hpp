@@ -27,6 +27,8 @@ namespace hano
 			void setVertices(std::vector<Vertex> const& vertices);
 			void setIndices(std::vector<uint32> const& indices);
 
+			vk::GeometryNV toVkGeometryNV() const;
+
 			void handleResizing();
 
 			void updateUniformBuffer(uint32 currentFrame, Camera const& camera);

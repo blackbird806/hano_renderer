@@ -9,6 +9,13 @@
 
 namespace hano
 {
+	// used for UBO
+	struct CameraMatrices
+	{
+		glm::mat4 view;
+		glm::mat4 proj;
+	};
+
 	struct Camera
 	{
 		void setPerspectiveProjection() noexcept;
@@ -16,7 +23,7 @@ namespace hano
 
 		void update() noexcept;
 
-		float near = 0.01f, far = 100.0f;
+		float near = 0.01f, far = 10000.0f;
 		glm::vec2 view;
 		float fov = 45.0f;
 

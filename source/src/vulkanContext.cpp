@@ -1,6 +1,6 @@
 #include <vulkanContext.hpp>
+#include <renderer/scene.hpp>
 #undef max
-
 using namespace hano;
 
 void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
@@ -72,7 +72,7 @@ void VulkanContext::createSwapchain()
 	graphicsPipeline = std::make_unique<vkh::GraphicsPipeline>(*swapchain, *depthBuffer, false);
 	
 	descriptorPool = std::make_unique<vkh::DescriptorPool>(*device, graphicsPipeline->descriptorSetLayout.getDescriptorBindings(), /*@TODO*/500);
-
+	
 	for (auto const& imageView : swapchain->imageViews)
 	{
 		swapchainFrameBuffers.emplace_back(imageView, graphicsPipeline->renderPass);
@@ -108,6 +108,145 @@ void VulkanContext::recreateSwapchain()
 	deleteSwapchain();
 	createSwapchain();
 	onRecreateSwapchain();
+}
+
+void VulkanContext::createRtStructures(Scene const& scene)
+{
+	createAccelerationStructures(scene);
+	createRaytracingDescriptorSets(scene);
+}
+
+//@Review
+void VulkanContext::createAccelerationStructures(Scene const& scene)
+{
+	std::vector<vkh::GeometryInstance> instances(scene.meshes.size());
+	m_bottomLevelAccelerationStructures.reserve(scene.meshes.size());
+	
+	uint32 i = 0;
+	// create one GeometryInstance per mesh, this is not the best way of doing this, but it should be the easiest way
+	for (auto const& mesh : scene.meshes)
+	{
+		auto& bottomAs = m_bottomLevelAccelerationStructures.emplace_back(*device, std::vector{ mesh.toVkGeometryNV() }, true);
+		{
+			vkh::SingleTimeCommands command(*commandPool);
+			bottomAs.generate(command.buffer());
+		}
+		
+		instances.push_back(vkh::TopLevelAS::createGeometryInstance(bottomAs, mesh.transform.getMatrix(), i, 0 /*@TODO*/));
+	}
+
+	m_topLevelAccelerationStructure = std::make_unique<vkh::TopLevelAS>(*device, instances, true);
+	{
+		vkh::SingleTimeCommands command(*commandPool);
+		m_topLevelAccelerationStructure->generate(command.buffer());
+	}
+}
+
+void VulkanContext::createRaytracingOutImage()
+{
+	m_rtOutputImage.init(*device, swapchain->extent, swapchain->format, vk::MemoryPropertyFlagBits::eDeviceLocal,
+		vk::ImageTiling::eOptimal,
+		vk::ImageUsageFlagBits::eColorAttachment
+		| vk::ImageUsageFlagBits::eSampled
+		| vk::ImageUsageFlagBits::eStorage);
+
+	m_rtOutputImageView.init(*device, m_rtOutputImage.handle.get(), swapchain->format, vk::ImageAspectFlagBits::eColor);
+}
+
+// @Review
+void VulkanContext::createRaytracingDescriptorSets(Scene const& scene)
+{
+	std::vector<vkh::DescriptorBinding> descriptorBindings;
+	descriptorBindings.push_back({ 0, 1, vk::DescriptorType::eAccelerationStructureNV, vk::ShaderStageFlagBits::eRaygenNV }); // TLAS
+	descriptorBindings.push_back({ 1, 1, vk::DescriptorType::eStorageImage, vk::ShaderStageFlagBits::eRaygenNV}); // outputImage
+	descriptorBindings.push_back({ 2, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eRaygenNV }); // camera matrices
+	m_rtDescriptorPool = std::make_unique<vkh::DescriptorPool>(*device, descriptorBindings, /*@TODO*/500);
+	m_rtDescriptorSetLayout.init(*device, descriptorBindings);
+	m_rtDescriptorSets.init(*m_rtDescriptorPool, m_rtDescriptorSetLayout, 1); // @TODO
+	
+	vk::WriteDescriptorSetAccelerationStructureNV accelWrite;
+	accelWrite.accelerationStructureCount = 1;
+	accelWrite.pAccelerationStructures = &m_topLevelAccelerationStructure->handle.get();
+	m_rtDescriptorSets.push(0, 0, accelWrite);
+	
+	vk::DescriptorImageInfo imageInfo;
+	//imageInfo.imageLayout = m_rtOutputImage.imageLayout;
+	imageInfo.imageView = m_rtOutputImageView.handle.get();
+	imageInfo.imageLayout = vk::ImageLayout::eGeneral;
+	imageInfo.sampler = vk::Sampler();
+	m_rtDescriptorSets.push(0, 1, imageInfo);
+	
+	// @TODO redo
+	CameraMatrices camMtr = { .view = scene.camera.viewMtr, .proj = scene.camera.projectionMtr };
+	m_cameraUbo.init(*device, sizeof(CameraMatrices), vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+	
+	void* camData = m_cameraUbo.map();
+		memcpy(camData, &camMtr, sizeof(CameraMatrices));
+	m_cameraUbo.unMap();
+	
+	vk::DescriptorBufferInfo cameraInfo;
+	cameraInfo.buffer = m_cameraUbo.handle.get();
+	cameraInfo.offset = 0;
+	cameraInfo.range = VK_WHOLE_SIZE;
+	m_rtDescriptorSets.push(0, 2, cameraInfo);
+
+	m_rtDescriptorSets.updateDescriptors(0);
+}
+
+// should be called when resizing window after created a new image with correct size
+void VulkanContext::updateRaytracingOutImage()
+{
+	vk::DescriptorImageInfo imageInfo;
+	//imageInfo.imageLayout = m_rtOutputImage.imageLayout;
+	imageInfo.imageLayout = vk::ImageLayout::eGeneral;
+	imageInfo.imageView = m_rtOutputImageView.handle.get();
+	imageInfo.sampler = vk::Sampler();
+	m_rtDescriptorSets.push(0, 1, imageInfo);
+
+	m_rtDescriptorSets.updateDescriptors(0);
+}
+
+void VulkanContext::createRaytracingPipeline()
+{
+	vkh::RaytracingPipelineGenerator pipelineGen;
+	vkh::ShaderModule raygen(*device, "assets/shaders/raygen.spv", vk::ShaderStageFlagBits::eRaygenNV);
+	vkh::ShaderModule closestHit(*device, "assets/shaders/closestHit.spv", vk::ShaderStageFlagBits::eClosestHitNV);
+	vkh::ShaderModule miss(*device, "assets/shaders/miss.spv", vk::ShaderStageFlagBits::eMissNV);
+
+	pipelineGen.addHitGroup({ raygen }, vk::RayTracingShaderGroupTypeNV::eGeneral);
+	pipelineGen.addHitGroup({ closestHit }, vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup);
+	pipelineGen.addHitGroup({ miss }, vk::RayTracingShaderGroupTypeNV::eGeneral);
+	m_rtPipeline = pipelineGen.create(m_rtDescriptorSetLayout, /*@TODO Recursion*/1);
+}
+
+// @Review
+void VulkanContext::createShaderBindingTable()
+{
+	m_sbt = std::make_unique<vkh::ShaderBindingTable>(*device, m_rtPipeline, 
+		std::vector{ vkh::ShaderBindingTable::Entry{0, { } } }, // raygenEntries
+		std::vector{ vkh::ShaderBindingTable::Entry{2, { } } }, // miss
+		std::vector{ vkh::ShaderBindingTable::Entry{1, { } } }	// hit
+		);
+}
+
+// @Review
+void VulkanContext::raytrace(vk::CommandBuffer commandBuffer)
+{
+	vk::ImageSubresourceRange subresourceRange;
+	subresourceRange.baseMipLevel = 0;
+	subresourceRange.levelCount = 1;
+	subresourceRange.baseArrayLayer = 0;
+	subresourceRange.layerCount = 1;
+
+	commandBuffer.bindPipeline(vk::PipelineBindPoint::eRayTracingNV, m_rtPipeline.handle.get());
+	m_rtDescriptorSets.bindDescriptor(0, commandBuffer, vk::PipelineBindPoint::eRayTracingNV, m_rtPipeline.pipelineLayout.get());
+	auto const& sbtBuffer = m_sbt->getBuffer().handle.get();
+	commandBuffer.traceRaysNV(sbtBuffer, m_sbt->rayGenOffset(),
+		sbtBuffer, m_sbt->missOffset(), m_sbt->missEntrySize(),
+		sbtBuffer, m_sbt->hitGroupOffset(), m_sbt->hitGroupEntrySize(),
+		nullptr, 0, 0, 
+		800, 600, // imageExtent
+		1); //depth
 }
 
 std::optional<vk::CommandBuffer> VulkanContext::beginFrame()

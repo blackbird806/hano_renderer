@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <vulkan/vulkan.hpp>
+#include <core/hanoConfig.hpp>
 #include <vulkanHelpers/vkhShaderModule.hpp>
 
 namespace hano::vkh
@@ -17,9 +18,10 @@ namespace hano::vkh
 	// helper struct used to create RaytracingPipeline
 	struct RaytracingPipelineGenerator
 	{
-		void addHitGroup(std::vector<vkh::ShaderModule*> shaders, vk::RayTracingShaderGroupTypeNV hitGroupType);
-		RaytracingPipeline create(vkh::DescriptorSetLayout descriptorSetLayout_, uint32_t maxRecursionDepth);
+		void addHitGroup(std::vector<std::reference_wrapper<vkh::ShaderModule>> shaders, vk::RayTracingShaderGroupTypeNV hitGroupType);
+		HANO_NODISCARD RaytracingPipeline create(vkh::DescriptorSetLayout const& descriptorSetLayout_, uint32_t maxRecursionDepth);
 
+	private:
 		std::vector<vk::RayTracingShaderGroupCreateInfoNV> m_shaderGroups;
 		std::vector<vk::PipelineShaderStageCreateInfo> m_shaderStages;
 	};

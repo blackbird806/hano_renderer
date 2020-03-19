@@ -200,6 +200,9 @@
     <ClInclude Include="source\include\renderer\mesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\renderer\model.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\renderer\renderInfo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

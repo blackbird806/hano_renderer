@@ -22,7 +22,7 @@ namespace
 			maxArgs = std::max(maxArgs, entry.inlineData.size());
 		}
 
-		vk::DeviceSize entrySize = progIdSize + static_cast<VkDeviceSize>(maxArgs);
+		vk::DeviceSize entrySize = progIdSize + static_cast<vk::DeviceSize>(maxArgs);
 
 		// A SBT entry is made of a program ID and a set of 4-byte parameters (offsets or push constants)
 		// and must be 16-bytes-aligned.
@@ -57,8 +57,8 @@ ShaderBindingTable::ShaderBindingTable(Device const& device_, RaytracingPipeline
 	std::vector<Entry> const& missPrograms,
 	std::vector<Entry> const& hitGroups)
 {
-	vk::PhysicalDeviceProperties2 props = device_.physicalDevice.getProperties2();
-	vk::PhysicalDeviceRayTracingPropertiesNV raytracingProps = *(reinterpret_cast<vk::PhysicalDeviceRayTracingPropertiesNV*>(props.pNext));
+	auto properties = device_.physicalDevice.getProperties2<vk::PhysicalDeviceProperties2, vk::PhysicalDeviceRayTracingPropertiesNV>();
+	vk::PhysicalDeviceRayTracingPropertiesNV raytracingProps = properties.get<vk::PhysicalDeviceRayTracingPropertiesNV>();
 	
 	m_buffer = std::make_unique<vkh::Buffer>(
 		device_, 
@@ -100,4 +100,9 @@ vk::DeviceSize ShaderBindingTable::computeSize(vkh::Device const& device_,
 		+ m_hitGroupEntrySize * hitGroups.size();
 
 	return sbtSize;
+}
+
+Buffer const& ShaderBindingTable::getBuffer() const noexcept
+{
+	return *m_buffer;
 }

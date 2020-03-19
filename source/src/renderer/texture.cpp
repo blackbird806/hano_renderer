@@ -9,10 +9,8 @@ using namespace hano;
 Texture::Texture(VulkanContext const& ctx, std::filesystem::path const& texturePath)
     : vkContext(&ctx)
 {
-    if (texturePath.extension() == ".jpg")
-	    load(texturePath);
-
-    assert(false);
+	load(texturePath);
+	assert(false);
 }
 
 void Texture::load(std::filesystem::path const& texturePath)

@@ -1,6 +1,6 @@
 #pragma once
-#include <vulkanHelpers/vkhImage.hpp>
-#include <vulkanHelpers/vkhImageView.hpp>
+#include <vector>
+#include "texture.hpp"
 
 namespace hano
 {
@@ -8,8 +8,11 @@ namespace hano
 	{
 		public:
 
+
 		private:
-
-
+			
+			vk::Pipeline m_pipeline;
+			vk::PipelineBindPoint m_bindPoint;
+			std::vector<Texture> m_textures;
 	};
 }

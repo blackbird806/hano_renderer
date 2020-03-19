@@ -17,9 +17,9 @@ namespace hano::vkh
 		};
 
 		ShaderBindingTable(Device const& device_, RaytracingPipeline const& pipeline,
-			std::vector<Entry> const& rayGenPrograms,
-			std::vector<Entry> const& missPrograms,
-			std::vector<Entry> const& hitGroups);
+							std::vector<Entry> const& rayGenPrograms,
+							std::vector<Entry> const& missPrograms,
+							std::vector<Entry> const& hitGroups);
 		
 		vk::DeviceSize  rayGenOffset() const noexcept { return m_rayGenOffset; }
 		vk::DeviceSize  missOffset() const noexcept { return m_missOffset; }
@@ -28,6 +28,8 @@ namespace hano::vkh
 		vk::DeviceSize  rayGenEntrySize() const noexcept { return m_rayGenEntrySize; }
 		vk::DeviceSize  missEntrySize() const noexcept { return m_missEntrySize; }
 		vk::DeviceSize  hitGroupEntrySize() const noexcept { return m_hitGroupEntrySize; }
+
+		vkh::Buffer const& getBuffer() const noexcept;
 
 		private:
 

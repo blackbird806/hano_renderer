@@ -80,7 +80,7 @@ void Mesh::setIndices(std::vector<uint32> const& indices)
 
 	m_indexCount = static_cast<uint32>(indices.size());
 
-	uint32 const bufferSize = sizeof(Vertex) * indices.size();
+	uint32 const bufferSize = sizeof(uint32) * indices.size();
 
 	vkh::Buffer staging(*m_vkContext->device, bufferSize,
 		vk::BufferUsageFlagBits::eTransferSrc,
@@ -103,10 +103,34 @@ std::vector<Vertex> Mesh::getVertices()
 	return std::vector<Vertex>();
 }
 
+vk::GeometryNV Mesh::toVkGeometryNV() const
+{
+	vk::GeometryTrianglesNV triangles;
+	triangles.setVertexData(m_vertexBuffer.handle.get());
+	triangles.setVertexOffset(0);  // Start at the beginning of the buffer
+	triangles.setVertexCount(m_vertexCount);
+	triangles.setVertexStride(sizeof(Vertex));
+	triangles.setVertexFormat(vk::Format::eR32G32B32Sfloat);  // 3xfloat32 for vertices
+	if (m_indexCount > 0)
+	{
+		triangles.setIndexData(m_indexBuffer.handle.get());
+		triangles.setIndexOffset(0 * sizeof(uint32_t));
+		triangles.setIndexCount(m_indexCount);
+		triangles.setIndexType(vk::IndexType::eUint32);  // 32-bit indices
+	}
+	vk::GeometryDataNV geoData;
+	geoData.setTriangles(triangles);
+	vk::GeometryNV geometry;
+	geometry.setGeometry(geoData);
+	// Consider the geometry opaque for optimization
+	geometry.setFlags(vk::GeometryFlagBitsNV::eOpaque);
+	return geometry;
+}
+
 void Mesh::updateUniformBuffer(uint32 currentFrame, Camera const& camera)
 {
 	UniformBufferObject ubo;
-	ubo.model = glm::translate(glm::mat4(), transform.pos) * glm::scale(glm::mat4(), transform.scale) * glm::toMat4(transform.rot);
+	ubo.model = transform.getMatrix();
 	ubo.view = camera.viewMtr;
 	ubo.projection = camera.projectionMtr;
 
@@ -180,6 +204,12 @@ void Mesh::loadObj(std::filesystem::path const& filePath)
 				attrib.vertices[3 * index.vertex_index + 1],
 				attrib.vertices[3 * index.vertex_index + 2]
 			};
+
+			if (!attrib.normals.empty() && index.normal_index >= 0)
+			{
+				float* np = &attrib.normals[3 * index.normal_index];
+				vertex.normal = { np[0], np[1], np[2] };
+			}
 
 			vertex.texCoord = {
 				attrib.texcoords[2 * index.texcoord_index + 0],

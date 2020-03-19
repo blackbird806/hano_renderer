@@ -4,16 +4,20 @@
 
 using namespace hano::vkh;
 
-void RaytracingPipelineGenerator::addHitGroup(std::vector<vkh::ShaderModule*> shaders, vk::RayTracingShaderGroupTypeNV hitGroupType)
+// @TO REDO
+void RaytracingPipelineGenerator::addHitGroup(std::vector<std::reference_wrapper<vkh::ShaderModule>> shaders, vk::RayTracingShaderGroupTypeNV hitGroupType)
 {
 	vk::RayTracingShaderGroupCreateInfoNV groupInfo;
 	groupInfo.type = hitGroupType;
-
+	groupInfo.generalShader = VK_SHADER_UNUSED_NV;
+	groupInfo.closestHitShader = VK_SHADER_UNUSED_NV;
+	groupInfo.intersectionShader = VK_SHADER_UNUSED_NV;
+	groupInfo.anyHitShader = VK_SHADER_UNUSED_NV;
+	
 	m_shaderStages.reserve(shaders.size());
-	for (int index = 0; auto const& shaderPtr : shaders)
+	for (int index = 0; auto const& shaderRef : shaders)
 	{
-		assert(shaderPtr);
-		auto& shader = *shaderPtr;
+		auto& shader = shaderRef.get();
 		m_shaderStages.push_back(shader.createShaderStageInfo());
 		switch (shader.shaderStage)
 		{
@@ -34,10 +38,14 @@ void RaytracingPipelineGenerator::addHitGroup(std::vector<vkh::ShaderModule*> sh
 
 		case vk::ShaderStageFlagBits::eMissNV:
 			assert(hitGroupType == vk::RayTracingShaderGroupTypeNV::eGeneral);
+			assert(shaders.size() == 1); // general groups have only one shader
+			groupInfo.generalShader = index;
 			break;
 
 		case vk::ShaderStageFlagBits::eRaygenNV:
 			assert(hitGroupType == vk::RayTracingShaderGroupTypeNV::eGeneral);
+			assert(shaders.size() == 1);
+			groupInfo.generalShader = index;
 			break;
 
 		default:
@@ -50,7 +58,7 @@ void RaytracingPipelineGenerator::addHitGroup(std::vector<vkh::ShaderModule*> sh
 	m_shaderGroups.push_back(groupInfo);
 }
 
-RaytracingPipeline RaytracingPipelineGenerator::create(vkh::DescriptorSetLayout descriptorSetLayout_, uint32_t maxRecursionDepth)
+RaytracingPipeline RaytracingPipelineGenerator::create(vkh::DescriptorSetLayout const& descriptorSetLayout_, uint32_t maxRecursionDepth)
 {
 	RaytracingPipeline pipeline;
 

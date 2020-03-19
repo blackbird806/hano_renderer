@@ -4,11 +4,14 @@
 #include <memory>
 #include <optional>
 #include <functional>
+#include <vector>
 #include <glfw/glfw3.h>
 #include "vulkanHelpers.hpp"
 
 namespace hano
 {
+	struct Scene;
+
 	struct VulkanConfig
 	{
 		const char* appName;
@@ -16,8 +19,11 @@ namespace hano
 		bool vsyncEnabled;
 	};
 
-	struct VulkanContext
+	class VulkanContext
 	{
+
+	public:
+		
 		void init(GLFWwindow* window, VulkanConfig const& config);
 
 		std::optional<vk::CommandBuffer> beginFrame();
@@ -26,6 +32,17 @@ namespace hano
 		void createSwapchain();
 		void deleteSwapchain();
 		void recreateSwapchain();
+
+		// raytracing @Review
+		void createRtStructures(Scene const& scene);
+		void createAccelerationStructures(Scene const& scene);
+		void createRaytracingOutImage();
+		void createRaytracingDescriptorSets(Scene const& scene);
+		void updateRaytracingOutImage();
+		void createRaytracingPipeline();
+		void createShaderBindingTable();
+		void raytrace(vk::CommandBuffer commandBuffer);
+		// -- 
 
 		vkh::FrameBuffer const& getCurrentFrameBuffer() const;
 
@@ -48,8 +65,8 @@ namespace hano
 
 		bool frameBufferResized = false;
 		std::function<void()> onRecreateSwapchain;
-
-		private:
+		
+		protected:
 			
 			uint64 m_currentFrame = 0;
 			uint32 imageIndex = 0;
@@ -60,5 +77,19 @@ namespace hano
 			std::vector<vkh::Semaphore> m_imageAvailableSemaphores;
 			std::vector<vkh::Semaphore> m_renderFinishedSemaphores;
 			std::vector<vkh::Fence> m_inFlightFences;
+
+			// rtx
+			std::unique_ptr<vkh::TopLevelAS> m_topLevelAccelerationStructure;
+			std::vector<vkh::BottomLevelAS> m_bottomLevelAccelerationStructures;
+			vkh::RaytracingPipeline m_rtPipeline;
+			std::unique_ptr<vkh::ShaderBindingTable> m_sbt;
+			vkh::Buffer m_cameraUbo;
+
+			std::unique_ptr<vkh::DescriptorPool> m_rtDescriptorPool;
+			vkh::DescriptorSetLayout m_rtDescriptorSetLayout;
+			vkh::DescriptorSets m_rtDescriptorSets;
+
+			vkh::Image m_rtOutputImage;
+			vkh::ImageView m_rtOutputImageView;
 	};
 }

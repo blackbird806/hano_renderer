@@ -5,6 +5,12 @@
 # ignore shader spir-V files
 *.spv
 
+# ignore assets files
+*.obj
+*.jpg
+*.png
+*.jpeg
+
 # Created by https://www.gitignore.io/api/c++,cmake,visualstudio,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=c++,cmake,visualstudio,visualstudiocode
 

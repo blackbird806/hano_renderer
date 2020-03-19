@@ -141,3 +141,19 @@ void Image::copyFrom(CommandPool& commandPool, vkh::Buffer const& buffer)
 
 	singleTimeCommands.buffer().copyBufferToImage(buffer.handle.get(), handle.get(), vk::ImageLayout::eTransferDstOptimal, { region });
 }
+
+void Image::insertBarrier(vk::CommandBuffer commandBuffer, vk::ImageSubresourceRange subresourceRange, vk::AccessFlags srcAccessMask, vk::AccessFlags dstAccessMask, vk::ImageLayout newLayout)
+{
+	vk::ImageMemoryBarrier barrier;
+	barrier.srcAccessMask = srcAccessMask;
+	barrier.dstAccessMask = dstAccessMask;
+	barrier.oldLayout = imageLayout;
+	barrier.newLayout = newLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = handle.get();
+	barrier.subresourceRange = subresourceRange;
+
+	commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands, vk::DependencyFlags(),
+		{}, {}, { barrier });
+}

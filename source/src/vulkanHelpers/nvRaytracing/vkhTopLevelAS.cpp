@@ -118,9 +118,9 @@ GeometryInstance TopLevelAS::createGeometryInstance(
 
 	GeometryInstance geometryInstance = {};
 	std::memcpy(geometryInstance.transform, &transform, sizeof(glm::mat4));
-	geometryInstance.instanceCustomIndex = instanceId;
+	geometryInstance.instanceId = instanceId;
 	geometryInstance.mask = 0xFF; // The visibility mask is always set of 0xFF, but if some instances would need to be ignored in some cases, this flag should be passed by the application.
-	geometryInstance.instanceOffset = hitGroupIndex; // Set the hit group index, that will be used to find the shader code to execute when hitting the geometry.
+	geometryInstance.hitGroupId = hitGroupIndex; // Set the hit group index, that will be used to find the shader code to execute when hitting the geometry.
 	geometryInstance.flags = (uint32_t)vk::GeometryInstanceFlagBitsNV::eTriangleFrontCounterclockwise;
 	geometryInstance.accelerationStructureHandle = accelerationStructureHandle;
 
