@@ -14,6 +14,9 @@ int main()
 		{
 			renderer.renderFrame();
 		}
+
+		// @TODO need to wait work finishe before deinit vulkan data
+		renderer.m_vkContext.device->handle.waitIdle();
 	}
     return 0;
 }

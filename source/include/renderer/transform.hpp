@@ -12,7 +12,7 @@ namespace hano
 		glm::quat rot;
 		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
-		inline glm::mat2 getMatrix() const noexcept
+		glm::mat4 getMatrix() const noexcept
 		{
 			return glm::translate(glm::mat4(), pos)* glm::scale(glm::mat4(), scale)* glm::toMat4(rot);
 		}

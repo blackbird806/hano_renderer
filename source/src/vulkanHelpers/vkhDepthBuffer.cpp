@@ -39,8 +39,8 @@ namespace
 }
 
 DepthBuffer::DepthBuffer(CommandPool& commandPool, vk::Extent2D extent)
-	:	image(commandPool.device, extent, findDepthFormat(commandPool.device), vk::MemoryPropertyFlagBits::eDeviceLocal, vk::ImageTiling::eOptimal, vk::ImageUsageFlagBits::eDepthStencilAttachment),
-		imageView(commandPool.device, image.handle.get(), image.format, vk::ImageAspectFlagBits::eDepth)
+	:	image(*commandPool.device, extent, findDepthFormat(*commandPool.device), vk::MemoryPropertyFlagBits::eDeviceLocal, vk::ImageTiling::eOptimal, vk::ImageUsageFlagBits::eDepthStencilAttachment),
+		imageView(*commandPool.device, image.handle.get(), image.format, vk::ImageAspectFlagBits::eDepth)
 {
 	image.transitionImageLayout(commandPool, vk::ImageLayout::eDepthStencilAttachmentOptimal);
 }

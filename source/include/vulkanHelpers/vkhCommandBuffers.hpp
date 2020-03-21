@@ -15,17 +15,17 @@ namespace hano::vkh
 			: commandPool(pool)
 		{
 			vk::CommandBufferAllocateInfo allocInfo = {};
-			allocInfo.commandPool = commandPool.handle;
+			allocInfo.commandPool = commandPool.handle.get();
 			allocInfo.level = vk::CommandBufferLevel::ePrimary;
 			allocInfo.commandBufferCount = size;
 
-			commandBuffers = commandPool.device.handle.allocateCommandBuffers(allocInfo);
+			commandBuffers = commandPool.device->handle.allocateCommandBuffers(allocInfo);
 		}
 
 		~CommandBuffers()
 		{
-			if (!commandBuffers.empty())
-				commandPool.device.handle.freeCommandBuffers(commandPool.handle, commandBuffers);
+			if (!commandBuffers.empty() && commandPool.handle)
+				commandPool.device->handle.freeCommandBuffers(commandPool.handle.get(), commandBuffers);
 		}
 
 		HANO_NODISCARD vk::CommandBuffer begin(size_t i)
@@ -82,7 +82,7 @@ namespace hano::vkh
 			submitInfo.commandBufferCount = 1;
 			submitInfo.pCommandBuffers = &commandBuffers[0];
 
-			const auto graphicsQueue = commandPool.device.graphicsQueue();
+			const auto graphicsQueue = commandPool.device->graphicsQueue();
 			VKH_CHECK(
 				graphicsQueue.submit(1, &submitInfo, nullptr), "failed to submit single time Command !");
 			graphicsQueue.waitIdle();

@@ -22,49 +22,49 @@ namespace hano
 	class VulkanContext
 	{
 
-	public:
+		public:
 		
-		void init(GLFWwindow* window, VulkanConfig const& config);
+			void init(GLFWwindow* window, VulkanConfig const& config);
 
-		std::optional<vk::CommandBuffer> beginFrame();
-		void endFrame();
+			std::optional<vk::CommandBuffer> beginFrame();
+			void endFrame();
 
-		void createSwapchain();
-		void deleteSwapchain();
-		void recreateSwapchain();
+			void createSwapchain();
+			void deleteSwapchain();
+			void recreateSwapchain();
 
-		// raytracing @Review
-		void createRtStructures(Scene const& scene);
-		void createAccelerationStructures(Scene const& scene);
-		void createRaytracingOutImage();
-		void createRaytracingDescriptorSets(Scene const& scene);
-		void updateRaytracingOutImage();
-		void createRaytracingPipeline();
-		void createShaderBindingTable();
-		void raytrace(vk::CommandBuffer commandBuffer);
-		// -- 
+			// raytracing @Review
+			void createRtStructures(Scene const& scene);
+			void createAccelerationStructures(Scene const& scene);
+			void createRaytracingOutImage();
+			void createRaytracingDescriptorSets(Scene const& scene);
+			void updateRaytracingOutImage();
+			void createRaytracingPipeline();
+			void createShaderBindingTable();
+			void raytrace(vk::CommandBuffer commandBuffer);
+			// -- 
 
-		vkh::FrameBuffer const& getCurrentFrameBuffer() const;
+			vkh::FrameBuffer const& getCurrentFrameBuffer() const;
 
-		std::vector<vk::PhysicalDevice> const& getPhysicalDevices() const;
-		std::vector<vk::ExtensionProperties> const& getExtensions() const;
-		vk::PhysicalDevice getSuitableDevice() const;
-		uint32 getCurrentImageIndex() const noexcept;
+			std::vector<vk::PhysicalDevice> const& getPhysicalDevices() const;
+			std::vector<vk::ExtensionProperties> const& getExtensions() const;
+			vk::PhysicalDevice getSuitableDevice() const;
+			uint32 getCurrentImageIndex() const noexcept;
 
-		vk::AllocationCallbacks* vkAllocator = nullptr;
-		std::unique_ptr<vkh::Instance> instance;
-		std::unique_ptr<vkh::Surface> surface;
-		std::unique_ptr<vkh::Device> device;
-		std::unique_ptr<vkh::Swapchain> swapchain;
-		std::vector<vkh::FrameBuffer> swapchainFrameBuffers;
-		std::unique_ptr<vkh::CommandPool> commandPool;
-		std::unique_ptr<vkh::CommandBuffers> commandBuffers;
-		std::unique_ptr<vkh::DepthBuffer> depthBuffer;
-		std::unique_ptr<vkh::GraphicsPipeline> graphicsPipeline;
-		std::unique_ptr<vkh::DescriptorPool> descriptorPool;
+			vk::AllocationCallbacks* vkAllocator = nullptr;
+			std::unique_ptr<vkh::Instance> instance;
+			std::unique_ptr<vkh::Surface> surface;
+			std::unique_ptr<vkh::Device> device;
+			std::unique_ptr<vkh::Swapchain> swapchain;
+			std::vector<vkh::FrameBuffer> swapchainFrameBuffers;
+			std::unique_ptr<vkh::CommandPool> commandPool;
+			std::unique_ptr<vkh::CommandBuffers> commandBuffers;
+			std::unique_ptr<vkh::DepthBuffer> depthBuffer;
+			std::unique_ptr<vkh::GraphicsPipeline> graphicsPipeline;
+			std::unique_ptr<vkh::DescriptorPool> descriptorPool;
 
-		bool frameBufferResized = false;
-		std::function<void()> onRecreateSwapchain;
+			bool frameBufferResized = false;
+			std::function<void()> onRecreateSwapchain;
 		
 		protected:
 			

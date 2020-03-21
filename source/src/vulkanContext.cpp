@@ -224,8 +224,8 @@ void VulkanContext::createShaderBindingTable()
 {
 	m_sbt = std::make_unique<vkh::ShaderBindingTable>(*device, m_rtPipeline, 
 		std::vector{ vkh::ShaderBindingTable::Entry{0, { } } }, // raygenEntries
-		std::vector{ vkh::ShaderBindingTable::Entry{2, { } } }, // miss
-		std::vector{ vkh::ShaderBindingTable::Entry{1, { } } }	// hit
+		std::vector{ vkh::ShaderBindingTable::Entry{1, { } } },	// hit
+		std::vector{ vkh::ShaderBindingTable::Entry{2, { } } }  // miss
 		);
 }
 

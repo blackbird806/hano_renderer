@@ -158,6 +158,7 @@
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhShaderBindingTable.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhTopLevelAS.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhBuffer.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhCommandPool.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDepthBuffer.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorPool.cpp" />

@@ -50,8 +50,12 @@ Renderer::Renderer()
 			m_currentScene->camera.setPerspectiveProjection();
 		}
 
-		if (ImGui::DragFloat3("obj pos", (float*)&m_currentScene->meshes[0].transform.pos))
+		for (int i = 0; auto & mesh : m_currentScene->meshes)
 		{
+			if (ImGui::DragFloat3((std::string("pos ") + std::to_string(i)).c_str(), (float*)&mesh.transform.pos))
+			{
+			}
+			i++;
 		}
 
 		ImGui::End();
@@ -74,10 +78,10 @@ void Renderer::setRenderScene(Scene& scene)
 	scene.camera.view.y = 600;
 	scene.camera.setPerspectiveProjection();
 
-	m_vkContext.createRaytracingOutImage();
-	m_vkContext.createRtStructures(scene);
-	m_vkContext.createRaytracingPipeline();
-	m_vkContext.createShaderBindingTable();
+	//m_vkContext.createRaytracingOutImage();
+	//m_vkContext.createRtStructures(scene);
+	//m_vkContext.createRaytracingPipeline();
+	//m_vkContext.createShaderBindingTable();
 }
 
 void Renderer::renderFrame()
@@ -90,25 +94,25 @@ void Renderer::renderFrame()
 	auto commandBuffer = m_vkContext.beginFrame();
 	if (commandBuffer)
 	{
-		//std::array<vk::ClearValue, 2> clearValues = {};
-		//auto e = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
-		//clearValues[0].color = { e };
-		//clearValues[1].depthStencil = { 1.0f, 0 };
+		std::array<vk::ClearValue, 2> clearValues = {};
+		auto e = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
+		clearValues[0].color = { e };
+		clearValues[1].depthStencil = { 1.0f, 0 };
 
-		//vk::RenderPassBeginInfo renderPassInfo = {};
-		//renderPassInfo.renderPass = m_vkContext.graphicsPipeline->renderPass.handle.get();
-		//renderPassInfo.framebuffer = m_vkContext.swapchainFrameBuffers[m_vkContext.getCurrentImageIndex()].handle.get();
-		//renderPassInfo.renderArea.offset = { 0, 0 };
-		//renderPassInfo.renderArea.extent = m_vkContext.swapchain->extent;
-		//renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		//renderPassInfo.pClearValues = clearValues.data();
+		vk::RenderPassBeginInfo renderPassInfo = {};
+		renderPassInfo.renderPass = m_vkContext.graphicsPipeline->renderPass.handle.get();
+		renderPassInfo.framebuffer = m_vkContext.swapchainFrameBuffers[m_vkContext.getCurrentImageIndex()].handle.get();
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = m_vkContext.swapchain->extent;
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
 
-		//commandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-		//commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->handle.get());
-		//
-		//m_currentScene->render(*commandBuffer);
-		//commandBuffer->endRenderPass();
-		m_vkContext.raytrace(*commandBuffer);
+		commandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+		commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->handle.get());
+		
+		m_currentScene->render(*commandBuffer);
+		commandBuffer->endRenderPass();
+		//m_vkContext.raytrace(*commandBuffer);
 		m_editorGUI->render(*commandBuffer, m_vkContext.getCurrentFrameBuffer());
 		m_vkContext.endFrame();
 	}

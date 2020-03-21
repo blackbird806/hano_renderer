@@ -117,6 +117,9 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\vkhCommandPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

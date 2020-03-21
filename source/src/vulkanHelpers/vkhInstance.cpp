@@ -18,8 +18,8 @@ std::vector<const char*> hano::vkh::getGlfwRequiredExtensions(bool validationLay
 	return extensions;
 }
 
-Instance::Instance(const char* appName, const char* engineName, std::vector<const char*> ivalidationLayers, vk::AllocationCallbacks* alloc, GLFWwindow* win)
-	: allocator(alloc), validationLayers(ivalidationLayers), window(win)
+Instance::Instance(const char* appName, const char* engineName, std::vector<const char*> validationLayers_, vk::AllocationCallbacks* alloc, GLFWwindow* win)
+	: allocator(alloc), validationLayers(validationLayers_), window(win)
 {
 	assert(window);
 	// disable validation layers if none provided
