@@ -27,7 +27,7 @@ namespace hano
 
 			vk::GeometryNV toVkGeometryNV() const;
 
-			void render(vk::CommandBuffer commandBuffer, uint32 instances = 1);
+			void render(vk::CommandBuffer commandBuffer, uint32 instances = 1) const;
 
 			// get vertices from GPU memory
 			std::vector<Vertex> getVertices();

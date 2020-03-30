@@ -17,8 +17,10 @@ namespace hano
 			void render(vk::CommandBuffer commandBuffer);
 
 			// @Review
-			Camera camera;
+			std::vector<std::reference_wrapper<Model>> const& getModels() const;
 
+			// @Review
+			Camera camera;
 		private:
 
 			std::vector<std::reference_wrapper<Model>> models;

@@ -53,6 +53,12 @@ void Renderer::init(Renderer::Info const& infos)
 	m_isRunning = true;
 }
 
+void Renderer::waitIdle() const
+{
+	assert(m_vkContext.device);
+	m_vkContext.device->handle.waitIdle();
+}
+
 void Renderer::destroy()
 {
 	if (m_vkContext.device)
@@ -88,6 +94,11 @@ Texture& Renderer::loadTexture(std::filesystem::path const& texturePath)
 void Renderer::setRenderScene(Scene& scene)
 {
 	m_currentScene = &scene;
+
+	m_vkContext.createRaytracingOutImage();
+	m_vkContext.createRtStructures(scene);
+	m_vkContext.createRaytracingPipeline();
+	m_vkContext.createShaderBindingTable();
 }
 
 void Renderer::setEditorGUI(CustomEditorGUI& editor)
@@ -105,24 +116,25 @@ void Renderer::renderFrame()
 	auto commandBuffer = m_vkContext.beginFrame();
 	if (commandBuffer)
 	{
-		std::array<vk::ClearValue, 2> clearValues = {};
-		auto e = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
-		clearValues[0].color = { e };
-		clearValues[1].depthStencil = { 1.0f, 0 };
+		//std::array<vk::ClearValue, 2> clearValues = {};
+		//auto e = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
+		//clearValues[0].color = { e };
+		//clearValues[1].depthStencil = { 1.0f, 0 };
 
-		vk::RenderPassBeginInfo renderPassInfo = {};
-		renderPassInfo.renderPass = m_vkContext.graphicsPipeline->renderPass.handle.get();
-		renderPassInfo.framebuffer = m_vkContext.swapchainFrameBuffers[m_vkContext.getCurrentImageIndex()].handle.get();
-		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = m_vkContext.swapchain->extent;
-		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassInfo.pClearValues = clearValues.data();
+		//vk::RenderPassBeginInfo renderPassInfo = {};
+		//renderPassInfo.renderPass = m_vkContext.graphicsPipeline->renderPass.handle.get();
+		//renderPassInfo.framebuffer = m_vkContext.swapchainFrameBuffers[m_vkContext.getCurrentImageIndex()].handle.get();
+		//renderPassInfo.renderArea.offset = { 0, 0 };
+		//renderPassInfo.renderArea.extent = m_vkContext.swapchain->extent;
+		//renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		//renderPassInfo.pClearValues = clearValues.data();
 
-		commandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-		commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->handle.get());
-		
-		m_currentScene->render(*commandBuffer);
-		commandBuffer->endRenderPass();
+		//commandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+		//commandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkContext.graphicsPipeline->handle.get());
+		//
+		//m_currentScene->render(*commandBuffer);
+		//commandBuffer->endRenderPass();
+		m_vkContext.raytrace(*commandBuffer);
 		m_editorGUI->render(*commandBuffer, m_vkContext.getCurrentFrameBuffer());
 		m_vkContext.endFrame();
 	}

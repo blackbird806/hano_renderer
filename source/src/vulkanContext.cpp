@@ -110,7 +110,6 @@ void VulkanContext::recreateSwapchain()
 	onRecreateSwapchain();
 }
 
-#if 0
 void VulkanContext::createRtStructures(Scene const& scene)
 {
 	createAccelerationStructures(scene);
@@ -119,20 +118,21 @@ void VulkanContext::createRtStructures(Scene const& scene)
 //@Review
 void VulkanContext::createAccelerationStructures(Scene const& scene)
 {
-	std::vector<vkh::GeometryInstance> instances(scene.meshes.size());
-	m_bottomLevelAccelerationStructures.reserve(scene.meshes.size());
+	auto nbModels = scene.getModels().size();
+	std::vector<vkh::GeometryInstance> instances(nbModels);
+	m_bottomLevelAccelerationStructures.reserve(nbModels);
 	
 	uint32 i = 0;
 	// create one GeometryInstance per mesh, this is not the best way of doing this, but it should be the easiest way
-	for (auto const& mesh : scene.meshes)
+	for (auto const& model : scene.getModels())
 	{
-		auto& bottomAs = m_bottomLevelAccelerationStructures.emplace_back(*device, std::vector{ mesh.toVkGeometryNV() }, true);
+		auto& bottomAs = m_bottomLevelAccelerationStructures.emplace_back(*device, std::vector{ model.get().getMesh().toVkGeometryNV() }, true);
 		{
 			vkh::SingleTimeCommands command(*commandPool);
 			bottomAs.generate(command.buffer());
 		}
 		
-		instances.push_back(vkh::TopLevelAS::createGeometryInstance(bottomAs, mesh.transform.getMatrix(), i, 0 /*@TODO*/));
+		instances.push_back(vkh::TopLevelAS::createGeometryInstance(bottomAs, model.get().transform.getMatrix(), i, 0 /*@TODO*/));
 	}
 
 	m_topLevelAccelerationStructure = std::make_unique<vkh::TopLevelAS>(*device, instances, true);
@@ -247,11 +247,10 @@ void VulkanContext::raytrace(vk::CommandBuffer commandBuffer)
 		sbtBuffer, m_sbt->missOffset(), m_sbt->missEntrySize(),
 		sbtBuffer, m_sbt->hitGroupOffset(), m_sbt->hitGroupEntrySize(),
 		nullptr, 0, 0, 
-		800, 600, // imageExtent
+		swapchain->extent.width, swapchain->extent.height, // imageExtent
 		1); //depth
 }
 
-#endif
 std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
 {
 	auto constexpr noTimeout = std::numeric_limits<uint64>::max();

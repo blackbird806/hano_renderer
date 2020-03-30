@@ -13,9 +13,13 @@ int main()
 
 	hano::Mesh& cube = renderer.loadMesh("assets/obj/cube.obj");
 	hano::Model simpleCube(cube);
+	hano::Model simpleCube2(cube);
 
 	hano::Scene scene;
 	scene.addModel(simpleCube);
+
+	simpleCube.transform.pos = glm::vec3(1, 0, 0);
+	simpleCube2.transform.pos = glm::vec3(-1, 0, -1);
 
 	renderer.setRenderScene(scene);
 
@@ -27,7 +31,7 @@ int main()
 		renderer.renderFrame();
 	}
 
-	renderer.destroy();
+	renderer.waitIdle();
 	
     return 0;
 }

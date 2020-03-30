@@ -25,6 +25,7 @@ namespace hano
 			Renderer(Info const& infos);
 			void init(Info const& infos);
 
+			void waitIdle() const;
 			void destroy();
 
 			~Renderer();

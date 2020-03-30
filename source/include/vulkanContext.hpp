@@ -34,7 +34,6 @@ namespace hano
 			void deleteSwapchain();
 			void recreateSwapchain();
 
-#if 0
 			// raytracing @Review
 			void createRtStructures(Scene const& scene);
 			void createAccelerationStructures(Scene const& scene);
@@ -45,7 +44,7 @@ namespace hano
 			void createShaderBindingTable();
 			void raytrace(vk::CommandBuffer commandBuffer);
 			// ------ 
-#endif
+
 			vkh::FrameBuffer const& getCurrentFrameBuffer() const;
 
 			std::vector<vk::PhysicalDevice> const& getPhysicalDevices() const;

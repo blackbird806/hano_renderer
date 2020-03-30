@@ -128,7 +128,7 @@ vk::GeometryNV Mesh::toVkGeometryNV() const
 	return geometry;
 }
 
-void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances)
+void Mesh::render(vk::CommandBuffer commandBuffer, uint32 instances) const
 {
 	if (m_indexCount > 0)
 	{

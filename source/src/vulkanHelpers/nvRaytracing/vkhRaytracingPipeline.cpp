@@ -15,19 +15,22 @@ void RaytracingPipelineGenerator::addHitGroup(std::vector<std::reference_wrapper
 	groupInfo.anyHitShader = VK_SHADER_UNUSED_NV;
 	
 	m_shaderStages.reserve(shaders.size());
-	for (int index = 0; auto const& shaderRef : shaders)
+	for (auto const& shaderRef : shaders)
 	{
 		auto& shader = shaderRef.get();
+		uint32 index = m_shaderStages.size();
 		m_shaderStages.push_back(shader.createShaderStageInfo());
 		switch (shader.shaderStage)
 		{
 		case vk::ShaderStageFlagBits::eClosestHitNV:
-			assert(hitGroupType == vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup);
+			assert(	hitGroupType == vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup || 
+					hitGroupType == vk::RayTracingShaderGroupTypeNV::eProceduralHitGroup);
 			groupInfo.closestHitShader = index;
 			break;
 
 		case vk::ShaderStageFlagBits::eAnyHitNV:
-			assert(hitGroupType == vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup);
+			assert(	hitGroupType == vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup ||
+					hitGroupType == vk::RayTracingShaderGroupTypeNV::eProceduralHitGroup);
 			groupInfo.anyHitShader = index;
 			break;
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "transform.hpp"
 #include "mesh.hpp"
 #include "material.hpp"
 
@@ -14,6 +15,10 @@ namespace hano
 		Model& operator=(Model&&) noexcept = default;
 		
 		void render(vk::CommandBuffer commandBuffer);
+		
+		Mesh const& getMesh() const;
+
+		Transform transform;
 
 	private:
 

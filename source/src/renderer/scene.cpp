@@ -15,3 +15,8 @@ void Scene::render(vk::CommandBuffer commandBuffer)
 		model.render(commandBuffer);
 	}
 }
+
+std::vector<std::reference_wrapper<Model>> const& Scene::getModels() const
+{
+	return models;
+}

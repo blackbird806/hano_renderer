@@ -16,6 +16,11 @@ Model::Model(Mesh const& mesh, Material const& mtrl)
 
 void Model::render(vk::CommandBuffer commandBuffer)
 {
-
+	resourceMesh->render(commandBuffer);
 }
 
+Mesh const& Model::getMesh() const
+{
+	assert(resourceMesh);
+	return *resourceMesh;
+}
