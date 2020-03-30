@@ -18,14 +18,11 @@ namespace hano
 
 	struct Camera
 	{
-		void setPerspectiveProjection() noexcept;
-		void setOrthographicProjection() noexcept;
+		void setPerspectiveProjection(float fov, glm::vec2 view, float near, float far) noexcept;
+		void setOrthographicProjection(glm::vec2 view) noexcept;
 
+		// @Review
 		void update() noexcept;
-
-		float near = 0.01f, far = 10000.0f;
-		glm::vec2 view;
-		float fov = 45.0f;
 
 		glm::vec3 pos;
 		glm::quat rot;

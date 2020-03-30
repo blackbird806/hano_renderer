@@ -1,10 +1,11 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 #include <vulkanHelpers/vkhBuffer.hpp>
 #include "camera.hpp"
 #include "light.hpp"
-#include "mesh.hpp"
+#include "model.hpp"
 
 namespace hano
 {
@@ -12,12 +13,15 @@ namespace hano
 	{
 		public:
 
+			void addModel(Model& model);
 			void render(vk::CommandBuffer commandBuffer);
-			void handleResizing();
 
+			// @Review
 			Camera camera;
-			std::vector<Mesh> meshes;
-			std::vector<vkh::Buffer> uniformBuffers;
+
+		private:
+
+			std::vector<std::reference_wrapper<Model>> models;
 			std::vector<PointLight> lights;
 	};
 }

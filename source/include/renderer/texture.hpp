@@ -9,12 +9,14 @@ namespace hano
 {
 	class Texture
 	{
-		Texture() = default;
-		Texture(VulkanContext const& ctx, std::filesystem::path const& texturePath);
-		Texture(Texture&&) = default;
-		Texture& operator=(Texture&&) = default;
 
-		void load(std::filesystem::path const& texturePath);
+		public:
+			Texture() = default;
+			Texture(VulkanContext const& ctx, std::filesystem::path const& texturePath);
+			Texture(Texture&&) = default;
+			Texture& operator=(Texture&&) = default;
+
+			void load(std::filesystem::path const& texturePath);
 
 		private:
 

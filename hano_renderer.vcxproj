@@ -131,6 +131,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\include\renderer\model.cpp" />
     <ClCompile Include="source\include\vulkanHelpers\vkhGraphicsPipeline.cpp" />
     <ClCompile Include="source\libraries\imguizmo\ImCurveEdit.cpp" />
     <ClCompile Include="source\libraries\imguizmo\ImGradient.cpp" />
@@ -147,7 +148,9 @@
     <ClCompile Include="source\src\main.cpp" />
     <ClCompile Include="source\src\renderer\camera.cpp" />
     <ClCompile Include="source\src\renderer\editorGUI.cpp" />
+    <ClCompile Include="source\src\renderer\hanoEditor.cpp" />
     <ClCompile Include="source\src\renderer\mesh.cpp" />
+    <ClCompile Include="source\src\renderer\ResourceManager.cpp" />
     <ClCompile Include="source\src\renderer\scene.cpp" />
     <ClCompile Include="source\src\renderer\texture.cpp" />
     <ClCompile Include="source\src\vulkanContext.cpp" />
@@ -185,11 +188,13 @@
     <ClInclude Include="source\include\hanoRenderer.hpp" />
     <ClInclude Include="source\include\renderer\camera.hpp" />
     <ClInclude Include="source\include\renderer\editorGUI.hpp" />
+    <ClInclude Include="source\include\renderer\hanoEditor.hpp" />
     <ClInclude Include="source\include\renderer\light.hpp" />
     <ClInclude Include="source\include\renderer\material.hpp" />
     <ClInclude Include="source\include\renderer\mesh.hpp" />
     <ClInclude Include="source\include\renderer\model.hpp" />
     <ClInclude Include="source\include\renderer\renderInfo.hpp" />
+    <ClInclude Include="source\include\renderer\resourceManager.hpp" />
     <ClInclude Include="source\include\renderer\scene.hpp" />
     <ClInclude Include="source\include\renderer\texture.hpp" />
     <ClInclude Include="source\include\renderer\transform.hpp" />

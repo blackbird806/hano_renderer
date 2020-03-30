@@ -36,6 +36,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\include\renderer\model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\include\vulkanHelpers\vkhGraphicsPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,7 +87,13 @@
     <ClCompile Include="source\src\renderer\editorGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\renderer\hanoEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\renderer\mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\src\renderer\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\src\renderer\scene.cpp">
@@ -194,6 +203,9 @@
     <ClInclude Include="source\include\renderer\editorGUI.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\renderer\hanoEditor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\renderer\light.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -207,6 +219,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\renderer\renderInfo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\renderer\resourceManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\renderer\scene.hpp">

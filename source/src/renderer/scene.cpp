@@ -2,19 +2,16 @@
 
 using namespace hano;
 
+void Scene::addModel(Model& model)
+{
+	models.push_back(model);
+}
+
 void Scene::render(vk::CommandBuffer commandBuffer)
 {
 	camera.update();
-	for (auto& mesh : meshes)
+	for (Model& model : models)
 	{
-		mesh.render(commandBuffer, camera);
-	}
-}
-
-void Scene::handleResizing()
-{
-	for (auto& mesh : meshes)
-	{
-		mesh.handleResizing();
+		model.render(commandBuffer);
 	}
 }

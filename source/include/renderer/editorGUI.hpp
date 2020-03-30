@@ -9,21 +9,31 @@
 
 namespace hano
 {
+	// @Review
+	class CustomEditorGUI
+	{
+	public:
+		virtual ~CustomEditorGUI() {};
+
+		virtual void initUI() {};
+		virtual void drawUI() {};
+	};
+
 	class EditorGUI
 	{
 		public:
 
 			EditorGUI(VulkanContext const& vkContext_);
-			~EditorGUI();
+			virtual ~EditorGUI();
 
+			void setCustomEditor(CustomEditorGUI* customEditor);
 			void render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& framebuffer);
 			void handleSwapchainRecreation();
-
-			std::function<void()> onGUI;
 
 		private:
 
 			VulkanContext const* vkContext;
+			CustomEditorGUI* customEditor;
 			std::unique_ptr<vkh::DescriptorPool> descriptorPool;
 			std::unique_ptr<vkh::RenderPass> renderPass;
 	};

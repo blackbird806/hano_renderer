@@ -12,76 +12,87 @@ void Renderer::framebufferResizeCallback(GLFWwindow* window, int width, int heig
 {
 	auto app = reinterpret_cast<Renderer*>(glfwGetWindowUserPointer(window));
 	app->m_vkContext.frameBufferResized = true;
+	app->m_windowWidth = width;
+	app->m_windowHeight = height;
 }
 
-Renderer::Renderer()
+Renderer::Renderer() 
+	: m_window(nullptr), m_windowWidth(0), m_windowHeight(0), m_currentScene(nullptr), m_editorGUI(nullptr), m_isRunning(false)
+{
+
+}
+
+Renderer::Renderer(Renderer::Info const& infos)
+{
+	init(infos);
+}
+
+void Renderer::init(Renderer::Info const& infos)
 {
 	glfwInit();
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	m_window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
+	m_window = glfwCreateWindow(infos.windowWidth, infos.windowHeight, infos.appName, nullptr, nullptr);
 	glfwSetWindowUserPointer(m_window, this);
 
+	m_windowWidth = infos.windowWidth;
+	m_windowHeight = infos.windowHeight;
+
 	glfwSetFramebufferSizeCallback(m_window, &framebufferResizeCallback);
-	m_vkContext.init(m_window, { .appName = "hanoRtx", .engineName = "hanoRenderer" });
-	
+	m_vkContext.init(m_window, { .appName = infos.appName, .engineName = c_engineName });
+
 	m_editorGUI = std::make_unique<EditorGUI>(m_vkContext);
-	
+
+	// @Review
 	m_vkContext.onRecreateSwapchain = [&]() {
 		m_editorGUI->handleSwapchainRecreation();
-		m_currentScene->handleResizing();
 	};
-
-	m_editorGUI->onGUI = [this]() {
-
-		ImGui::ShowMetricsWindow();
-
-		ImGui::Begin("my window");
-
-		ImGui::DragFloat3("camPos", (float*)&m_currentScene->camera.pos);
-
-		if (ImGui::Button("create"))
-		{
-			m_currentScene->meshes.emplace_back(m_vkContext, "assets/obj/cube.obj");
-		}
-
-		if (ImGui::DragFloat("fov", &m_currentScene->camera.fov))
-		{
-			m_currentScene->camera.setPerspectiveProjection();
-		}
-
-		for (int i = 0; auto & mesh : m_currentScene->meshes)
-		{
-			if (ImGui::DragFloat3((std::string("pos ") + std::to_string(i)).c_str(), (float*)&mesh.transform.pos))
-			{
-			}
-			i++;
-		}
-
-		ImGui::End();
-	};
+	
+	m_resourceMgr.init(m_vkContext);
 
 	m_isRunning = true;
+}
 
+void Renderer::destroy()
+{
+	if (m_vkContext.device)
+		m_vkContext.device->handle.waitIdle();
+
+	m_resourceMgr.releaseResources();
+	m_editorGUI.reset();
+	m_vkContext.destroy();
+
+	if (m_window)
+	{
+		glfwDestroyWindow(m_window);
+		glfwTerminate();
+		m_window = nullptr;
+	}
 }
 
 Renderer::~Renderer()
 {
-	glfwDestroyWindow(m_window);
-	glfwTerminate();
+	destroy();
+}
+
+Mesh& hano::Renderer::loadMesh(std::filesystem::path const& meshPath)
+{
+	return m_resourceMgr.loadMesh(meshPath);
+}
+
+Texture& Renderer::loadTexture(std::filesystem::path const& texturePath)
+{
+	return m_resourceMgr.loadTexture(texturePath);
 }
 
 void Renderer::setRenderScene(Scene& scene)
 {
 	m_currentScene = &scene;
-	scene.camera.view.x = 800;
-	scene.camera.view.y = 600;
-	scene.camera.setPerspectiveProjection();
+}
 
-	//m_vkContext.createRaytracingOutImage();
-	//m_vkContext.createRtStructures(scene);
-	//m_vkContext.createRaytracingPipeline();
-	//m_vkContext.createShaderBindingTable();
+void Renderer::setEditorGUI(CustomEditorGUI& editor)
+{
+	m_editorGUI->setCustomEditor(&editor);
 }
 
 void Renderer::renderFrame()
@@ -112,7 +123,6 @@ void Renderer::renderFrame()
 		
 		m_currentScene->render(*commandBuffer);
 		commandBuffer->endRenderPass();
-		//m_vkContext.raytrace(*commandBuffer);
 		m_editorGUI->render(*commandBuffer, m_vkContext.getCurrentFrameBuffer());
 		m_vkContext.endFrame();
 	}
@@ -121,4 +131,19 @@ void Renderer::renderFrame()
 bool Renderer::isRunning() const noexcept
 {
 	return m_isRunning;
+}
+
+int Renderer::getWindowWidth() const noexcept
+{
+	return m_windowWidth;
+}
+
+int Renderer::getWindowHeight() const noexcept
+{
+	return m_windowHeight;
+}
+
+Scene* Renderer::getCurrentScene()
+{
+	return m_currentScene;
 }

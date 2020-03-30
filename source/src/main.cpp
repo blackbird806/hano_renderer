@@ -1,22 +1,33 @@
 #include "hanoRenderer.hpp"
+#include "renderer/hanoEditor.hpp"
 
 int main()
 {
+	hano::Renderer::Info infos = {
+		.appName = "Render test 1",
+		.windowWidth = 800,
+		.windowHeight = 600
+	};
+
+	hano::Renderer renderer(infos);
+
+	hano::Mesh& cube = renderer.loadMesh("assets/obj/cube.obj");
+	hano::Model simpleCube(cube);
+
+	hano::Scene scene;
+	scene.addModel(simpleCube);
+
+	renderer.setRenderScene(scene);
+
+	hano::HanoEditor editor(renderer);
+	renderer.setEditorGUI(editor);
+
+	while (renderer.isRunning())
 	{
-		hano::Renderer renderer;
-		hano::Scene scene;
-		scene.camera.pos = glm::vec3(0, 0, -3);
-		//scene.meshes.emplace_back(renderer.m_vkContext, "assets/obj/Sniper.obj");
-		scene.meshes.emplace_back(renderer.m_vkContext, "assets/obj/cube.obj");
-		renderer.setRenderScene(scene);
-
-		while (renderer.isRunning())
-		{
-			renderer.renderFrame();
-		}
-
-		// @TODO need to wait work finishe before deinit vulkan data
-		renderer.m_vkContext.device->handle.waitIdle();
+		renderer.renderFrame();
 	}
+
+	renderer.destroy();
+	
     return 0;
 }

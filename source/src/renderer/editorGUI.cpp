@@ -19,7 +19,7 @@ namespace
 }
 
 EditorGUI::EditorGUI(VulkanContext const& vkContext_)
-	: vkContext(&vkContext_)
+	: vkContext(&vkContext_), customEditor(nullptr)
 {
 	auto const& device = *vkContext->device;
 	auto const& window = vkContext->surface->instance.window;
@@ -93,6 +93,9 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	}
 
 	//ImGui_ImplVulkan_DestroyFontUploadObjects();
+
+	if (customEditor)
+		customEditor->initUI();
 }
 
 EditorGUI::~EditorGUI()
@@ -100,6 +103,11 @@ EditorGUI::~EditorGUI()
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void EditorGUI::setCustomEditor(CustomEditorGUI* editor)
+{
+	customEditor = editor;
 }
 
 void EditorGUI::handleSwapchainRecreation()
@@ -116,7 +124,8 @@ void EditorGUI::render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& 
 
 	ImGuizmo::BeginFrame();
 
-	onGUI();
+	if (customEditor)
+		customEditor->drawUI();
 
 	ImGui::Render();
 

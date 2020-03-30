@@ -3,14 +3,14 @@
 
 using namespace hano;
 
-void Camera::setPerspectiveProjection() noexcept
+void Camera::setPerspectiveProjection(float fov, glm::vec2 view, float near, float far) noexcept
 {
 	projectionMtr = glm::perspective(glm::radians(fov), view.x/view.y, near, far);
 }
 
-void Camera::setOrthographicProjection() noexcept
+void Camera::setOrthographicProjection(glm::vec2 view) noexcept
 {
-	assert(false);
+	projectionMtr = glm::ortho(0.0f, view.x, 0.0f, view.y);
 }
 
 void Camera::update() noexcept

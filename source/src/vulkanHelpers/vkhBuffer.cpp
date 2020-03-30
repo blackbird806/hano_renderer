@@ -69,3 +69,8 @@ void Buffer::unMap()
 {
 	device->handle.unmapMemory(memory.get());
 }
+
+vk::DeviceSize Buffer::getSize() const noexcept
+{
+	return m_size;
+}

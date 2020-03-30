@@ -25,6 +25,7 @@ namespace hano
 		public:
 		
 			void init(GLFWwindow* window, VulkanConfig const& config);
+			void destroy();
 
 			std::optional<vk::CommandBuffer> beginFrame();
 			void endFrame();
@@ -33,6 +34,7 @@ namespace hano
 			void deleteSwapchain();
 			void recreateSwapchain();
 
+#if 0
 			// raytracing @Review
 			void createRtStructures(Scene const& scene);
 			void createAccelerationStructures(Scene const& scene);
@@ -42,8 +44,8 @@ namespace hano
 			void createRaytracingPipeline();
 			void createShaderBindingTable();
 			void raytrace(vk::CommandBuffer commandBuffer);
-			// -- 
-
+			// ------ 
+#endif
 			vkh::FrameBuffer const& getCurrentFrameBuffer() const;
 
 			std::vector<vk::PhysicalDevice> const& getPhysicalDevices() const;

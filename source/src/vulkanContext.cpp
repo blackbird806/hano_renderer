@@ -110,12 +110,12 @@ void VulkanContext::recreateSwapchain()
 	onRecreateSwapchain();
 }
 
+#if 0
 void VulkanContext::createRtStructures(Scene const& scene)
 {
 	createAccelerationStructures(scene);
 	createRaytracingDescriptorSets(scene);
 }
-
 //@Review
 void VulkanContext::createAccelerationStructures(Scene const& scene)
 {
@@ -238,6 +238,8 @@ void VulkanContext::raytrace(vk::CommandBuffer commandBuffer)
 	subresourceRange.baseArrayLayer = 0;
 	subresourceRange.layerCount = 1;
 
+	m_rtOutputImage.insertBarrier(commandBuffer, subresourceRange, vk::AccessFlagBits(), vk::AccessFlagBits::eShaderWrite, vk::ImageLayout::eGeneral);
+
 	commandBuffer.bindPipeline(vk::PipelineBindPoint::eRayTracingNV, m_rtPipeline.handle.get());
 	m_rtDescriptorSets.bindDescriptor(0, commandBuffer, vk::PipelineBindPoint::eRayTracingNV, m_rtPipeline.pipelineLayout.get());
 	auto const& sbtBuffer = m_sbt->getBuffer().handle.get();
@@ -249,6 +251,7 @@ void VulkanContext::raytrace(vk::CommandBuffer commandBuffer)
 		1); //depth
 }
 
+#endif
 std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
 {
 	auto constexpr noTimeout = std::numeric_limits<uint64>::max();
@@ -340,4 +343,30 @@ vkh::FrameBuffer const& VulkanContext::getCurrentFrameBuffer() const
 uint32 VulkanContext::getCurrentImageIndex() const noexcept
 {
 	return imageIndex;
+}
+
+void VulkanContext::destroy()
+{
+	if (!device)
+		return;
+
+	device->handle.waitIdle();
+
+	m_topLevelAccelerationStructure.reset();
+	m_bottomLevelAccelerationStructures.clear();
+	m_rtPipeline.pipelineLayout.reset();
+	m_rtPipeline.handle.reset();
+	m_sbt.reset();
+	m_cameraUbo.destroy();
+	m_rtDescriptorSetLayout.destroy();
+	m_rtDescriptorPool.reset();
+	m_rtOutputImageView.destroy();
+	m_rtOutputImage.destroy();
+
+	deleteSwapchain();
+	descriptorPool.reset();
+	commandPool.reset();
+	device.reset();
+	surface.reset();
+	instance.reset();
 }

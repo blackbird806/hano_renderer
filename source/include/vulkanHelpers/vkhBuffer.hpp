@@ -22,6 +22,8 @@ namespace hano::vkh
 		void* map(vk::DeviceSize offset = 0);
 		void  unMap();
 
+		vk::DeviceSize getSize() const noexcept;
+
 		void copyFrom(CommandPool& commandPool, Buffer const& buffer, vk::DeviceSize size);
 		
 		vkh::Device const* device;
