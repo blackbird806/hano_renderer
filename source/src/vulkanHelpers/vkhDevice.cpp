@@ -1,4 +1,5 @@
 #include <vulkanHelpers/vkhDevice.hpp>
+#include <vulkanHelpers/vkhDebugUtilsExtension.hpp>
 #include <vulkanHelpers/nvRaytracing/vkhNvRTXExtension.hpp>
 
 using namespace hano::vkh;
@@ -85,6 +86,7 @@ Device::Device(vk::PhysicalDevice physDevice, Surface const& isurface, std::vect
 	#if HANO_RENDERER_ENABLE_RAYTRACING
 		load_VK_NV_ray_tracing(handle, &vkGetDeviceProcAddr);
 	#endif
+	load_VK_EXT_debug_utils(surface.instance.handle.get(), &vkGetInstanceProcAddr, handle, &vkGetDeviceProcAddr);
 }
 
 Device::~Device()

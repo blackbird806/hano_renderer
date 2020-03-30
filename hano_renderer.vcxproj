@@ -163,6 +163,7 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhBuffer.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhCommandPool.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp" />
+    <ClCompile Include="source\src\vulkanHelpers\vkhDebugUtilsExtension.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDepthBuffer.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorPool.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\vkhDescriptorSetLayout.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="source\include\vulkanHelpers\vkhCommandBuffers.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhCommandPool.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDebug.hpp" />
+    <ClInclude Include="source\include\vulkanHelpers\vkhDebugUtilsExtension.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDepthBuffer.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorBinding.hpp" />
     <ClInclude Include="source\include\vulkanHelpers\vkhDescriptorPool.hpp" />

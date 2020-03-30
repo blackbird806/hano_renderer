@@ -94,6 +94,10 @@ Texture& Renderer::loadTexture(std::filesystem::path const& texturePath)
 void Renderer::setRenderScene(Scene& scene)
 {
 	m_currentScene = &scene;
+	
+	scene.camera.pos = glm::vec3(0.0f, 0.0f, -1.0f);
+	scene.camera.setPerspectiveProjection(45.0f, glm::vec2(m_windowWidth, m_windowHeight), 0.001f, 1000.0f);
+	scene.camera.update();
 
 	m_vkContext.createRaytracingOutImage();
 	m_vkContext.createRtStructures(scene);

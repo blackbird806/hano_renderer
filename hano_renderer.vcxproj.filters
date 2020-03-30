@@ -132,6 +132,9 @@
     <ClCompile Include="source\src\vulkanHelpers\vkhDebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\vulkanHelpers\vkhDebugUtilsExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\vulkanHelpers\vkhDepthBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -273,6 +276,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhDebug.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\vulkanHelpers\vkhDebugUtilsExtension.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\vulkanHelpers\vkhDepthBuffer.hpp">

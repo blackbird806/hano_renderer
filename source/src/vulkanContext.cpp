@@ -12,7 +12,7 @@ void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
 		vkAllocator, window);
 
 	surface = std::make_unique<vkh::Surface>(*instance, window, vkAllocator);
-	device = std::make_unique<vkh::Device>(getSuitableDevice(), *surface, std::vector(c_vulkanDefaultRequiredExtentions.begin(), c_vulkanDefaultRequiredExtentions.end()), vkAllocator);
+	device = std::make_unique<vkh::Device>(getSuitableDevice(), *surface, std::vector(c_vulkanDefaultDeviceRequiredExtentions.begin(), c_vulkanDefaultDeviceRequiredExtentions.end()), vkAllocator);
 	commandPool = std::make_unique<vkh::CommandPool>(*device, device->graphicsFamilyIndex(), true);
 	createSwapchain();
 }
@@ -148,7 +148,8 @@ void VulkanContext::createRaytracingOutImage()
 		vk::ImageTiling::eOptimal,
 		vk::ImageUsageFlagBits::eColorAttachment
 		| vk::ImageUsageFlagBits::eSampled
-		| vk::ImageUsageFlagBits::eStorage);
+		| vk::ImageUsageFlagBits::eStorage
+		| vk::ImageUsageFlagBits::eTransferSrc);
 
 	m_rtOutputImageView.init(*device, m_rtOutputImage.handle.get(), swapchain->format, vk::ImageAspectFlagBits::eColor);
 }
@@ -214,8 +215,8 @@ void VulkanContext::createRaytracingPipeline()
 	vkh::ShaderModule miss(*device, "assets/shaders/miss.spv", vk::ShaderStageFlagBits::eMissNV);
 
 	pipelineGen.addHitGroup({ raygen }, vk::RayTracingShaderGroupTypeNV::eGeneral);
-	pipelineGen.addHitGroup({ closestHit }, vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup);
 	pipelineGen.addHitGroup({ miss }, vk::RayTracingShaderGroupTypeNV::eGeneral);
+	pipelineGen.addHitGroup({ closestHit }, vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup);
 	m_rtPipeline = pipelineGen.create(m_rtDescriptorSetLayout, /*@TODO Recursion*/1);
 }
 
@@ -223,9 +224,9 @@ void VulkanContext::createRaytracingPipeline()
 void VulkanContext::createShaderBindingTable()
 {
 	m_sbt = std::make_unique<vkh::ShaderBindingTable>(*device, m_rtPipeline, 
-		std::vector{ vkh::ShaderBindingTable::Entry{0, { } } }, // raygenEntries
-		std::vector{ vkh::ShaderBindingTable::Entry{1, { } } },	// hit
-		std::vector{ vkh::ShaderBindingTable::Entry{2, { } } }  // miss
+		std::vector{ vkh::ShaderBindingTable::Entry{ 0, { } } }, // raygenEntries
+		std::vector{ vkh::ShaderBindingTable::Entry{ 1, { } } }, // miss
+		std::vector{ vkh::ShaderBindingTable::Entry{ 2, { } } }  // hit
 		);
 }
 
@@ -233,6 +234,7 @@ void VulkanContext::createShaderBindingTable()
 void VulkanContext::raytrace(vk::CommandBuffer commandBuffer)
 {
 	vk::ImageSubresourceRange subresourceRange;
+	subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
 	subresourceRange.baseMipLevel = 0;
 	subresourceRange.levelCount = 1;
 	subresourceRange.baseArrayLayer = 0;
@@ -246,9 +248,46 @@ void VulkanContext::raytrace(vk::CommandBuffer commandBuffer)
 	commandBuffer.traceRaysNV(sbtBuffer, m_sbt->rayGenOffset(),
 		sbtBuffer, m_sbt->missOffset(), m_sbt->missEntrySize(),
 		sbtBuffer, m_sbt->hitGroupOffset(), m_sbt->hitGroupEntrySize(),
-		nullptr, 0, 0, 
+		sbtBuffer, 0, 0,
 		swapchain->extent.width, swapchain->extent.height, // imageExtent
 		1); //depth
+
+	m_rtOutputImage.insertBarrier(commandBuffer, subresourceRange, vk::AccessFlagBits::eTransferWrite, vk::AccessFlagBits::eShaderRead, vk::ImageLayout::eTransferSrcOptimal);
+	
+	vk::ImageMemoryBarrier barrier;
+	barrier.srcAccessMask = vk::AccessFlagBits();
+	barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+	barrier.oldLayout = vk::ImageLayout::eUndefined;
+	barrier.newLayout = vk::ImageLayout::eTransferDstOptimal;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = swapchain->images[imageIndex];
+	barrier.subresourceRange = subresourceRange;
+
+	commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands, vk::DependencyFlags(),
+		{}, {}, { barrier });
+
+	vk::ImageCopy copyRegion;
+	copyRegion.srcSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 };
+	copyRegion.srcOffset = { 0, 0, 0 };
+	copyRegion.dstSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 };
+	copyRegion.dstOffset = { 0, 0, 0 };
+	copyRegion.extent = { swapchain->extent.width, swapchain->extent.height, 1 };
+
+	commandBuffer.copyImage(m_rtOutputImage.handle.get(), vk::ImageLayout::eTransferSrcOptimal,
+		swapchain->images[imageIndex], vk::ImageLayout::eTransferDstOptimal, copyRegion);
+
+	barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+	barrier.dstAccessMask = vk::AccessFlagBits();
+	barrier.oldLayout = vk::ImageLayout::eTransferDstOptimal;
+	barrier.newLayout = vk::ImageLayout::ePresentSrcKHR;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = swapchain->images[imageIndex];
+	barrier.subresourceRange = subresourceRange;
+
+	commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands, vk::DependencyFlags(),
+		{}, {}, { barrier });
 }
 
 std::optional<vk::CommandBuffer> VulkanContext::beginFrame()

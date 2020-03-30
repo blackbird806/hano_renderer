@@ -1,6 +1,7 @@
 #include <vulkanHelpers/nvRaytracing/vkhShaderBindingTable.hpp>
 #include <vulkanHelpers/nvRaytracing/vkhRaytracingPipeline.hpp>
 #include <vulkanHelpers/vkhDevice.hpp>
+#include <vulkanHelpers/vkhDebug.hpp>
 #undef max
 
 using namespace hano::vkh;
@@ -22,7 +23,7 @@ namespace
 			maxArgs = std::max(maxArgs, entry.inlineData.size());
 		}
 
-		vk::DeviceSize entrySize = progIdSize + static_cast<vk::DeviceSize>(maxArgs);
+		vk::DeviceSize const entrySize = progIdSize + static_cast<vk::DeviceSize>(maxArgs);
 
 		// A SBT entry is made of a program ID and a set of 4-byte parameters (offsets or push constants)
 		// and must be 16-bytes-aligned.
@@ -58,14 +59,16 @@ ShaderBindingTable::ShaderBindingTable(Device const& device_, RaytracingPipeline
 	std::vector<Entry> const& hitGroups)
 {
 	auto properties = device_.physicalDevice.getProperties2<vk::PhysicalDeviceProperties2, vk::PhysicalDeviceRayTracingPropertiesNV>();
-	vk::PhysicalDeviceRayTracingPropertiesNV raytracingProps = properties.get<vk::PhysicalDeviceRayTracingPropertiesNV>();
+	vk::PhysicalDeviceRayTracingPropertiesNV const raytracingProps = properties.get<vk::PhysicalDeviceRayTracingPropertiesNV>();
 	
 	m_buffer = std::make_unique<vkh::Buffer>(
-		device_, 
+		device_,
 		computeSize(device_, raytracingProps.shaderGroupHandleSize, rayGenPrograms, missPrograms, hitGroups),
-		vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible);
-		
-	uint32_t groupCount = rayGenPrograms.size() + missPrograms.size() + hitGroups.size();
+		vk::BufferUsageFlagBits::eRayTracingNV, vk::MemoryPropertyFlagBits::eHostVisible);
+	
+	vkh::setObjectName(m_buffer->handle, "sbt buffer", m_buffer->device->handle);
+
+	uint32_t const groupCount = rayGenPrograms.size() + missPrograms.size() + hitGroups.size();
 
 	std::vector<uint8_t> shaderHandleStorage(raytracingProps.shaderGroupHandleSize * groupCount);
 
