@@ -4,9 +4,9 @@
 #include <tiny/tiny_obj_loader.h>
 
 #include <vulkanContext.hpp>
+#include <vulkanHelpers/vkhDebug.hpp>
 #include <vulkanHelpers/vkhCommandBuffers.hpp>
 #include <core/logger.hpp>
-#include <renderer/uniformBuffer.hpp>
 
 using namespace hano;
 
@@ -17,6 +17,10 @@ Mesh::Mesh(VulkanContext& context, std::filesystem::path const& filePath)
 		loadObj(filePath);
 	else
 		assert(false);
+
+	vkh::setObjectName(m_vertexBuffer, (filePath.filename().string() + std::string(" vertex buffer")).c_str());
+	if (m_indexBuffer)
+		vkh::setObjectName(m_indexBuffer, (filePath.filename().string() + std::string(" index buffer")).c_str());
 }
 
 Mesh::Mesh(VulkanContext& context, std::vector<Vertex> const& vertices, std::vector<uint32> const& indices)

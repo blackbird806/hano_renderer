@@ -66,7 +66,7 @@ ShaderBindingTable::ShaderBindingTable(Device const& device_, RaytracingPipeline
 		computeSize(device_, raytracingProps.shaderGroupHandleSize, rayGenPrograms, missPrograms, hitGroups),
 		vk::BufferUsageFlagBits::eRayTracingNV, vk::MemoryPropertyFlagBits::eHostVisible);
 	
-	vkh::setObjectName(m_buffer->handle, "sbt buffer", m_buffer->device->handle);
+	vkh::setObjectName(*m_buffer, "SBT buffer");
 
 	uint32_t const groupCount = rayGenPrograms.size() + missPrograms.size() + hitGroups.size();
 
@@ -76,15 +76,18 @@ ShaderBindingTable::ShaderBindingTable(Device const& device_, RaytracingPipeline
 
 	uint8_t* mappedData = reinterpret_cast<uint8_t*>(m_buffer->map());
 
-	vk::DeviceSize offset = copyShaderData(mappedData, rayGenPrograms, m_rayGenEntrySize, shaderHandleStorage.data(), raytracingProps.shaderGroupHandleSize);
-	mappedData += offset;
-	offset = copyShaderData(mappedData, missPrograms, m_missEntrySize, shaderHandleStorage.data(), raytracingProps.shaderGroupHandleSize);
-	mappedData += offset;
-	offset = copyShaderData(mappedData, hitGroups, m_hitGroupEntrySize, shaderHandleStorage.data(), raytracingProps.shaderGroupHandleSize);
+	memcpy(mappedData, shaderHandleStorage.data(), m_buffer->getSize());
+
+	//vk::DeviceSize offset = copyShaderData(mappedData, rayGenPrograms, m_rayGenEntrySize, shaderHandleStorage.data(), raytracingProps.shaderGroupHandleSize);
+	//mappedData += offset;
+	//offset = copyShaderData(mappedData, missPrograms, m_missEntrySize, shaderHandleStorage.data(), raytracingProps.shaderGroupHandleSize);
+	//mappedData += offset;
+	//offset = copyShaderData(mappedData, hitGroups, m_hitGroupEntrySize, shaderHandleStorage.data(), raytracingProps.shaderGroupHandleSize);
 	
 	m_buffer->unMap();
 }
 
+// @Review should be pure ?
 vk::DeviceSize ShaderBindingTable::computeSize(vkh::Device const& device_,
 	vk::DeviceSize progIdSize,
 	std::vector<Entry> const& rayGenPrograms,
@@ -96,6 +99,11 @@ vk::DeviceSize ShaderBindingTable::computeSize(vkh::Device const& device_,
 	m_rayGenEntrySize = getEntrySize(rayGenPrograms, progIdSize);
 	m_missEntrySize = getEntrySize(missPrograms, progIdSize);
 	m_hitGroupEntrySize = getEntrySize(hitGroups, progIdSize);
+
+	// @Review
+	m_rayGenOffset = 0 * m_rayGenEntrySize;
+	m_missOffset = 1 * m_rayGenEntrySize;
+	m_hitGroupOffset = 2 * m_rayGenEntrySize;
 
 	// The total SBT size is the sum of the entries for ray generation, miss and hit groups
 	auto sbtSize = m_rayGenEntrySize * rayGenPrograms.size()

@@ -119,7 +119,7 @@ void VulkanContext::createRtStructures(Scene const& scene)
 void VulkanContext::createAccelerationStructures(Scene const& scene)
 {
 	auto nbModels = scene.getModels().size();
-	std::vector<vkh::GeometryInstance> instances(nbModels);
+	std::vector<vkh::GeometryInstance> instances;
 	m_bottomLevelAccelerationStructures.reserve(nbModels);
 	
 	uint32 i = 0;
@@ -151,6 +151,8 @@ void VulkanContext::createRaytracingOutImage()
 		| vk::ImageUsageFlagBits::eStorage
 		| vk::ImageUsageFlagBits::eTransferSrc);
 
+	vkh::setObjectName(m_rtOutputImage, "rtOutputImage");
+
 	m_rtOutputImageView.init(*device, m_rtOutputImage.handle.get(), swapchain->format, vk::ImageAspectFlagBits::eColor);
 }
 
@@ -180,7 +182,8 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene)
 	// @TODO redo
 	CameraMatrices camMtr = { .view = scene.camera.viewMtr, .proj = scene.camera.projectionMtr };
 	m_cameraUbo.init(*device, sizeof(CameraMatrices), vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
-	
+	vkh::setObjectName(m_cameraUbo, "camera UBO");
+
 	void* camData = m_cameraUbo.map();
 		memcpy(camData, &camMtr, sizeof(CameraMatrices));
 	m_cameraUbo.unMap();
