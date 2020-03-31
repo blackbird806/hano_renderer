@@ -17,12 +17,12 @@ int main()
 
 	hano::Scene scene;
 	scene.addModel(simpleCube);
-	simpleCube.transform.pos = glm::vec3(0, 0, -5);
-	simpleCube.transform.scale = glm::vec3(0.1, 0.1, 0.1);
+	simpleCube.transform.pos = glm::vec3(0, 0, 2);
+	simpleCube.transform.scale = glm::vec3(0.1, 1, 0.1);
 
 	scene.addModel(simpleCube2);
-	simpleCube2.transform.pos = glm::vec3(0, 0, 5);
-	simpleCube2.transform.scale = glm::vec3(0.1, 0.1, 0.1);
+	simpleCube2.transform.pos = glm::vec3(1, 0, 2);
+	simpleCube2.transform.scale = glm::vec3(1, 0.1, 0.1);
 
 	renderer.setRenderScene(scene);
 
