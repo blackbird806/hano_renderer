@@ -17,7 +17,7 @@ void Renderer::framebufferResizeCallback(GLFWwindow* window, int width, int heig
 }
 
 Renderer::Renderer() 
-	: m_window(nullptr), m_windowWidth(0), m_windowHeight(0), m_currentScene(nullptr), m_editorGUI(nullptr), m_isRunning(false)
+	: m_window(nullptr), m_windowWidth(0), m_windowHeight(0), m_editorGUI(nullptr), m_isRunning(false)
 {
 
 }
@@ -93,11 +93,11 @@ Texture& Renderer::loadTexture(std::filesystem::path const& texturePath)
 
 void Renderer::setRenderScene(Scene& scene)
 {
-	m_currentScene = &scene;
+	m_vkContext.scene = &scene;
 	
 	scene.camera.pos = glm::vec3(0.0f, 0.0f, -1.0f);
 	scene.camera.setPerspectiveProjection(45.0f, glm::vec2(m_windowWidth, m_windowHeight), 0.001f, 1000.0f);
-	scene.camera.update();
+	scene.camera.updateViewMtr();
 
 	m_vkContext.createRaytracingOutImage();
 	m_vkContext.createRtStructures(scene);
@@ -138,6 +138,7 @@ void Renderer::renderFrame()
 		//
 		//m_currentScene->render(*commandBuffer);
 		//commandBuffer->endRenderPass();
+		m_vkContext.updateTlas(*commandBuffer);
 		m_vkContext.raytrace(*commandBuffer);
 		m_editorGUI->render(*commandBuffer, m_vkContext.getCurrentFrameBuffer());
 		m_vkContext.endFrame();
@@ -161,5 +162,5 @@ int Renderer::getWindowHeight() const noexcept
 
 Scene* Renderer::getCurrentScene()
 {
-	return m_currentScene;
+	return m_vkContext.scene;
 }

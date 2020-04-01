@@ -24,13 +24,13 @@ namespace
 	}
 }
 
-TopLevelAS::TopLevelAS(vkh::Device const& device_, std::vector<GeometryInstance> const& instances, bool allowUpdate_)
-	: AccelerationStructure(device_, getCreateInfo(instances.size(), allowUpdate_)), geometryInstances(instances)
+TopLevelAS::TopLevelAS(vkh::Device const& device_, uint32_t instancesCount, bool allowUpdate_)
+	: AccelerationStructure(device_, getCreateInfo(instancesCount, allowUpdate_))
 {
 
 }
 
-void TopLevelAS::generate(vk::CommandBuffer commandBuffer)
+void TopLevelAS::generate(vk::CommandBuffer commandBuffer, std::vector<GeometryInstance> const& geometryInstances)
 {
 	auto const memRequirements = getMemoryRequirements();
 	// Copy the instance descriptors into the provider buffer.
@@ -71,25 +71,14 @@ void TopLevelAS::generate(vk::CommandBuffer commandBuffer)
 	commandBuffer.buildAccelerationStructureNV(buildInfo, instancesBuffer->handle.get(), 0, VK_FALSE, handle.get(), nullptr, scratchBuffer->handle.get(), 0);
 }
 
-void TopLevelAS::update(vk::CommandBuffer commandBuffer)
+void TopLevelAS::update(vk::CommandBuffer commandBuffer, std::vector<GeometryInstance> const& geometryInstances)
 {
 	assert(allowUpdate);
 
 	auto const instancesBufferSize = geometryInstances.size() * sizeof(GeometryInstance);
 	void* data = instancesBuffer->map();
-	std::memcpy(data, geometryInstances.data(), instancesBufferSize);
+		std::memcpy(data, geometryInstances.data(), instancesBufferSize);
 	instancesBuffer->unMap();
-
-	// Bind the acceleration structure descriptor to the actual memory that will contain it
-	vk::BindAccelerationStructureMemoryInfoNV bindInfo = {};
-	bindInfo.pNext = nullptr;
-	bindInfo.accelerationStructure = handle.get();
-	bindInfo.memory = resultBuffer->memory.get();
-	bindInfo.memoryOffset = 0;
-	bindInfo.deviceIndexCount = 0;
-	bindInfo.pDeviceIndices = nullptr;
-
-	device->handle.bindAccelerationStructureMemoryNV({ bindInfo });
 
 	// Build the actual bottom-level acceleration structure
 	auto const flags = allowUpdate

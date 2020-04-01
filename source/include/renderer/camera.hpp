@@ -22,7 +22,7 @@ namespace hano
 		void setOrthographicProjection(glm::vec2 view) noexcept;
 
 		// @Review
-		void update() noexcept;
+		void updateViewMtr() noexcept;
 
 		glm::vec3 pos;
 		glm::quat rot;

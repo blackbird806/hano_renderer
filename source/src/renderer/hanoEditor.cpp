@@ -18,12 +18,21 @@ void HanoEditor::drawUI()
 
 	ImGui::Begin("my window");
 
-	ImGui::DragFloat3("camPos", (float*)&scene.camera.pos);
+	if (ImGui::DragFloat3("camPos", (float*)&scene.camera.pos))
+	{
+		scene.camera.updateViewMtr();
+	}
 
 	if (ImGui::DragFloat("fov", &cameraFov))
 	{
 		scene.camera.setPerspectiveProjection(cameraFov, glm::vec2(m_renderer->getWindowWidth(), m_renderer->getWindowWidth()), 0.01f, 1000.0f);
 	}
+
+	auto& m = scene.getModels()[0];
+
+	ImGui::DragFloat3((std::string("pos ") + std::to_string(0)).c_str(), (float*)  &m.get().transform.pos);
+	ImGui::DragFloat4((std::string("rot ") + std::to_string(0)).c_str(), (float*)  &m.get().transform.rot);
+	ImGui::DragFloat3((std::string("scale ") + std::to_string(0)).c_str(), (float*)&m.get().transform.scale);
 
 #if 0
 	for (int i = 0; auto & mesh : m_currentScene->meshes)

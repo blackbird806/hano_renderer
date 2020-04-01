@@ -55,7 +55,6 @@ namespace hano
 			int m_windowHeight;
 
 			std::unique_ptr<EditorGUI> m_editorGUI;
-			Scene* m_currentScene;
 			bool m_isRunning;
 	};
 }

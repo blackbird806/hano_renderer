@@ -19,11 +19,14 @@ namespace hano
 		bool vsyncEnabled;
 	};
 
+	//@Review
 	class VulkanContext
 	{
 
 		public:
 		
+			static constexpr size_t c_maxFramesInFlight = 2;
+
 			void init(GLFWwindow* window, VulkanConfig const& config);
 			void destroy();
 
@@ -42,6 +45,10 @@ namespace hano
 			void updateRaytracingOutImage();
 			void createRaytracingPipeline();
 			void createShaderBindingTable();
+
+			void updateTlas(vk::CommandBuffer commandBuffer);
+			void updateRtDescriptorSets(Scene const& scene);
+
 			void raytrace(vk::CommandBuffer commandBuffer);
 			// ------ 
 
@@ -67,10 +74,12 @@ namespace hano
 			bool frameBufferResized = false;
 			std::function<void()> onRecreateSwapchain;
 		
+			Scene* scene;
+
 		protected:
 			
 			uint64 m_currentFrame = 0;
-			uint32 imageIndex = 0;
+			uint32 swapchainImageIndex = 0;
 			vk::CommandBuffer commandBuffer;
 			vk::Result m_result;
 
@@ -84,13 +93,13 @@ namespace hano
 			std::vector<vkh::BottomLevelAS> m_bottomLevelAccelerationStructures;
 			vkh::RaytracingPipeline m_rtPipeline;
 			std::unique_ptr<vkh::ShaderBindingTable> m_sbt;
-			vkh::Buffer m_cameraUbo;
+			std::vector<vkh::Buffer> m_cameraUbos;
 
 			std::unique_ptr<vkh::DescriptorPool> m_rtDescriptorPool;
 			vkh::DescriptorSetLayout m_rtDescriptorSetLayout;
 			vkh::DescriptorSets m_rtDescriptorSets;
 
-			vkh::Image m_rtOutputImage;
-			vkh::ImageView m_rtOutputImageView;
+			std::vector<vkh::Image> m_rtOutputImages;
+			std::vector<vkh::ImageView> m_rtOutputImageViews;
 	};
 }

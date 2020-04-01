@@ -26,10 +26,10 @@ namespace hano::vkh
 
 	struct TopLevelAS final : AccelerationStructure
 	{
-		TopLevelAS(vkh::Device const& device_, std::vector<GeometryInstance> const& geometries_, bool allowUpdate);
+		TopLevelAS(vkh::Device const& device_, uint32_t instancesCount, bool allowUpdate);
 
-		void generate(vk::CommandBuffer commandBuffer);
-		void update(vk::CommandBuffer commandBuffer);
+		void generate(vk::CommandBuffer commandBuffer, std::vector<GeometryInstance> const& geometryInstances);
+		void update(vk::CommandBuffer commandBuffer, std::vector<GeometryInstance> const& geometryInstancess);
 
 		static GeometryInstance createGeometryInstance(
 			BottomLevelAS const& bottomLevelAs,
@@ -39,7 +39,6 @@ namespace hano::vkh
 
 	private:
 
-		std::vector<GeometryInstance> geometryInstances;
 		std::unique_ptr<vkh::Buffer> resultBuffer;
 		std::unique_ptr<vkh::Buffer> instancesBuffer;
 		std::unique_ptr<vkh::Buffer> scratchBuffer;

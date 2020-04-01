@@ -9,7 +9,7 @@ void Scene::addModel(Model& model)
 
 void Scene::render(vk::CommandBuffer commandBuffer)
 {
-	camera.update();
+	camera.updateViewMtr();
 	for (Model& model : models)
 	{
 		model.render(commandBuffer);

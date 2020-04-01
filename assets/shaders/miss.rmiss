@@ -10,5 +10,5 @@ layout(location = 0) rayPayloadInNV hitPayload prd;
 
 void main()
 {
-	prd.hitValue = vec3(1, 0, 0);
+	prd.hitValue = vec3(0, 0, 0.35);
 }
