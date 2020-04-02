@@ -100,6 +100,7 @@ void Renderer::setRenderScene(Scene& scene)
 	scene.camera.updateViewMtr();
 
 	m_vkContext.createRaytracingOutImage();
+	m_vkContext.createSceneBuffers();
 	m_vkContext.createRtStructures(scene);
 	m_vkContext.createRaytracingPipeline();
 	m_vkContext.createShaderBindingTable();

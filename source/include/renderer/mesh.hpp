@@ -28,16 +28,19 @@ namespace hano
 			vk::GeometryNV toVkGeometryNV() const;
 
 			void render(vk::CommandBuffer commandBuffer, uint32 instances = 1) const;
-
-			// get vertices from GPU memory
-			std::vector<Vertex> getVertices();
+			std::vector<Vertex> getVerticesFromDeviceMemory();
+			std::vector<Vertex> const& getVertices() const;
+			std::vector<uint32> const& getIndices() const;
 
 		private:
 
 			VulkanContext* m_vkContext;
 
 			void loadObj(std::filesystem::path const& objPath);
-
+			
+			std::vector<Vertex> m_vertices;
+			std::vector<uint32> m_indices;
+			
 			vkh::Buffer m_vertexBuffer;
 			vkh::Buffer m_indexBuffer;
 

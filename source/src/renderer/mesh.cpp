@@ -30,6 +30,7 @@ Mesh::Mesh(VulkanContext& context, std::vector<Vertex> const& vertices, std::vec
 	setIndices(indices);
 }
 
+// @Review Move vertices and indices may avoid copy 
 void Mesh::setVertices(std::vector<Vertex> const& vertices)
 {
 	if (vertices.empty())
@@ -51,10 +52,12 @@ void Mesh::setVertices(std::vector<Vertex> const& vertices)
 	staging.unMap();
 
 	m_vertexBuffer.init(*m_vkContext->device, bufferSize,
-		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, // VK_IMAGE_USAGE_TRANSFER_SRC_BIT ?
+		vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eTransferSrc, 
 		vk::MemoryPropertyFlagBits::eDeviceLocal);
 
 	m_vertexBuffer.copyFrom(*m_vkContext->commandPool, staging, bufferSize);
+	// TODO optional keep
+	m_vertices = vertices;	
 }
 
 void Mesh::setIndices(std::vector<uint32> const& indices)
@@ -75,14 +78,16 @@ void Mesh::setIndices(std::vector<uint32> const& indices)
 	staging.unMap();
 
 	m_indexBuffer.init(*m_vkContext->device, bufferSize,
-		vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, // VK_IMAGE_USAGE_TRANSFER_SRC_BIT ?
+		vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eTransferSrc,
 		vk::MemoryPropertyFlagBits::eDeviceLocal);
 
 	m_indexBuffer.copyFrom(*m_vkContext->commandPool, staging, bufferSize);
+	// @TODO optional keep
+	m_indices = indices;
 }
 
 // @TO TEST
-std::vector<Vertex> Mesh::getVertices()
+std::vector<Vertex> Mesh::getVerticesFromDeviceMemory()
 {
 	vkh::Buffer staging(*m_vkContext->device, m_vertexBuffer.getSize(),
 		vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst,
@@ -196,4 +201,20 @@ void Mesh::loadObj(std::filesystem::path const& filePath)
 
 	setVertices(vertices);
 	setIndices(indices);
+}
+
+std::vector<Vertex> const& Mesh::getVertices() const
+{
+	if (m_vertices.empty())
+		throw HanoException("no vertex buffer in host memory !");
+
+	return m_vertices;
+}
+
+std::vector<uint32> const& Mesh::getIndices() const
+{
+	if (m_indices.empty())
+		throw HanoException("no index buffer in host memory !");
+
+	return m_indices;
 }
