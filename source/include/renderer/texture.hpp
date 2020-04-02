@@ -13,12 +13,14 @@ namespace hano
 		public:
 			Texture() = default;
 			Texture(VulkanContext const& ctx, std::filesystem::path const& texturePath);
+			void init(VulkanContext const& ctx, std::filesystem::path const& texturePath);
+
 			Texture(Texture&&) = default;
 			Texture& operator=(Texture&&) = default;
 
-			void load(std::filesystem::path const& texturePath);
 
-		private:
+		//private:
+			void load(std::filesystem::path const& texturePath);
 
 			VulkanContext const* vkContext;
 			vkh::Image image;

@@ -29,7 +29,7 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 		{0, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlags()},
 	};
 
-	descriptorPool = std::make_unique<vkh::DescriptorPool>(device, descriptorBindings, 1);
+	descriptorPool = std::make_unique<vkh::DescriptorPool>(device, descriptorBindings, 30);
 	renderPass = std::make_unique<vkh::RenderPass>(*vkContext->swapchain, *vkContext->depthBuffer, false, false);
 
 	// Initialise ImGui
@@ -93,9 +93,6 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	}
 
 	//ImGui_ImplVulkan_DestroyFontUploadObjects();
-
-	if (customEditor)
-		customEditor->initUI();
 }
 
 EditorGUI::~EditorGUI()
@@ -108,6 +105,7 @@ EditorGUI::~EditorGUI()
 void EditorGUI::setCustomEditor(CustomEditorGUI* editor)
 {
 	customEditor = editor;
+	customEditor->initUI();
 }
 
 void EditorGUI::handleSwapchainRecreation()

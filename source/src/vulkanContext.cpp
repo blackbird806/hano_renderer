@@ -130,9 +130,8 @@ void VulkanContext::createAccelerationStructures(Scene const& scene_)
 	std::vector<vkh::GeometryInstance> instances;
 	m_bottomLevelAccelerationStructures.reserve(nbModels);
 	
-	uint32 i = 0;
 	// create one GeometryInstance per mesh, this is not the best way of doing this, but it should be the easiest way
-	for (auto const& model : scene_.getModels())
+	for (uint32 i = 0;auto const& model : scene_.getModels())
 	{
 		auto& bottomAs = m_bottomLevelAccelerationStructures.emplace_back(*device, std::vector{ model.get().getMesh().toVkGeometryNV() }, true);
 		{
@@ -141,6 +140,7 @@ void VulkanContext::createAccelerationStructures(Scene const& scene_)
 		}
 		
 		instances.push_back(vkh::TopLevelAS::createGeometryInstance(bottomAs, model.get().transform.getMatrix(), i, 0 /*@TODO*/));
+		i++;
 	}
 
 	m_topLevelAccelerationStructure = std::make_unique<vkh::TopLevelAS>(*device, instances.size(), true);
@@ -173,9 +173,16 @@ void VulkanContext::createRaytracingOutImage()
 void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 {
 	std::vector<vkh::DescriptorBinding> descriptorBindings;
-	descriptorBindings.push_back({ 0, 1, vk::DescriptorType::eAccelerationStructureNV, vk::ShaderStageFlagBits::eRaygenNV }); // TLAS
-	descriptorBindings.push_back({ 1, 1, vk::DescriptorType::eStorageImage, vk::ShaderStageFlagBits::eRaygenNV }); // outputImage
-	descriptorBindings.push_back({ 2, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eRaygenNV }); // camera matrices
+
+	uint32 binding = 0;
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eAccelerationStructureNV, vk::ShaderStageFlagBits::eRaygenNV }); // TLAS
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageImage, vk::ShaderStageFlagBits::eRaygenNV }); // outputImage
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eRaygenNV }); // camera matrices
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // vertex Buffer
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // index Buffer
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // offset Buffer
+	//descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eClosestHitNV }); // textures
+
 	m_rtDescriptorPool = std::make_unique<vkh::DescriptorPool>(*device, descriptorBindings, /*@TODO*/500);
 	m_rtDescriptorSetLayout.init(*device, descriptorBindings);
 	m_rtDescriptorSets.init(*m_rtDescriptorPool, m_rtDescriptorSetLayout, c_maxFramesInFlight);
@@ -189,15 +196,12 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 		m_rtDescriptorSets.push(i, 0, accelWrite);
 	
 		vk::DescriptorImageInfo imageInfo;
-		//imageInfo.imageLayout = m_rtOutputImage.imageLayout;
 		imageInfo.imageView = m_rtOutputImageViews[i].handle.get();
 		imageInfo.imageLayout = vk::ImageLayout::eGeneral;
 		imageInfo.sampler = vk::Sampler();
 		m_rtDescriptorSets.push(i, 1, imageInfo);
 	
-		// @Review
 		CameraMatrices camMtr = { .view = scene_.camera.viewMtr, .proj = scene_.camera.projectionMtr };
-
 		m_cameraUbos[i].init(*device, sizeof(CameraMatrices), vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 		vkh::setObjectName(m_cameraUbos[i], "camera UBO");
 
@@ -209,9 +213,80 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 		cameraInfo.buffer = m_cameraUbos[i].handle.get();
 		cameraInfo.offset = 0;
 		cameraInfo.range = VK_WHOLE_SIZE;
-		m_rtDescriptorSets.push(1, 2, cameraInfo);
+		m_rtDescriptorSets.push(i, 2, cameraInfo);
+
+		vk::DescriptorBufferInfo verticesInfo;
+		verticesInfo.buffer = m_sceneVertexBuffers[i].handle.get();
+		verticesInfo.offset = 0;
+		verticesInfo.range = VK_WHOLE_SIZE;
+		m_rtDescriptorSets.push(i, 3, verticesInfo);
+
+		vk::DescriptorBufferInfo indicesInfo;
+		indicesInfo.buffer = m_sceneIndexBuffers[i].handle.get();
+		indicesInfo.offset = 0;
+		indicesInfo.range = VK_WHOLE_SIZE;
+		m_rtDescriptorSets.push(i, 4, indicesInfo);
+
+		vk::DescriptorBufferInfo offsetsInfo;
+		offsetsInfo.buffer = m_sceneOffsetsBuffers[i].handle.get();
+		offsetsInfo.offset = 0;
+		offsetsInfo.range = VK_WHOLE_SIZE;
+		m_rtDescriptorSets.push(i, 5, offsetsInfo);
 
 		m_rtDescriptorSets.updateDescriptors(i);
+	}
+}
+
+void VulkanContext::createSceneBuffers()
+{
+	// Concatenate all the models
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
+	std::vector<glm::uvec2> offsets;
+
+	for (auto const& model : scene->getModels())
+	{
+		auto const vertexOffset = vertices.size();
+		auto const indexOffset = indices.size();
+
+		auto const& mesh = model.get().getMesh();
+		vertices.insert(vertices.end(), mesh.getVertices().begin(), mesh.getVertices().end());
+		indices.insert(indices.end(), mesh.getIndices().begin(), mesh.getIndices().end());
+		offsets.emplace_back(vertexOffset, indexOffset);
+	}
+
+	m_sceneVertexBuffers.reserve(c_maxFramesInFlight);
+	for (int i = 0; i < c_maxFramesInFlight; i++)
+	{
+		auto& vbuff = m_sceneVertexBuffers.emplace_back(*device, sizeof(vertices[0]) * vertices.size(), 
+			vk::BufferUsageFlagBits::eStorageBuffer, 
+			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+
+		void* data = vbuff.map();
+
+			memcpy(data, vertices.data(), vbuff.getSize());
+
+		vbuff.unMap();
+
+		auto& ibuff = m_sceneIndexBuffers.emplace_back(*device, sizeof(indices[0]) * indices.size(),
+			vk::BufferUsageFlagBits::eStorageBuffer,
+			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+
+		data = ibuff.map();
+
+			memcpy(data, indices.data(), ibuff.getSize());
+
+		ibuff.unMap();
+
+		auto& obuff = m_sceneOffsetsBuffers.emplace_back(*device, sizeof(offsets[0]) * offsets.size(),
+			vk::BufferUsageFlagBits::eStorageBuffer,
+			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+
+		data = obuff.map();
+
+			memcpy(data, offsets.data(), obuff.getSize());
+
+		obuff.unMap();
 	}
 }
 
@@ -249,21 +324,6 @@ void VulkanContext::updateRtDescriptorSets(Scene const& scene_)
 	m_rtDescriptorSets.push(m_currentFrame, 0, accelWrite);
 
 	m_rtDescriptorSets.updateDescriptors(m_currentFrame);
-}
-
-// should be called when resizing window after created a new image with correct size
-void VulkanContext::updateRaytracingOutImage()
-{
-	for (int i = 0; i < c_maxFramesInFlight; i++)
-	{
-		vk::DescriptorImageInfo imageInfo;
-		imageInfo.imageLayout = vk::ImageLayout::eGeneral;
-		imageInfo.imageView = m_rtOutputImageViews[i].handle.get();
-		imageInfo.sampler = vk::Sampler();
-		m_rtDescriptorSets.push(i, 1, imageInfo);
-
-		m_rtDescriptorSets.updateDescriptors(i);
-	}
 }
 
 void VulkanContext::createRaytracingPipeline()

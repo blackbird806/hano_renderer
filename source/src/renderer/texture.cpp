@@ -10,7 +10,6 @@ Texture::Texture(VulkanContext const& ctx, std::filesystem::path const& textureP
     : vkContext(&ctx)
 {
 	load(texturePath);
-	assert(false);
 }
 
 void Texture::load(std::filesystem::path const& texturePath)
@@ -55,4 +54,10 @@ void Texture::load(std::filesystem::path const& texturePath)
 	samplerInfo.maxLod = 0.0f;
 
 	sampler = vkContext->device->handle.createSamplerUnique(samplerInfo, vkContext->device->allocator);
+}
+
+void Texture::init(VulkanContext const& ctx, std::filesystem::path const& texturePath)
+{
+	vkContext = &ctx;
+	load(texturePath);
 }

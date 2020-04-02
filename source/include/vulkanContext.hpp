@@ -42,7 +42,7 @@ namespace hano
 			void createAccelerationStructures(Scene const& scene);
 			void createRaytracingOutImage();
 			void createRaytracingDescriptorSets(Scene const& scene);
-			void updateRaytracingOutImage();
+			void createSceneBuffers();
 			void createRaytracingPipeline();
 			void createShaderBindingTable();
 
@@ -101,5 +101,10 @@ namespace hano
 
 			std::vector<vkh::Image> m_rtOutputImages;
 			std::vector<vkh::ImageView> m_rtOutputImageViews;
+
+			// buffers that store all the vertices and indices of the scene
+			std::vector<vkh::Buffer> m_sceneVertexBuffers;
+			std::vector<vkh::Buffer> m_sceneIndexBuffers;
+			std::vector<vkh::Buffer> m_sceneOffsetsBuffers;
 	};
 }
