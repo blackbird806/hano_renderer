@@ -35,7 +35,7 @@ void Mesh::setVertices(std::vector<Vertex> const& vertices)
 {
 	if (vertices.empty())
 	{
-		warnf("trying to create mesh without vertices !");
+		hano_warnf("trying to create mesh without vertices !");
 		return;
 	}
 

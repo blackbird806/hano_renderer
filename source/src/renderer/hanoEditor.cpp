@@ -9,8 +9,11 @@
 using namespace hano;
 
 namespace {
-	void editTransform(Camera const& camera, glm::mat4& matrix)
+
+	void editTransform(Camera const& camera, Transform& transform)
 	{
+		glm::mat4 matrix = transform.getMatrix();
+
 		static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
 		static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
 		if (ImGui::IsKeyPressed(90))
@@ -27,12 +30,18 @@ namespace {
 		ImGui::SameLine();
 		if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
 			mCurrentGizmoOperation = ImGuizmo::SCALE;
+
 		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+		static glm::vec3 eulerRot(0, 0, 0);
 		ImGuizmo::DecomposeMatrixToComponents((float*)&matrix, matrixTranslation, matrixRotation, matrixScale);
-		ImGui::InputFloat3("Tr", matrixTranslation, 3);
-		ImGui::InputFloat3("Rt", matrixRotation, 3);
-		ImGui::InputFloat3("Sc", matrixScale, 3);
-		ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, (float*)&matrix);
+		ImGui::DragFloat3("pos", matrixTranslation);
+		ImGui::DragFloat3("rot", (float*)&eulerRot);
+		ImGui::DragFloat3("scale", matrixScale);
+		ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, (float*)&eulerRot, matrixScale, (float*)&matrix);
+
+		transform.pos = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
+		transform.rot = glm::quat(glm::radians(eulerRot));
+		transform.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
 
 		if (mCurrentGizmoOperation != ImGuizmo::SCALE)
 		{
@@ -45,25 +54,31 @@ namespace {
 		static bool useSnap(false);
 		if (ImGui::IsKeyPressed(83))
 			useSnap = !useSnap;
-		ImGui::Checkbox("", &useSnap);
+		ImGui::Checkbox("snap ", &useSnap);
 		ImGui::SameLine();
 
 		glm::vec3 snap;
 		switch (mCurrentGizmoOperation)
 		{
 		case ImGuizmo::TRANSLATE:
-			ImGui::InputFloat3("Snap", &snap.x);
+			ImGui::DragFloat3("Snap", &snap.x);
 			break;
 		case ImGuizmo::ROTATE:
-			ImGui::InputFloat("Angle Snap", &snap.x);
+			ImGui::DragFloat3("Angle Snap", &snap.x);
 			break;
 		case ImGuizmo::SCALE:
-			ImGui::InputFloat("Scale Snap", &snap.x);
+			ImGui::DragFloat3("Scale Snap", &snap.x);
 			break;
 		}
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-		ImGuizmo::Manipulate((float*)&camera.viewMtr, (float*)&camera.projectionMtr, mCurrentGizmoOperation, mCurrentGizmoMode, (float*)&matrix, NULL, useSnap ? &snap.x : NULL);
+		
+		static bool show_gizmos = false;
+		ImGui::Checkbox("show transform gizmo", &show_gizmos);
+		if (show_gizmos)
+		{
+			ImGuizmo::Manipulate((float*)&camera.viewMtr, (float*)&camera.projectionMtr, mCurrentGizmoOperation, mCurrentGizmoMode, (float*)&matrix, NULL, useSnap ? &snap.x : NULL);
+		}
 	}
 }
 
@@ -77,12 +92,17 @@ void HanoEditor::initUI()
 {
 }
 
-void HanoEditor::drawUI() 
+void HanoEditor::drawUI()
 {
 	Scene& scene = *m_renderer->getCurrentScene();
-
-	ImGui::ShowMetricsWindow();
-
+	/*
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui::Text("Dear ImGui %s", ImGui::GetVersion());
+	ImGui::Text("Application average %.4f ms/frame (%.2f FPS)", 1000.0f / io.Framerate, io.Framerate);
+	ImGui::Text("%d vertices, %d indices (%d triangles)", io.MetricsRenderVertices, io.MetricsRenderIndices, io.MetricsRenderIndices / 3);
+	ImGui::Text("%d active windows (%d visible)", io.MetricsActiveWindows, io.MetricsRenderWindows);
+	ImGui::Text("%d active allocations", io.MetricsActiveAllocations);
+	*/
 	ImGui::Begin("scene");
 
 	if (ImGui::DragFloat3("camPos", (float*)&scene.camera.pos))
@@ -90,12 +110,14 @@ void HanoEditor::drawUI()
 		scene.camera.updateViewMtr();
 	}
 
+	static float cameraFov = 45.0f;
 	if (ImGui::DragFloat("fov", &cameraFov))
 	{
 		scene.camera.setPerspectiveProjection(cameraFov, glm::vec2(m_renderer->getWindowWidth(), m_renderer->getWindowHeight()), 0.01f, 1000.0f);
 	}
 
-	for (int i = 0; auto& model : scene.getModels())
+	static int selected_index = 0;
+	for (int i = 0; auto & model : scene.getModels())
 	{
 		if (ImGui::RadioButton((std::string("model ") + std::to_string(i)).c_str(), selected_index == i))
 		{
@@ -104,24 +126,16 @@ void HanoEditor::drawUI()
 		i++;
 	}
 
-	auto& selectedModel = scene.getModels()[selected_index];
+	auto& selectedModel = scene.getModels()[selected_index].get();
+	editTransform(scene.camera, selectedModel.transform);
 
-	glm::mat4 model = selectedModel.get().transform.getMatrix();
-
-	editTransform(scene.camera, model);
-
-	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-	ImGuizmo::DecomposeMatrixToComponents((float*)&model, matrixTranslation, matrixRotation, matrixScale);
-
-	selectedModel.get().transform.pos.x = matrixTranslation[0];
-	selectedModel.get().transform.pos.y = matrixTranslation[1];
-	selectedModel.get().transform.pos.z = matrixTranslation[2];
-
-	//selectedModel.get().transform.rot = glm::quat(glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]));
-
-	selectedModel.get().transform.scale.x = matrixScale[0];
-	selectedModel.get().transform.scale.y = matrixScale[1];
-	selectedModel.get().transform.scale.z = matrixScale[2];
+	for (int i = 0; auto& light : scene.lights)
+	{
+		ImGui::DragFloat3((std::string("light pos"			) + std::to_string(i)).c_str(), (float*)&light.pos);
+		ImGui::DragFloat3((std::string("light color"		) + std::to_string(i)).c_str(), (float*)&light.color);
+		ImGui::DragFloat( (std::string("light intensity"	) + std::to_string(i)).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
+		i++;
+	}
 
 	ImGui::End();
 }

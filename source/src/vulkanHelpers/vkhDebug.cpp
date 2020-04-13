@@ -8,7 +8,7 @@ namespace hano::vkh
 		VkDebugUtilsMessengerCallbackDataEXT const* callbackData,
 		void* userData)
 	{
-		error_stream << "[vulkan] " << "validation layer: " << callbackData->pMessage << std::endl;
+		hano_error_stream << "[vulkan] " << "validation layer: " << callbackData->pMessage << std::endl;
 		return VK_FALSE;
 	}
 

@@ -16,7 +16,5 @@ namespace hano
 		private:
 
 			Renderer* m_renderer;
-			int selected_index = 0;
-			float cameraFov = 45.0f;
 	};
 }

@@ -83,6 +83,7 @@ void VulkanContext::createSwapchain()
 
 void VulkanContext::deleteSwapchain()
 {
+	m_lightBuffers.clear();
 	m_cameraUbos.clear();
 	m_rtOutputImageViews.clear();
 	m_rtOutputImages.clear();
@@ -180,13 +181,15 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eRaygenNV }); // camera matrices
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // vertex Buffer
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // index Buffer
-	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // offset Buffer
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // index Buffer
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // light Buffers
 	//descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eClosestHitNV }); // textures
 
 	m_rtDescriptorPool = std::make_unique<vkh::DescriptorPool>(*device, descriptorBindings, /*@TODO*/500);
 	m_rtDescriptorSetLayout.init(*device, descriptorBindings);
 	m_rtDescriptorSets.init(*m_rtDescriptorPool, m_rtDescriptorSetLayout, c_maxFramesInFlight);
 	m_cameraUbos.resize(c_maxFramesInFlight);
+	m_lightBuffers.resize(c_maxFramesInFlight);
 
 	for (int i = 0; i < c_maxFramesInFlight; i++)
 	{
@@ -232,6 +235,20 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 		offsetsInfo.offset = 0;
 		offsetsInfo.range = VK_WHOLE_SIZE;
 		m_rtDescriptorSets.push(i, 5, offsetsInfo);
+
+		m_lightBuffers[i].init(*device, sizeof(PointLight) * Scene::c_maxLights, 
+			vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+		vkh::setObjectName(m_lightBuffers[i], "light");
+
+		void* lightData = m_lightBuffers[i].map();
+			memcpy(lightData, scene_.getPointLights().data(), scene_.getPointLights().size() * sizeof(PointLight));
+		m_lightBuffers[i].unMap();
+
+		vk::DescriptorBufferInfo lightInfo;
+		lightInfo.buffer = m_lightBuffers[i].handle.get();
+		lightInfo.offset = 0;
+		lightInfo.range = VK_WHOLE_SIZE;
+		m_rtDescriptorSets.push(i, 6, lightInfo);
 
 		m_rtDescriptorSets.updateDescriptors(i);
 	}
@@ -323,6 +340,16 @@ void VulkanContext::updateRtDescriptorSets(Scene const& scene_)
 	accelWrite.pAccelerationStructures = &m_topLevelAccelerationStructure->handle.get();
 	m_rtDescriptorSets.push(m_currentFrame, 0, accelWrite);
 
+	void* lightData = m_lightBuffers[m_currentFrame].map();
+		memcpy(lightData, scene_.getPointLights().data(), scene_.getPointLights().size() * sizeof(PointLight));
+	m_lightBuffers[m_currentFrame].unMap();
+
+	vk::DescriptorBufferInfo lightInfo;
+	lightInfo.buffer = m_lightBuffers[m_currentFrame].handle.get();
+	lightInfo.offset = 0;
+	lightInfo.range = VK_WHOLE_SIZE;
+	m_rtDescriptorSets.push(m_currentFrame, 6, lightInfo);
+
 	m_rtDescriptorSets.updateDescriptors(m_currentFrame);
 }
 
@@ -336,7 +363,13 @@ void VulkanContext::createRaytracingPipeline()
 	pipelineGen.addHitGroup({ raygen }, vk::RayTracingShaderGroupTypeNV::eGeneral);
 	pipelineGen.addHitGroup({ miss }, vk::RayTracingShaderGroupTypeNV::eGeneral);
 	pipelineGen.addHitGroup({ closestHit }, vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup);
-	m_rtPipeline = pipelineGen.create(m_rtDescriptorSetLayout, /*@TODO Recursion*/1);
+
+	vk::PushConstantRange nbLightsConst;
+	nbLightsConst.offset = 0;
+	nbLightsConst.stageFlags = vk::ShaderStageFlagBits::eClosestHitNV;
+	nbLightsConst.size = sizeof(uint32);
+
+	m_rtPipeline = pipelineGen.create(m_rtDescriptorSetLayout, { nbLightsConst }, /*@TODO Recursion*/1);
 }
 
 // @Review
@@ -362,7 +395,10 @@ void VulkanContext::raytrace(vk::CommandBuffer commandBuffer)
 	subresourceRange.layerCount = 1;
 
 	m_rtOutputImages[m_currentFrame].insertBarrier(commandBuffer, subresourceRange, vk::AccessFlagBits(), vk::AccessFlagBits::eShaderWrite, vk::ImageLayout::eGeneral);
-
+	
+	std::vector nbLightsConst = { (uint32)scene->getPointLights().size() };
+	commandBuffer.pushConstants(m_rtPipeline.pipelineLayout.get(), vk::ShaderStageFlagBits::eClosestHitNV, 0, nbLightsConst.size() * sizeof(uint32), nbLightsConst.data());
+	
 	commandBuffer.bindPipeline(vk::PipelineBindPoint::eRayTracingNV, m_rtPipeline.handle.get());
 	m_rtDescriptorSets.bindDescriptor(m_currentFrame, commandBuffer, vk::PipelineBindPoint::eRayTracingNV, m_rtPipeline.pipelineLayout.get());
 	auto const& sbtBuffer = m_sbt->getBuffer().handle.get();

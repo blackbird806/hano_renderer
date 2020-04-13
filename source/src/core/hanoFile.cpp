@@ -9,7 +9,7 @@ std::vector<char> hano::readFile(std::filesystem::path const& filePath)
 
 	if (!file.is_open())
 	{
-		error("failed to open file : ", filePath);
+		hano_error("failed to open file : ", filePath);
 		// @Review maybe throw here
 		return {};
 	}

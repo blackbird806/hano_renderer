@@ -61,15 +61,15 @@ void RaytracingPipelineGenerator::addHitGroup(std::vector<std::reference_wrapper
 	m_shaderGroups.push_back(groupInfo);
 }
 
-RaytracingPipeline RaytracingPipelineGenerator::create(vkh::DescriptorSetLayout const& descriptorSetLayout_, uint32_t maxRecursionDepth)
+RaytracingPipeline RaytracingPipelineGenerator::create(vkh::DescriptorSetLayout const& descriptorSetLayout_, std::vector<vk::PushConstantRange> pushConstants, uint32_t maxRecursionDepth)
 {
 	RaytracingPipeline pipeline;
 
 	vk::PipelineLayoutCreateInfo layoutInfo;
 	layoutInfo.setLayoutCount = 1;
 	layoutInfo.pSetLayouts = &descriptorSetLayout_.handle.get();
-	layoutInfo.pushConstantRangeCount = 0;
-	layoutInfo.pPushConstantRanges = 0;
+	layoutInfo.pushConstantRangeCount = std::size(pushConstants);
+	layoutInfo.pPushConstantRanges = pushConstants.data();
 
 	pipeline.pipelineLayout = descriptorSetLayout_.device->handle.createPipelineLayoutUnique(layoutInfo, descriptorSetLayout_.device->allocator);
 

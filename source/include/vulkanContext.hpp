@@ -93,7 +93,6 @@ namespace hano
 			std::vector<vkh::BottomLevelAS> m_bottomLevelAccelerationStructures;
 			vkh::RaytracingPipeline m_rtPipeline;
 			std::unique_ptr<vkh::ShaderBindingTable> m_sbt;
-			std::vector<vkh::Buffer> m_cameraUbos;
 
 			std::unique_ptr<vkh::DescriptorPool> m_rtDescriptorPool;
 			vkh::DescriptorSetLayout m_rtDescriptorSetLayout;
@@ -102,9 +101,12 @@ namespace hano
 			std::vector<vkh::Image> m_rtOutputImages;
 			std::vector<vkh::ImageView> m_rtOutputImageViews;
 
+			// scene
 			// buffers that store all the vertices and indices of the scene
+			std::vector<vkh::Buffer> m_cameraUbos;
 			std::vector<vkh::Buffer> m_sceneVertexBuffers;
 			std::vector<vkh::Buffer> m_sceneIndexBuffers;
 			std::vector<vkh::Buffer> m_sceneOffsetsBuffers;
+			std::vector<vkh::Buffer> m_lightBuffers;
 	};
 }

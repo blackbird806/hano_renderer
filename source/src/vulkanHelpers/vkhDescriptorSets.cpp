@@ -75,7 +75,7 @@ void DescriptorSets::push(uint32 index, uint32 binding, const vk::DescriptorBuff
 	descriptorWrite.descriptorType = bindingTypes.at(binding);
 	descriptorWrite.descriptorCount = count;
 	descriptorWrite.pBufferInfo = &bufferInfo;
-
+	
 	writeDescriptorSets.push_back(descriptorWrite);
 }
 

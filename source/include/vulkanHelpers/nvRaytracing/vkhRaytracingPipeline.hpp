@@ -19,7 +19,7 @@ namespace hano::vkh
 	struct RaytracingPipelineGenerator
 	{
 		void addHitGroup(std::vector<std::reference_wrapper<vkh::ShaderModule>> shaders, vk::RayTracingShaderGroupTypeNV hitGroupType);
-		HANO_NODISCARD RaytracingPipeline create(vkh::DescriptorSetLayout const& descriptorSetLayout_, uint32_t maxRecursionDepth);
+		HANO_NODISCARD RaytracingPipeline create(vkh::DescriptorSetLayout const& descriptorSetLayout_, std::vector<vk::PushConstantRange> pushConstants,uint32_t maxRecursionDepth);
 
 	private:
 		std::vector<vk::RayTracingShaderGroupCreateInfoNV> m_shaderGroups;

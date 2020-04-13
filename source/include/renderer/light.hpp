@@ -5,10 +5,8 @@ namespace hano
 {
 	struct PointLight
 	{
-		float intensity;
-		glm::vec3 pos;
-
-		// @Review maybe create a Color class ?
-		glm::vec3 color;
+		alignas(8)  float intensity;
+		alignas(16) glm::vec3 pos;
+		alignas(16) glm::vec3 color;
 	};
 }

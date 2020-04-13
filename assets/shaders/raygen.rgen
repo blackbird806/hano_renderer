@@ -44,7 +44,7 @@ void main()
           direction.xyz,  // ray direction
           tMax,           // ray max range
           0               // payload (location = 0)
-  );
+  	);
 
 	imageStore(image, ivec2(gl_LaunchIDNV.xy), vec4(prd.hitValue, 1.0));
 }
