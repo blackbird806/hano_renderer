@@ -176,7 +176,7 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 	std::vector<vkh::DescriptorBinding> descriptorBindings;
 
 	uint32 binding = 0;
-	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eAccelerationStructureNV, vk::ShaderStageFlagBits::eRaygenNV }); // TLAS
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eAccelerationStructureNV, vk::ShaderStageFlagBits::eRaygenNV | vk::ShaderStageFlagBits::eClosestHitNV }); // TLAS
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageImage, vk::ShaderStageFlagBits::eRaygenNV }); // outputImage
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eRaygenNV }); // camera matrices
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // vertex Buffer
@@ -366,9 +366,11 @@ void VulkanContext::createRaytracingPipeline()
 	vkh::ShaderModule raygen(*device, "assets/shaders/raygen.spv", vk::ShaderStageFlagBits::eRaygenNV);
 	vkh::ShaderModule closestHit(*device, "assets/shaders/closestHit.spv", vk::ShaderStageFlagBits::eClosestHitNV);
 	vkh::ShaderModule miss(*device, "assets/shaders/miss.spv", vk::ShaderStageFlagBits::eMissNV);
+	vkh::ShaderModule shadowMiss(*device, "assets/shaders/shadowMiss.spv", vk::ShaderStageFlagBits::eMissNV);
 
 	pipelineGen.addHitGroup({ raygen }, vk::RayTracingShaderGroupTypeNV::eGeneral);
 	pipelineGen.addHitGroup({ miss }, vk::RayTracingShaderGroupTypeNV::eGeneral);
+	pipelineGen.addHitGroup({ shadowMiss }, vk::RayTracingShaderGroupTypeNV::eGeneral);
 	pipelineGen.addHitGroup({ closestHit }, vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup);
 
 	vk::PushConstantRange nbLightsConst;
@@ -376,16 +378,16 @@ void VulkanContext::createRaytracingPipeline()
 	nbLightsConst.stageFlags = vk::ShaderStageFlagBits::eClosestHitNV;
 	nbLightsConst.size = sizeof(uint32);
 
-	m_rtPipeline = pipelineGen.create(m_rtDescriptorSetLayout, { nbLightsConst }, /*@TODO Recursion*/1);
+	m_rtPipeline = pipelineGen.create(m_rtDescriptorSetLayout, { nbLightsConst }, /*@TODO Recursion*/2);
 }
 
 // @Review
 void VulkanContext::createShaderBindingTable()
 {
 	m_sbt = std::make_unique<vkh::ShaderBindingTable>(*device, m_rtPipeline, 
-		std::vector{ vkh::ShaderBindingTable::Entry{ 0, { } } }, // raygenEntries
-		std::vector{ vkh::ShaderBindingTable::Entry{ 1, { } } }, // miss
-		std::vector{ vkh::ShaderBindingTable::Entry{ 2, { } } }  // hit
+		std::vector{ vkh::ShaderBindingTable::Entry{ 0, { } } },	// raygenEntries
+		std::vector{ vkh::ShaderBindingTable::Entry{ 1, { } }, vkh::ShaderBindingTable::Entry{ 2, { } } },	// miss
+		std::vector{ vkh::ShaderBindingTable::Entry{ 3, { } } }		// hit
 		);
 }
 

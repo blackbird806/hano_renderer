@@ -14,7 +14,7 @@ void RaytracingPipelineGenerator::addHitGroup(std::vector<std::reference_wrapper
 	groupInfo.intersectionShader = VK_SHADER_UNUSED_NV;
 	groupInfo.anyHitShader = VK_SHADER_UNUSED_NV;
 	
-	m_shaderStages.reserve(shaders.size());
+	m_shaderStages.reserve(m_shaderStages.size() + shaders.size());
 	for (auto const& shaderRef : shaders)
 	{
 		auto& shader = shaderRef.get();

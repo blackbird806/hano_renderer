@@ -90,19 +90,20 @@ HanoEditor::HanoEditor(Renderer& renderer)
 
 void HanoEditor::initUI()
 {
+	m_renderer->reloadShaders();
 }
 
 void HanoEditor::drawUI()
 {
 	Scene& scene = *m_renderer->getCurrentScene();
-	/*
+	
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui::Text("Dear ImGui %s", ImGui::GetVersion());
 	ImGui::Text("Application average %.4f ms/frame (%.2f FPS)", 1000.0f / io.Framerate, io.Framerate);
 	ImGui::Text("%d vertices, %d indices (%d triangles)", io.MetricsRenderVertices, io.MetricsRenderIndices, io.MetricsRenderIndices / 3);
 	ImGui::Text("%d active windows (%d visible)", io.MetricsActiveWindows, io.MetricsRenderWindows);
 	ImGui::Text("%d active allocations", io.MetricsActiveAllocations);
-	*/
+	
 	ImGui::Begin("scene");
 
 	if (ImGui::Button("reload shaders"))

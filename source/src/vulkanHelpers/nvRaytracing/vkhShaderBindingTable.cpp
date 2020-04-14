@@ -100,15 +100,15 @@ vk::DeviceSize ShaderBindingTable::computeSize(vkh::Device const& device_,
 	m_missEntrySize = getEntrySize(missPrograms, progIdSize);
 	m_hitGroupEntrySize = getEntrySize(hitGroups, progIdSize);
 
-	// @Review
-	m_rayGenOffset = 0 * m_rayGenEntrySize;
-	m_missOffset = 1 * m_rayGenEntrySize;
-	m_hitGroupOffset = 2 * m_rayGenEntrySize;
+	// 
+	m_rayGenOffset = 0; // raygen are stored at the begining of the buffer
+	m_missOffset = rayGenPrograms.size() * m_rayGenEntrySize; // then miss shaders
+	m_hitGroupOffset = m_missOffset + missPrograms.size() * m_missEntrySize; // then hit groups
 
 	// The total SBT size is the sum of the entries for ray generation, miss and hit groups
-	auto sbtSize = m_rayGenEntrySize * rayGenPrograms.size()
-		+ m_missEntrySize * missPrograms.size()
-		+ m_hitGroupEntrySize * hitGroups.size();
+	auto const sbtSize =	m_rayGenEntrySize * rayGenPrograms.size()
+							+ m_missEntrySize * missPrograms.size()
+							+ m_hitGroupEntrySize * hitGroups.size();
 
 	return sbtSize;
 }

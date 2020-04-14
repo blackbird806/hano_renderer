@@ -12,16 +12,16 @@ int main()
 	hano::Renderer renderer(infos);
 	
 	hano::Mesh& cube = renderer.loadMesh("assets/obj/cube.obj");
-	hano::Mesh& sniper = renderer.loadMesh("assets/obj/Sniper.obj");
+	hano::Mesh& house = renderer.loadMesh("assets/obj/rungholt.obj");
 	hano::Model simpleCube(cube);
-	hano::Model simpleCube2(cube);
+	hano::Model simpleHouse(house);
 
 	hano::Scene scene;
 	scene.addModel(simpleCube);
 	simpleCube.transform.pos = glm::vec3(0, 0, 2);
 
-	scene.addModel(simpleCube2);
-	simpleCube2.transform.pos = glm::vec3(1, 0, 20);
+	scene.addModel(simpleHouse);
+	simpleHouse.transform.pos = glm::vec3(1, 0, 20);
 
 	scene.addLight(hano::PointLight{ 1.0f, glm::vec3(2.0f, 1.0f, -2.0f), glm::vec3(1.0f, 1.0f, 1.0f) });
 

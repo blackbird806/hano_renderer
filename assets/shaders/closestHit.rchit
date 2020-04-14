@@ -22,6 +22,7 @@ layout(push_constant) uniform PushConsts {
 } pushConsts;
 
 layout(location = 0) rayPayloadInNV hitPayload prd;
+layout(location = 1) rayPayloadInNV bool isShadowed;
 
 layout(binding = 0, set = 0) uniform accelerationStructureNV topLevelAS;
 
@@ -75,7 +76,7 @@ void main()
 
   	const vec3 barycentrics = vec3(1.0 - attribs.x - attribs.y, attribs.x, attribs.y);
 	vec3 normal = normalize(Mix(v0.normal, v1.normal, v2.normal, barycentrics));
-	mat4 model = mat4(gl_ObjectToWorldNV);
+	const mat4 model = mat4(gl_ObjectToWorldNV);
 	
 	// Transforming the normal to world space
 	normal = normalize(vec3(inverse(transpose(model)) * vec4(normal, 0.0)));
@@ -97,11 +98,41 @@ void main()
 		float lightDist = length(lightDir);
 		lightDir = normalize(lightDir);
 
-		sum += max(dot(normal, lightDir), 0.2) * lightColor * lightIntensity;
+		// shadow cast
+		if (dot(normal, lightDir) > 0)
+		{
+			float tMin   = 0.001;
+			float tMax   = lightDist;
+			vec3  origin = worldPos;
+			vec3  rayDir = lightDir;
+			uint  flags = gl_RayFlagsTerminateOnFirstHitNV | gl_RayFlagsOpaqueNV | gl_RayFlagsSkipClosestHitShaderNV;
+			isShadowed = true;
+			traceNV(topLevelAS,  // acceleration structure
+					flags,       // rayFlags
+					0xFF,        // cullMask
+					0,           // sbtRecordOffset
+					0,           // sbtRecordStride
+					1,           // missIndex
+					origin,      // ray origin
+					tMin,        // ray min range
+					rayDir,      // ray direction
+					tMax,        // ray max range
+					1            // payload (location = 1) isShadowed
+			);
+
+			if (isShadowed)
+			{
+				sum = 0.2 * lightColor * lightIntensity;
+			}
+			else
+			{
+				sum += max(dot(normal, lightDir), 0.2) * lightColor * lightIntensity;
+			}
+		}
 	}
 	// ---
 
 	vec3 color = vec3(texCoord.x, texCoord.y, 0.5);
 
-	prd.hitValue = color * sum;
+	prd.hitValue =  sum;
 }
