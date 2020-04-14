@@ -3,6 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #include <vulkanHelpers/vkhBuffer.hpp>
+#include "vulkanContext.hpp"
 
 using namespace hano;
 
@@ -15,8 +16,8 @@ Texture::Texture(VulkanContext const& ctx, std::filesystem::path const& textureP
 void Texture::load(std::filesystem::path const& texturePath)
 {
     int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load(texturePath.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    vk::DeviceSize imageSize = texWidth * texHeight * 4;
+    stbi_uc* pixels = stbi_load(texturePath.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha); // @TODO alpha
+    vk::DeviceSize imageSize = texWidth * texHeight * STBI_rgb_alpha;
 
     if (!pixels) {
         throw HanoException("failed to load texture image!");
@@ -60,4 +61,11 @@ void Texture::init(VulkanContext const& ctx, std::filesystem::path const& textur
 {
 	vkContext = &ctx;
 	load(texturePath);
+}
+
+void Texture::destroy()
+{
+	imageView.destroy();
+	image.destroy();
+	sampler.reset();
 }

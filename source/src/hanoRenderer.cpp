@@ -98,7 +98,7 @@ void Renderer::setRenderScene(Scene& scene)
 	scene.camera.pos = glm::vec3(0.0f, 0.0f, -1.0f);
 	scene.camera.setPerspectiveProjection(45.0f, glm::vec2(m_windowWidth, m_windowHeight), 0.001f, 1000.0f);
 	scene.camera.updateViewMtr();
-
+	m_vkContext.createEnvMap();
 	m_vkContext.createRaytracingOutImage();
 	m_vkContext.createSceneBuffers();
 	m_vkContext.createRtStructures(scene);
@@ -164,4 +164,10 @@ int Renderer::getWindowHeight() const noexcept
 Scene* Renderer::getCurrentScene()
 {
 	return m_vkContext.scene;
+}
+
+void Renderer::reloadShaders()
+{
+	std::system("cd .\\assets\\shaders && shadercompile.bat");
+	m_vkContext.reloadShaders();
 }

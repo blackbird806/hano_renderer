@@ -10,7 +10,7 @@ int main()
 	};
 
 	hano::Renderer renderer(infos);
-
+	
 	hano::Mesh& cube = renderer.loadMesh("assets/obj/cube.obj");
 	hano::Mesh& sniper = renderer.loadMesh("assets/obj/Sniper.obj");
 	hano::Model simpleCube(cube);
@@ -34,8 +34,7 @@ int main()
 	{
 		renderer.renderFrame();
 	}
-
-	renderer.waitIdle();
 	
+	renderer.waitIdle();
     return 0;
 }

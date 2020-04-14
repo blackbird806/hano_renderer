@@ -183,6 +183,7 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // index Buffer
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // index Buffer
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // light Buffers
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eMissNV }); // envmap texture
 	//descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eClosestHitNV }); // textures
 
 	m_rtDescriptorPool = std::make_unique<vkh::DescriptorPool>(*device, descriptorBindings, /*@TODO*/500);
@@ -249,6 +250,12 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 		lightInfo.offset = 0;
 		lightInfo.range = VK_WHOLE_SIZE;
 		m_rtDescriptorSets.push(i, 6, lightInfo);
+
+		vk::DescriptorImageInfo envMapInfo;
+		envMapInfo.imageLayout = m_envMap.image.imageLayout;
+		envMapInfo.imageView = m_envMap.imageView.handle.get();
+		envMapInfo.sampler = m_envMap.sampler.get();
+		m_rtDescriptorSets.push(i, 7, envMapInfo);
 
 		m_rtDescriptorSets.updateDescriptors(i);
 	}
@@ -447,6 +454,25 @@ void VulkanContext::raytrace(vk::CommandBuffer commandBuffer)
 		{}, {}, { barrier });
 }
 
+void VulkanContext::recreateRtPipelineObjects()
+{
+	device->handle.waitIdle();
+	m_rtPipeline.destroy();
+	m_sbt.reset();
+	createRaytracingPipeline();
+	createShaderBindingTable();
+}
+
+void VulkanContext::reloadShaders()
+{
+	m_shaderReloadingAsked = true;
+}
+
+void VulkanContext::createEnvMap()
+{
+	m_envMap.init(*this, "assets/textures/envmap.jpg");
+}
+
 std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
 {
 	auto constexpr noTimeout = std::numeric_limits<uint64>::max();
@@ -528,6 +554,12 @@ void VulkanContext::endFrame()
 	}
 
 	m_currentFrame = (m_currentFrame + 1) % m_inFlightFences.size();
+
+	if (m_shaderReloadingAsked)
+	{
+		recreateRtPipelineObjects();
+		m_shaderReloadingAsked = false;
+	}
 }
 
 vkh::FrameBuffer const& VulkanContext::getCurrentFrameBuffer() const
@@ -547,6 +579,7 @@ void VulkanContext::destroy()
 
 	device->handle.waitIdle();
 
+	m_envMap.destroy();
 	m_topLevelAccelerationStructure.reset();
 	m_bottomLevelAccelerationStructures.clear();
 	m_rtPipeline.pipelineLayout.reset();

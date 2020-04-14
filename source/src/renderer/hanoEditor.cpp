@@ -105,6 +105,11 @@ void HanoEditor::drawUI()
 	*/
 	ImGui::Begin("scene");
 
+	if (ImGui::Button("reload shaders"))
+	{
+		m_renderer->reloadShaders();
+	}
+
 	if (ImGui::DragFloat3("camPos", (float*)&scene.camera.pos))
 	{
 		scene.camera.updateViewMtr();

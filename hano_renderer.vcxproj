@@ -110,6 +110,7 @@
     <ClCompile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)source\include\;$(SolutionDir)source\libraries\;%(AdditionalIncludeDirectories);$(SolutionDir)source\include;$(SolutionDir)source\libraries;%VULKAN_SDK%\include</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)libraryBin\;%(AdditionalLibraryDirectories);$(SolutionDir)libraryBin\;%VULKAN_SDK%\lib;$(SolutionDir)libraryBin</AdditionalLibraryDirectories>
@@ -125,6 +126,7 @@
       <AdditionalIncludeDirectories>;$(SolutionDir)source\include;$(SolutionDir)source\libraries;%VULKAN_SDK%\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>

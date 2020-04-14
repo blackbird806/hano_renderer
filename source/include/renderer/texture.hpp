@@ -3,10 +3,11 @@
 #include <filesystem>
 #include <vulkanHelpers/vkhImage.hpp>
 #include <vulkanHelpers/vkhImageView.hpp>
-#include "vulkanContext.hpp"
 
 namespace hano
 {
+	struct VulkanContext;
+
 	class Texture
 	{
 
@@ -14,11 +15,13 @@ namespace hano
 			Texture() = default;
 			Texture(VulkanContext const& ctx, std::filesystem::path const& texturePath);
 			void init(VulkanContext const& ctx, std::filesystem::path const& texturePath);
+			void destroy();
 
 			Texture(Texture&&) = default;
 			Texture& operator=(Texture&&) = default;
 
 
+			// @TOOD
 		//private:
 			void load(std::filesystem::path const& texturePath);
 

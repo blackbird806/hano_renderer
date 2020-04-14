@@ -7,6 +7,7 @@
 #include <vector>
 #include <glfw/glfw3.h>
 #include "vulkanHelpers.hpp"
+#include "renderer/texture.hpp"
 
 namespace hano
 {
@@ -50,7 +51,11 @@ namespace hano
 			void updateRtDescriptorSets(Scene const& scene);
 
 			void raytrace(vk::CommandBuffer commandBuffer);
+			void recreateRtPipelineObjects(); // recreate all object dependent of the pipeline
+			void reloadShaders();
 			// ------ 
+
+			void createEnvMap();
 
 			vkh::FrameBuffer const& getCurrentFrameBuffer() const;
 
@@ -88,6 +93,8 @@ namespace hano
 			std::vector<vkh::Semaphore> m_renderFinishedSemaphores;
 			std::vector<vkh::Fence> m_inFlightFences;
 
+			bool m_shaderReloadingAsked = false;
+
 			// rtx
 			std::unique_ptr<vkh::TopLevelAS> m_topLevelAccelerationStructure;
 			std::vector<vkh::BottomLevelAS> m_bottomLevelAccelerationStructures;
@@ -103,6 +110,7 @@ namespace hano
 
 			// scene
 			// buffers that store all the vertices and indices of the scene
+			hano::Texture m_envMap;
 			std::vector<vkh::Buffer> m_cameraUbos;
 			std::vector<vkh::Buffer> m_sceneVertexBuffers;
 			std::vector<vkh::Buffer> m_sceneIndexBuffers;

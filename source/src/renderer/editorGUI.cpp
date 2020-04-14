@@ -134,7 +134,6 @@ void EditorGUI::render(vk::CommandBuffer commandBuffer, vkh::FrameBuffer const& 
 		ImGui::RenderPlatformWindowsDefault();
 	}
 
-
 	std::array<vk::ClearValue, 2> clearValues = {};
 	clearValues[0].color = std::array{ 0.0f, 0.0f, 0.0f, 1.0f };
 	clearValues[1].depthStencil = { 1.0f, 0 };

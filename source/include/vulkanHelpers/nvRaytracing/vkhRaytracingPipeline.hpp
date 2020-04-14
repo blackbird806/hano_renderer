@@ -13,6 +13,13 @@ namespace hano::vkh
 	{
 		vk::UniquePipeline handle;
 		vk::UniquePipelineLayout pipelineLayout;
+
+		void destroy()
+		{
+			handle.reset();
+			pipelineLayout.reset();
+		}
+
 	};
 
 	// helper struct used to create RaytracingPipeline

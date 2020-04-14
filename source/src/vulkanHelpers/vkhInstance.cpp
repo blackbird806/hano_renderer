@@ -78,7 +78,6 @@ bool Instance::validationLayersEnabled() const noexcept
 
 bool Instance::checkValidationLayerSupport()
 {
-	uint32 layerCount;
 	std::vector<vk::LayerProperties> availablesLayers = vk::enumerateInstanceLayerProperties();
 	for (auto const& layerName : validationLayers)
 	{

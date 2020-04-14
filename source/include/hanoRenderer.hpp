@@ -44,6 +44,8 @@ namespace hano
 
 			Scene* getCurrentScene();
 
+			void reloadShaders();
+
 		private:
 
 			static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
