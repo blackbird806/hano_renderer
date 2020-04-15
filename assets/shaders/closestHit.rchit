@@ -1,5 +1,6 @@
 #version 460
 #extension GL_NV_ray_tracing : require
+#extension GL_EXT_nonuniform_qualifier : enable // see : https://github.com/KhronosGroup/GLSL/blob/master/extensions/ext/GL_EXT_nonuniform_qualifier.txt
 
 #define NUM_MAX_LIGHTS 4
 
@@ -29,7 +30,8 @@ layout(binding = 0, set = 0) uniform accelerationStructureNV topLevelAS;
 layout(binding = 3, set = 0) readonly buffer VertexArray { float Vertices[]; };
 layout(binding = 4, set = 0) readonly buffer IndexArray { uint Indices[]; };
 layout(binding = 5, set = 0) readonly buffer OffsetArray { uvec2 Offsets[]; };
-layout(binding = 6, set = 0) uniform  LightUBO { Light lights[NUM_MAX_LIGHTS]; };
+layout(binding = 6, set = 0) uniform LightUBO { Light lights[NUM_MAX_LIGHTS]; };
+layout(binding = 8, set = 0) uniform sampler2D textureSamplers[];
 
 struct Vertex
 {
@@ -86,7 +88,7 @@ void main()
   	// vec3 worldPos = v0.pos * barycentrics.x + v1.pos * barycentrics.y + v2.pos * barycentrics.z;
 
 	// light
-	vec3 sum = vec3(0.0, 0.0, 0.0);
+	vec3 sum = vec3(0.01, 0.01, 0.01);
 
 	for (int i = 0; i < pushConsts.nbLights; i++)
 	{
@@ -122,7 +124,7 @@ void main()
 
 			if (isShadowed)
 			{
-				sum = 0.2 * lightColor * lightIntensity;
+				sum += 0.25 * lightColor * lightIntensity;
 			}
 			else
 			{
@@ -132,7 +134,9 @@ void main()
 	}
 	// ---
 
-	vec3 color = vec3(texCoord.x, texCoord.y, 0.5);
+	// vec3 color = vec3(texCoord.x, texCoord.y, 0.5);
+	// vec3 color = normal;
+	vec3 color = sum * texture(textureSamplers[gl_InstanceCustomIndexNV], texCoord).xyz;
 
-	prd.hitValue =  sum;
+	prd.hitValue = color;
 }

@@ -24,3 +24,9 @@ Mesh const& Model::getMesh() const
 	assert(resourceMesh);
 	return *resourceMesh;
 }
+
+Material const& Model::getMaterial() const
+{
+	assert(resourceMaterial);
+	return *resourceMaterial;
+}

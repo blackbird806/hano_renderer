@@ -184,7 +184,7 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // index Buffer
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // light Buffers
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eMissNV }); // envmap texture
-	//descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eClosestHitNV }); // textures
+	descriptorBindings.push_back({ binding++, (uint32)scene->getModels().size(), vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eClosestHitNV }); // textures
 
 	m_rtDescriptorPool = std::make_unique<vkh::DescriptorPool>(*device, descriptorBindings, /*@TODO*/500);
 	m_rtDescriptorSetLayout.init(*device, descriptorBindings);
@@ -256,6 +256,20 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 		envMapInfo.imageView = m_envMap.imageView.handle.get();
 		envMapInfo.sampler = m_envMap.sampler.get();
 		m_rtDescriptorSets.push(i, 7, envMapInfo);
+
+
+		std::vector<vk::DescriptorImageInfo> textInfos(scene_.getModels().size());
+		for (int j = 0; auto const& model : scene_.getModels())
+		{
+			auto const& text = *model.get().getMaterial().texture;
+
+			textInfos[j].imageLayout = text.image.imageLayout;
+			textInfos[j].imageView = text.imageView.handle.get();
+			textInfos[j].sampler = text.sampler.get();
+			
+			j++;
+		}
+		m_rtDescriptorSets.push(i, 8, std::span(textInfos));
 
 		m_rtDescriptorSets.updateDescriptors(i);
 	}

@@ -92,6 +92,20 @@ void DescriptorSets::push(uint32 index, uint32 binding, const vk::DescriptorImag
 	writeDescriptorSets.push_back(descriptorWrite);
 }
 
+void DescriptorSets::push(uint32 index, uint32 binding, std::span<vk::DescriptorImageInfo> imageInfos)
+{
+	vk::WriteDescriptorSet descriptorWrite = {};
+	descriptorWrite.dstSet = descriptorSets[index];
+	descriptorWrite.dstBinding = binding;
+	descriptorWrite.dstArrayElement = 0;
+	descriptorWrite.descriptorType = bindingTypes.at(binding);
+	descriptorWrite.descriptorCount = imageInfos.size();
+	descriptorWrite.pImageInfo = imageInfos.data();
+
+	writeDescriptorSets.push_back(descriptorWrite);
+}
+
+
 void DescriptorSets::push(uint32 index, uint32 binding, const vk::WriteDescriptorSetAccelerationStructureNV& structureInfo, uint32 count)
 {
 	vk::WriteDescriptorSet descriptorWrite = {};

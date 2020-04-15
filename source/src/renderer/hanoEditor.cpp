@@ -96,7 +96,11 @@ void HanoEditor::initUI()
 void HanoEditor::drawUI()
 {
 	Scene& scene = *m_renderer->getCurrentScene();
-	
+
+	ImGui::ShowDemoWindow();
+
+	ImGui::Begin("scene");
+
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui::Text("Dear ImGui %s", ImGui::GetVersion());
 	ImGui::Text("Application average %.4f ms/frame (%.2f FPS)", 1000.0f / io.Framerate, io.Framerate);
@@ -104,7 +108,6 @@ void HanoEditor::drawUI()
 	ImGui::Text("%d active windows (%d visible)", io.MetricsActiveWindows, io.MetricsRenderWindows);
 	ImGui::Text("%d active allocations", io.MetricsActiveAllocations);
 	
-	ImGui::Begin("scene");
 
 	if (ImGui::Button("reload shaders"))
 	{
@@ -135,12 +138,37 @@ void HanoEditor::drawUI()
 	auto& selectedModel = scene.getModels()[selected_index].get();
 	editTransform(scene.camera, selectedModel.transform);
 
-	for (int i = 0; auto& light : scene.lights)
+	if (ImGui::CollapsingHeader("Lights"))
 	{
-		ImGui::DragFloat3((std::string("light pos"			) + std::to_string(i)).c_str(), (float*)&light.pos);
-		ImGui::DragFloat3((std::string("light color"		) + std::to_string(i)).c_str(), (float*)&light.color);
-		ImGui::DragFloat( (std::string("light intensity"	) + std::to_string(i)).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
-		i++;
+		if (ImGui::Button("AddLight"))
+		{
+			scene.lights.push_back(PointLight{});
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("RemoveLight"))
+		{
+			scene.lights.pop_back();
+		}
+		ImGui::SameLine();
+		static bool showLightGizmo = true;
+		ImGui::Checkbox("show light gizmo", &showLightGizmo);
+
+		for (int i = 0; auto & light : scene.lights)
+		{
+			ImGui::DragFloat3((std::string("light pos") + std::to_string(i)).c_str(), (float*)&light.pos);
+			ImGui::DragFloat3((std::string("light color") + std::to_string(i)).c_str(), (float*)&light.color, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat((std::string("light intensity") + std::to_string(i)).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
+
+			if (showLightGizmo)
+			{
+				Transform lightTr;
+				lightTr.pos = light.pos;
+				glm::mat4 const lightModel = lightTr.getMatrix();
+				ImGuizmo::DrawCube((float*)&scene.camera.viewMtr, (float*)&scene.camera.projectionMtr, (float*)&lightModel);
+			}
+
+			i++;
+		}
 	}
 
 	ImGui::End();

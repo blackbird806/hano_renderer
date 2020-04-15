@@ -17,6 +17,7 @@ namespace hano
 		void render(vk::CommandBuffer commandBuffer);
 		
 		Mesh const& getMesh() const;
+		Material const& getMaterial() const;
 
 		Transform transform;
 

@@ -57,7 +57,7 @@ Instance::Instance(const char* appName, const char* engineName, std::vector<cons
 		features.enabledValidationFeatureCount = std::size(enables);
 		features.pEnabledValidationFeatures = enables;
 		debugCreateInfo.pNext = &features;
-		createInfo.pNext = &debugCreateInfo;
+		createInfo.pNext = &debugCreateInfo; // @TODO
 	}
 	else
 	{
