@@ -69,8 +69,8 @@ vec3 Mix(vec3 a, vec3 b, vec3 c, vec3 barycentrics)
 void main()
 {
 	const uvec2 offsets = Offsets[gl_InstanceCustomIndexNV];
-	const uint indexOffset = offsets.x;
-	const uint vertexOffset = offsets.y;
+	const uint vertexOffset = offsets.x;
+	const uint indexOffset = offsets.y;
 
 	const Vertex v0 = UnpackVertex(vertexOffset + Indices[indexOffset + gl_PrimitiveID * 3 + 0]);
 	const Vertex v1 = UnpackVertex(vertexOffset + Indices[indexOffset + gl_PrimitiveID * 3 + 1]);

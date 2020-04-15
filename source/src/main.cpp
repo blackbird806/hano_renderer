@@ -11,7 +11,7 @@ int main()
 
 	hano::Renderer renderer(infos);
 	
-	hano::Mesh& cube = renderer.loadMesh("assets/obj/cube.obj");
+	hano::Mesh& cube = renderer.loadMesh("assets/obj/house.obj");
 	hano::Mesh& house = renderer.loadMesh("assets/obj/vokselia_spawn.obj");
 	hano::Material vokseliaMtrl{ &renderer.loadTexture("assets/textures/vokselia_spawn.png") };
 	hano::Material houseMtrl{ &renderer.loadTexture("assets/textures/house-RGBA.png") };
@@ -19,7 +19,7 @@ int main()
 	hano::Model simpleHouse(house, vokseliaMtrl);
 
 	hano::Scene scene;
-	//scene.addModel(simpleCube);
+	scene.addModel(simpleCube);
 	simpleCube.transform.pos = glm::vec3(0, 0, 2);
 
 	scene.addModel(simpleHouse);
