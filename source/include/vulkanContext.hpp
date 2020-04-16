@@ -111,10 +111,10 @@ namespace hano
 			// scene
 			// buffers that store all the vertices and indices of the scene
 			hano::Texture m_envMap;
-			std::vector<vkh::Buffer> m_cameraUbos;
-			std::vector<vkh::Buffer> m_sceneVertexBuffers;
-			std::vector<vkh::Buffer> m_sceneIndexBuffers;
-			std::vector<vkh::Buffer> m_sceneOffsetsBuffers;
-			std::vector<vkh::Buffer> m_lightBuffers;
+			vkh::Buffer m_cameraUbo;
+			vkh::Buffer m_sceneVertexBuffer;
+			vkh::Buffer m_sceneIndexBuffer;
+			vkh::Buffer m_sceneOffsetsBuffer;
+			vkh::Buffer m_lightBuffer;
 	};
 }
