@@ -83,7 +83,6 @@ void VulkanContext::createSwapchain()
 
 void VulkanContext::deleteSwapchain()
 {
-	m_lightBuffers.clear();
 	m_cameraUbos.clear();
 	m_rtOutputImageViews.clear();
 	m_rtOutputImages.clear();
@@ -293,6 +292,7 @@ void VulkanContext::createSceneBuffers()
 		offsets.emplace_back(vertexOffset, indexOffset);
 	}
 
+	// @Review only one buffer may be enough
 	m_sceneVertexBuffers.reserve(c_maxFramesInFlight);
 	for (int i = 0; i < c_maxFramesInFlight; i++)
 	{
@@ -594,8 +594,13 @@ void VulkanContext::destroy()
 		return;
 
 	device->handle.waitIdle();
-
+	
+	m_lightBuffers.clear();
 	m_envMap.destroy();
+	m_sceneIndexBuffers.clear();
+	m_sceneOffsetsBuffers.clear();
+	m_sceneVertexBuffers.clear();
+
 	m_topLevelAccelerationStructure.reset();
 	m_bottomLevelAccelerationStructures.clear();
 	m_rtPipeline.pipelineLayout.reset();

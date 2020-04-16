@@ -134,9 +134,11 @@ void main()
 	}
 	// ---
 
+	vec4 texColor = texture(textureSamplers[gl_InstanceCustomIndexNV], texCoord);
 	// vec3 color = vec3(texCoord.x, texCoord.y, 0.5);
 	// vec3 color = normal;
-	vec3 color = sum * texture(textureSamplers[gl_InstanceCustomIndexNV], texCoord).xyz;
+
+	vec3 color = sum * texColor.xyz;
 
 	prd.hitValue = color;
 }
