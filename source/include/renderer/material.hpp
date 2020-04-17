@@ -7,6 +7,14 @@ namespace hano
 	{
 		public:
 
-		Texture* texture;
+			float roughnessFactor;
+			float metallicFactor;
+			float baseColorFactor;
+
+			Texture* baseColor;
+			Texture* normalMap;
+			Texture* metallicRoughness;
+			Texture* emissive;
+			Texture* occlusion;
 	};
 }

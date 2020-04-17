@@ -11,13 +11,18 @@
 
 using namespace hano;
 
+Mesh::Mesh(VulkanContext& context) : m_vkContext(&context)
+{
+
+}
+
 Mesh::Mesh(VulkanContext& context, std::filesystem::path const& filePath)
 	: m_vkContext(&context), m_vertexCount(0), m_indexCount(0)
 {
 	if (filePath.extension() == ".obj")
 		loadObj(filePath);
 	else if (filePath.extension() == ".gltf")
-		loadGltf(filePath);
+		loadFromGltfFile(filePath);
 	else
 		assert(false);
 
@@ -206,12 +211,10 @@ void Mesh::loadObj(std::filesystem::path const& filePath)
 	setIndices(indices);
 }
 
-void Mesh::loadGltf(std::filesystem::path const& gltfPath)
+// @Review
+void Mesh::loadFromGltfFile(std::filesystem::path const& gltfPath)
 {
 	using namespace tinygltf;
-
-	std::vector<Vertex> vertices;
-	std::vector<uint32> indices;
 
 	Model model;
 	TinyGLTF loader;
@@ -232,6 +235,16 @@ void Mesh::loadGltf(std::filesystem::path const& gltfPath)
 	if (!ret) {
 		throw HanoException("Failed to parse glTF\n");
 	}
+
+	loadGltf(model);
+}
+
+void Mesh::loadGltf(tinygltf::Model const& model)
+{
+	using namespace tinygltf;
+
+	std::vector<Vertex> vertices;
+	std::vector<uint32> indices;
 
 	auto mesh = *model.meshes.begin(); // when loading gltf as mesh, only consider first mesh found
 
@@ -283,7 +296,7 @@ void Mesh::loadGltf(std::filesystem::path const& gltfPath)
 			vert.uv1 = bufferTexCoordSet1 ? glm::make_vec2(&bufferTexCoordSet1[v * uv1ByteStride]) : glm::vec3(0.0f);
 #endif
 			vertices.push_back(vert);
-		}
+	}
 
 		if (primitive.indices > -1)
 		{
@@ -320,11 +333,10 @@ void Mesh::loadGltf(std::filesystem::path const& gltfPath)
 			}
 		}
 
-	}
+}
 	setVertices(vertices);
 	setIndices(indices);
 }
-
 
 std::vector<Vertex> const& Mesh::getVertices() const
 {

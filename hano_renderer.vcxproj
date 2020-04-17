@@ -151,6 +151,7 @@
     <ClCompile Include="source\src\main.cpp" />
     <ClCompile Include="source\src\renderer\camera.cpp" />
     <ClCompile Include="source\src\renderer\editorGUI.cpp" />
+    <ClCompile Include="source\src\renderer\gltfLoader.cpp" />
     <ClCompile Include="source\src\renderer\hanoEditor.cpp" />
     <ClCompile Include="source\src\renderer\mesh.cpp" />
     <ClCompile Include="source\src\renderer\ResourceManager.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="source\include\hanoRenderer.hpp" />
     <ClInclude Include="source\include\renderer\camera.hpp" />
     <ClInclude Include="source\include\renderer\editorGUI.hpp" />
+    <ClInclude Include="source\include\renderer\gltfLoader.hpp" />
     <ClInclude Include="source\include\renderer\hanoEditor.hpp" />
     <ClInclude Include="source\include\renderer\light.hpp" />
     <ClInclude Include="source\include\renderer\material.hpp" />

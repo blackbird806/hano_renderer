@@ -41,6 +41,7 @@ namespace hano
 
 			int getWindowWidth() const noexcept;
 			int getWindowHeight() const noexcept;
+			VulkanContext& getVkContext();
 
 			Scene* getCurrentScene();
 

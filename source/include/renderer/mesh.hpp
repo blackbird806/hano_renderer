@@ -10,12 +10,18 @@
 #include "vulkanContext.hpp"
 #include "vertex.hpp"
 
+namespace tinygltf
+{
+	class Model;
+}
+
 namespace hano
 {
 	class Mesh
 	{
 		public:
 
+			Mesh(VulkanContext& context);
 			Mesh(VulkanContext& context, std::filesystem::path const& objPath);
 			Mesh(VulkanContext& context, std::vector<Vertex> const& vertices, std::vector<uint32> const& indices = {});
 			
@@ -32,13 +38,16 @@ namespace hano
 			std::vector<Vertex> const& getVertices() const;
 			std::vector<uint32> const& getIndices() const;
 
+			void loadObj(std::filesystem::path const& objPath);
+			void loadFromGltfFile(std::filesystem::path const& gltfPath);
+
+			// load mesh from already openned gltf file
+			void loadGltf(tinygltf::Model const& model);
+
 		private:
 
 			VulkanContext* m_vkContext;
 
-			void loadObj(std::filesystem::path const& objPath);
-			void loadGltf(std::filesystem::path const& gltfPath);
-			
 			std::vector<Vertex> m_vertices;
 			std::vector<uint32> m_indices;
 			

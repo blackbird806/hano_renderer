@@ -90,6 +90,9 @@
     <ClCompile Include="source\src\renderer\editorGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\src\renderer\gltfLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\renderer\hanoEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -207,6 +210,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\renderer\editorGUI.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\include\renderer\gltfLoader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\include\renderer\hanoEditor.hpp">

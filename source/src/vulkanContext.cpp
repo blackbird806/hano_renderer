@@ -239,7 +239,7 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 		std::vector<vk::DescriptorImageInfo> textInfos(scene_.getModels().size());
 		for (int j = 0; auto const& model : scene_.getModels())
 		{
-			auto const& text = *model.get().getMaterial().texture;
+			auto const& text = *model.get().getMaterial().baseColor;
 
 			textInfos[j].imageLayout = text.image.imageLayout;
 			textInfos[j].imageView = text.imageView.handle.get();

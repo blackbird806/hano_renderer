@@ -166,6 +166,11 @@ Scene* Renderer::getCurrentScene()
 	return m_vkContext.scene;
 }
 
+VulkanContext& Renderer::getVkContext()
+{
+	return m_vkContext;
+}
+
 void Renderer::reloadShaders()
 {
 	std::system("cd .\\assets\\shaders && shadercompile.bat");
