@@ -1,7 +1,8 @@
 #include <renderer/mesh.hpp>
 
-#define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny/tiny_obj_loader.h>
+#include <tiny/tiny_gltf.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <vulkanContext.hpp>
 #include <vulkanHelpers/vkhDebug.hpp>
@@ -15,6 +16,8 @@ Mesh::Mesh(VulkanContext& context, std::filesystem::path const& filePath)
 {
 	if (filePath.extension() == ".obj")
 		loadObj(filePath);
+	else if (filePath.extension() == ".gltf")
+		loadGltf(filePath);
 	else
 		assert(false);
 
@@ -56,7 +59,7 @@ void Mesh::setVertices(std::vector<Vertex> const& vertices)
 		vk::MemoryPropertyFlagBits::eDeviceLocal);
 
 	m_vertexBuffer.copyFrom(*m_vkContext->commandPool, staging, bufferSize);
-	// TODO optional keep
+	// @TODO optional keep
 	m_vertices = vertices;	
 }
 
@@ -158,7 +161,7 @@ void Mesh::loadObj(std::filesystem::path const& filePath)
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
 	std::string warn, err;
-
+	 // @TODO use obj v2 API
 	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filePath.string().c_str())) {
 		throw std::runtime_error(warn + err);
 	}
@@ -202,6 +205,126 @@ void Mesh::loadObj(std::filesystem::path const& filePath)
 	setVertices(vertices);
 	setIndices(indices);
 }
+
+void Mesh::loadGltf(std::filesystem::path const& gltfPath)
+{
+	using namespace tinygltf;
+
+	std::vector<Vertex> vertices;
+	std::vector<uint32> indices;
+
+	Model model;
+	TinyGLTF loader;
+	std::string err;
+	std::string warn;
+
+	bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, gltfPath.string());
+	//bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, argv[1]); // for binary glTF(.glb)
+
+	if (!warn.empty()) {
+		hano_warnf("Warn: %s\n", warn.c_str());
+	}
+
+	if (!err.empty()) {
+		hano_errorf("Err: %s\n", err.c_str());
+	}
+
+	if (!ret) {
+		throw HanoException("Failed to parse glTF\n");
+	}
+
+	auto mesh = *model.meshes.begin(); // when loading gltf as mesh, only consider first mesh found
+
+	for (int i = 0; i < mesh.primitives.size(); i++)
+	{
+		auto const& primitive = mesh.primitives[i];
+
+		uint32_t const indexStart = 0;
+		uint32_t const vertexStart = 0;
+
+		Accessor const& posAccessor = model.accessors[primitive.attributes.find("POSITION")->second];
+		BufferView const& posView = model.bufferViews[posAccessor.bufferView];
+		float const* bufferPos = reinterpret_cast<float const*>(&model.buffers[posView.buffer].data[posAccessor.byteOffset + posView.byteOffset]);
+		int posByteStride = posAccessor.ByteStride(posView) ? (posAccessor.ByteStride(posView) / sizeof(float)) : GetNumComponentsInType(TINYGLTF_TYPE_VEC3);
+
+		int normByteStride;
+		float const* bufferNormals;
+		if (primitive.attributes.find("NORMAL") != primitive.attributes.end()) {
+			tinygltf::Accessor const& normAccessor = model.accessors[primitive.attributes.find("NORMAL")->second];
+			tinygltf::BufferView const& normView = model.bufferViews[normAccessor.bufferView];
+			bufferNormals = reinterpret_cast<const float*>(&(model.buffers[normView.buffer].data[normAccessor.byteOffset + normView.byteOffset]));
+			normByteStride = normAccessor.ByteStride(normView) ? (normAccessor.ByteStride(normView) / sizeof(float)) : GetNumComponentsInType(TINYGLTF_TYPE_VEC3);
+		}
+
+		int uv0ByteStride;
+		float const* bufferTexCoordSet0;
+		if (primitive.attributes.find("TEXCOORD_0") != primitive.attributes.end()) {
+			tinygltf::Accessor const& uvAccessor = model.accessors[primitive.attributes.find("TEXCOORD_0")->second];
+			tinygltf::BufferView const& uvView = model.bufferViews[uvAccessor.bufferView];
+			bufferTexCoordSet0 = reinterpret_cast<const float*>(&(model.buffers[uvView.buffer].data[uvAccessor.byteOffset + uvView.byteOffset]));
+			uv0ByteStride = uvAccessor.ByteStride(uvView) ? (uvAccessor.ByteStride(uvView) / sizeof(float)) : GetNumComponentsInType(TINYGLTF_TYPE_VEC2);
+		}
+#if 0 // @TODO
+		int uv1ByteStride;
+		float const* bufferTexCoordSet1;
+		if (primitive.attributes.find("TEXCOORD_1") != primitive.attributes.end()) {
+			tinygltf::Accessor const& uvAccessor = model.accessors[primitive.attributes.find("TEXCOORD_1")->second];
+			tinygltf::BufferView const& uvView = model.bufferViews[uvAccessor.bufferView];
+			bufferTexCoordSet1 = reinterpret_cast<const float*>(&(model.buffers[uvView.buffer].data[uvAccessor.byteOffset + uvView.byteOffset]));
+			uv1ByteStride = uvAccessor.ByteStride(uvView) ? (uvAccessor.ByteStride(uvView) / sizeof(float)) : GetNumComponentsInType(TINYGLTF_TYPE_VEC2);
+		}
+#endif
+		for (size_t v = 0; v < posAccessor.count; v++) {
+			Vertex vert{};
+			vert.pos = glm::make_vec3(&bufferPos[v * posByteStride]);
+			vert.normal = glm::normalize(glm::vec3(bufferNormals ? glm::make_vec3(&bufferNormals[v * normByteStride]) : glm::vec3(0.0f)));
+			vert.texCoord = bufferTexCoordSet0 ? glm::make_vec2(&bufferTexCoordSet0[v * uv0ByteStride]) : glm::vec3(0.0f);
+#if 0
+			vert.uv1 = bufferTexCoordSet1 ? glm::make_vec2(&bufferTexCoordSet1[v * uv1ByteStride]) : glm::vec3(0.0f);
+#endif
+			vertices.push_back(vert);
+		}
+
+		if (primitive.indices > -1)
+		{
+			tinygltf::Accessor const& accessor = model.accessors[primitive.indices > -1 ? primitive.indices : 0];
+			tinygltf::BufferView const& bufferView = model.bufferViews[accessor.bufferView];
+			tinygltf::Buffer const& buffer = model.buffers[bufferView.buffer];
+
+			const void* dataPtr = &(buffer.data[accessor.byteOffset + bufferView.byteOffset]);
+			switch (accessor.componentType) {
+			case TINYGLTF_PARAMETER_TYPE_UNSIGNED_INT: {
+				const uint32_t* buf = static_cast<const uint32_t*>(dataPtr);
+				for (size_t index = 0; index < accessor.count; index++) {
+					indices.push_back(buf[index] + vertexStart);
+				}
+				break;
+			}
+			case TINYGLTF_PARAMETER_TYPE_UNSIGNED_SHORT: {
+				const uint16_t* buf = static_cast<const uint16_t*>(dataPtr);
+				for (size_t index = 0; index < accessor.count; index++) {
+					indices.push_back(buf[index] + vertexStart);
+				}
+				break;
+			}
+			case TINYGLTF_PARAMETER_TYPE_UNSIGNED_BYTE: {
+				const uint8_t* buf = static_cast<const uint8_t*>(dataPtr);
+				for (size_t index = 0; index < accessor.count; index++) {
+					indices.push_back(buf[index] + vertexStart);
+				}
+				break;
+			}
+			default:
+				hano_error_stream << "Index component type " << accessor.componentType << " not supported!" << std::endl;
+				return;
+			}
+		}
+
+	}
+	setVertices(vertices);
+	setIndices(indices);
+}
+
 
 std::vector<Vertex> const& Mesh::getVertices() const
 {

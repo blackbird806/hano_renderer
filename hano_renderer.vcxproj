@@ -145,6 +145,7 @@
     <ClCompile Include="source\libraries\imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_impl_vulkan.cpp" />
     <ClCompile Include="source\libraries\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="source\libraries\tiny\tiny.cpp" />
     <ClCompile Include="source\src\core\hanoFile.cpp" />
     <ClCompile Include="source\src\hanoRenderer.cpp" />
     <ClCompile Include="source\src\main.cpp" />

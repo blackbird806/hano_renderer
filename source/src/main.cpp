@@ -11,7 +11,7 @@ int main()
 
 	hano::Renderer renderer(infos);
 
-	hano::Mesh& cube = renderer.loadMesh("assets/obj/cube.obj");
+	hano::Mesh& cube = renderer.loadMesh("assets/gltf/cube/Cube.gltf");
 	hano::Material houseMtrl{ &renderer.loadTexture("assets/textures/back.jpg") };
 	hano::Model simpleCube(cube, houseMtrl);
 

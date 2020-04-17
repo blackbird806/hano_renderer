@@ -72,6 +72,9 @@
     <ClCompile Include="source\libraries\imguizmo\ImSequencer.cpp">
       <Filter>libraries\imguizmo</Filter>
     </ClCompile>
+    <ClCompile Include="source\libraries\tiny\tiny.cpp">
+      <Filter>libraries\tiny</Filter>
+    </ClCompile>
     <ClCompile Include="source\src\core\hanoFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

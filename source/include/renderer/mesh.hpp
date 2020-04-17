@@ -37,6 +37,7 @@ namespace hano
 			VulkanContext* m_vkContext;
 
 			void loadObj(std::filesystem::path const& objPath);
+			void loadGltf(std::filesystem::path const& gltfPath);
 			
 			std::vector<Vertex> m_vertices;
 			std::vector<uint32> m_indices;
