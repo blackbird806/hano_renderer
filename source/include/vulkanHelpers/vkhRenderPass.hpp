@@ -1,7 +1,5 @@
 #pragma once
 
-#include "vkhUtility.hpp"
-
 namespace hano::vkh
 {
 	struct Swapchain;
@@ -9,8 +7,6 @@ namespace hano::vkh
 
 	struct RenderPass
 	{
-		VULKAN_NON_COPIABLE(RenderPass);
-
 		RenderPass(vkh::Swapchain const& iswapChain, vkh::DepthBuffer const& idepthBuffer, bool clearColorBuffer, bool clearDepthBuffer);
 
 		vkh::Swapchain const* swapchain;

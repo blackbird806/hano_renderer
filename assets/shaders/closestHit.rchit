@@ -41,7 +41,7 @@ struct Vertex
 	int matIndex;
 };
 
-Vertex UnpackVertex(uint index)
+Vertex unpackVertex(uint index)
 {
 	const uint vertexSize = 9;
 	const uint offset = index * vertexSize;
@@ -68,13 +68,13 @@ vec3 Mix(vec3 a, vec3 b, vec3 c, vec3 barycentrics)
 
 void main()
 {
-	const uvec2 offsets = Offsets[gl_InstanceCustomIndexNV];
-	const uint vertexOffset = offsets.x;
-	const uint indexOffset = offsets.y;
+	const uvec2 offset = Offsets[gl_InstanceCustomIndexNV];
+	const uint vertexOffset = offset.x;
+	const uint indexOffset = offset.y;
 
-	const Vertex v0 = UnpackVertex(vertexOffset + Indices[indexOffset + gl_PrimitiveID * 3 + 0]);
-	const Vertex v1 = UnpackVertex(vertexOffset + Indices[indexOffset + gl_PrimitiveID * 3 + 1]);
-	const Vertex v2 = UnpackVertex(vertexOffset + Indices[indexOffset + gl_PrimitiveID * 3 + 2]);
+	const Vertex v0 = unpackVertex(vertexOffset + Indices[indexOffset + gl_PrimitiveID * 3 + 0]);
+	const Vertex v1 = unpackVertex(vertexOffset + Indices[indexOffset + gl_PrimitiveID * 3 + 1]);
+	const Vertex v2 = unpackVertex(vertexOffset + Indices[indexOffset + gl_PrimitiveID * 3 + 2]);
 
   	const vec3 barycentrics = vec3(1.0 - attribs.x - attribs.y, attribs.x, attribs.y);
 	vec3 normal = normalize(Mix(v0.normal, v1.normal, v2.normal, barycentrics));

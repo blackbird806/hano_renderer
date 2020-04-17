@@ -168,7 +168,6 @@ void VulkanContext::createRaytracingOutImage()
 	}
 }
 
-// @Review
 void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 {
 	std::vector<vkh::DescriptorBinding> descriptorBindings;
@@ -275,36 +274,24 @@ void VulkanContext::createSceneBuffers()
 	m_sceneVertexBuffer.init(*device, sizeof(vertices[0]) * vertices.size(), 
 		vk::BufferUsageFlagBits::eStorageBuffer, 
 		vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
-
-	void* data = m_sceneVertexBuffer.map();
-
-		memcpy(data, vertices.data(), m_sceneVertexBuffer.getSize());
-
-	m_sceneVertexBuffer.unMap();
+	vkh::setObjectName(m_sceneVertexBuffer, "scene vertex buffer");
+	m_sceneVertexBuffer.setDataArray(std::span(vertices));
 
 	m_sceneIndexBuffer.init(*device, sizeof(indices[0]) * indices.size(),
 		vk::BufferUsageFlagBits::eStorageBuffer,
 		vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
-
-	data = m_sceneIndexBuffer.map();
-
-		memcpy(data, indices.data(), m_sceneIndexBuffer.getSize());
-
-	m_sceneIndexBuffer.unMap();
+	vkh::setObjectName(m_sceneVertexBuffer, "scene index buffer");
+	m_sceneIndexBuffer.setDataArray(std::span(indices));
 
 	m_sceneOffsetsBuffer.init(*device, sizeof(offsets[0]) * offsets.size(),
 		vk::BufferUsageFlagBits::eStorageBuffer,
 		vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
-
-	data = m_sceneOffsetsBuffer.map();
-
-		memcpy(data, offsets.data(), m_sceneOffsetsBuffer.getSize());
-
-	m_sceneOffsetsBuffer.unMap();
+	vkh::setObjectName(m_sceneVertexBuffer, "scene offset buffer");
+	m_sceneOffsetsBuffer.setDataArray(std::span(offsets));
 
 	m_lightBuffer.init(*device, sizeof(PointLight) * Scene::c_maxLights,
 		vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
-	vkh::setObjectName(m_lightBuffer, "light");
+	vkh::setObjectName(m_lightBuffer, "light buffer");
 
 	void* lightData = m_lightBuffer.map();
 		memcpy(lightData, scene->getPointLights().data(), scene->getPointLights().size() * sizeof(PointLight));
@@ -314,9 +301,7 @@ void VulkanContext::createSceneBuffers()
 	m_cameraUbo.init(*device, sizeof(CameraMatrices), vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 	vkh::setObjectName(m_cameraUbo, "camera UBO");
 
-	void* camData = m_cameraUbo.map();
-		memcpy(camData, &camMtr, sizeof(CameraMatrices));
-	m_cameraUbo.unMap();
+	m_cameraUbo.setData(camMtr);
 }
 
 void VulkanContext::updateTlas(vk::CommandBuffer commandBuffer)
@@ -336,10 +321,7 @@ void VulkanContext::updateRtDescriptorSets(Scene const& scene_)
 {
 	// update camera
 	CameraMatrices camMtr = { .view = scene_.camera.viewMtr, .proj = scene_.camera.projectionMtr };
-
-	void* camData = m_cameraUbo.map();
-		memcpy(camData, &camMtr, sizeof(CameraMatrices));
-	m_cameraUbo.unMap();
+	m_cameraUbo.setData(camMtr);
 
 	vk::DescriptorBufferInfo cameraInfo;
 	cameraInfo.buffer = m_cameraUbo.handle.get();
@@ -396,7 +378,6 @@ void VulkanContext::createShaderBindingTable()
 		);
 }
 
-// @Review
 void VulkanContext::raytrace(vk::CommandBuffer commandBuffer)
 {
 	updateRtDescriptorSets(*scene);
@@ -477,6 +458,7 @@ void VulkanContext::reloadShaders()
 
 void VulkanContext::createEnvMap()
 {
+	// @TODO user defined
 	m_envMap.init(*this, "assets/textures/envmap.jpg");
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
+#include <span>
 #include "vkhUtility.hpp"
 
 namespace hano::vkh
@@ -18,6 +19,24 @@ namespace hano::vkh
 		void destroy();
 
 		operator bool() const noexcept;
+
+		template<typename T>
+		void setDataArray(std::span<T> data)
+		{
+			assert(data.size_bytes() == getSize());
+			void* bufferData = map();
+				memcpy(bufferData, data.data(), getSize());
+			unMap();
+		}
+
+		template<typename T>
+		void setData(T data)
+		{
+			assert(sizeof(T) == getSize());
+			void* bufferData = map();
+				memcpy(bufferData, &data, getSize());
+			unMap();
+		}
 
 		void* map(vk::DeviceSize offset = 0);
 		void  unMap();

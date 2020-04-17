@@ -54,7 +54,7 @@ namespace hano
 			void recreateRtPipelineObjects(); // recreate all object dependent of the pipeline
 			void reloadShaders();
 			// ------ 
-
+			
 			void createEnvMap();
 
 			vkh::FrameBuffer const& getCurrentFrameBuffer() const;

@@ -21,5 +21,5 @@ void main()
 	coord.y = -(theta / M_PI);
 
 	prd.hitValue = texture(envMap, coord).xyz;
-	// prd.hitValue = gl_WorldRayDirectionNV; // cool effect
+	//prd.hitValue = gl_WorldRayDirectionNV; // cool effect
 }
