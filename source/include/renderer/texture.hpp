@@ -19,7 +19,7 @@ namespace hano
 			Texture() = default;
 			Texture(VulkanContext const& ctx, std::filesystem::path const& texturePath);
 			void init(VulkanContext const& ctx, std::filesystem::path const& texturePath);
-			void init(VulkanContext const& ctx, std::span<byte> imageBuffer);
+			void init(VulkanContext const& ctx, std::span<byte> imageBuffer, vk::SamplerCreateInfo samplerInfo, vk::Format imageFormat, int width, int height, int channels);
 			void destroy();
 
 			Texture(Texture&&) = default;

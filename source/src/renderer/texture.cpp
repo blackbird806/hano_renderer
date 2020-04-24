@@ -69,12 +69,11 @@ void Texture::init(VulkanContext const& ctx, std::filesystem::path const& textur
 	load(texturePath);
 }
 
-void Texture::init(VulkanContext const& ctx, std::span<byte> imageBuffer)
+void Texture::init(VulkanContext const& ctx, std::span<byte> imageBuffer, vk::SamplerCreateInfo samplerInfo, vk::Format imageFormat, int width, int height, int channels)
 {
 	vkContext = &ctx;
-
+	createGPUResources(imageBuffer, samplerInfo, imageFormat, width, height, channels);
 }
-
 
 void Texture::destroy()
 {

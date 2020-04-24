@@ -3,6 +3,8 @@
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <renderer/scene.hpp>
 #include <renderer/camera.hpp>
 
@@ -32,16 +34,22 @@ namespace {
 			mCurrentGizmoOperation = ImGuizmo::SCALE;
 
 		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-		static glm::vec3 eulerRot(0, 0, 0);
-		ImGuizmo::DecomposeMatrixToComponents((float*)&matrix, matrixTranslation, matrixRotation, matrixScale);
-		ImGui::DragFloat3("pos", matrixTranslation);
+		glm::vec3 eulerRot;
+		glm::vec3 skew;
+		glm::vec4 perspective;
+		//ImGuizmo::DecomposeMatrixToComponents((float*)&matrix, matrixTranslation, matrixRotation, matrixScale);
+		glm::decompose(matrix, transform.scale, transform.rot, transform.pos, skew, perspective);
+		eulerRot = glm::eulerAngles(transform.rot);
+		ImGui::DragFloat3("pos", (float*)&transform.pos);
 		ImGui::DragFloat3("rot", (float*)&eulerRot);
-		ImGui::DragFloat3("scale", matrixScale);
-		ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, (float*)&eulerRot, matrixScale, (float*)&matrix);
+		ImGui::DragFloat3("scale", (float*)&transform.scale);
+		transform.rot = glm::quat(eulerRot);
+		matrix = transform.getMatrix();
+		//ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, (float*)&eulerRot, matrixScale, (float*)&matrix);
 
-		transform.pos = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
-		transform.rot = glm::quat(glm::radians(eulerRot));
-		transform.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
+		//transform.pos = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
+		//transform.rot = glm::quat(glm::radians(eulerRot));
+		//transform.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
 
 		if (mCurrentGizmoOperation != ImGuizmo::SCALE)
 		{
@@ -73,11 +81,19 @@ namespace {
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 		
-		static bool show_gizmos = false;
+		static bool show_gizmos = true;
 		ImGui::Checkbox("show transform gizmo", &show_gizmos);
 		if (show_gizmos)
 		{
-			ImGuizmo::Manipulate((float*)&camera.viewMtr, (float*)&camera.projectionMtr, mCurrentGizmoOperation, mCurrentGizmoMode, (float*)&matrix, NULL, useSnap ? &snap.x : NULL);
+			ImGuizmo::Manipulate((float*)&(camera.viewMtr), (float*)&(camera.projectionMtr), mCurrentGizmoOperation, mCurrentGizmoMode, (float*)&matrix, NULL, useSnap ? &snap.x : NULL);
+			//ImGuizmo::DecomposeMatrixToComponents((float*)&matrix, matrixTranslation, matrixRotation, matrixScale);
+			glm::quat rotation;
+
+			glm::decompose(matrix, transform.scale, rotation, transform.pos, skew, perspective);
+			transform.rot = glm::conjugate(rotation);
+			//transform.pos = glm::make_vec3(matrixTranslation);
+			//transform.rot = glm::quat(glm::radians(glm::make_vec3(matrixRotation)));
+			//transform.scale = glm::make_vec3(matrixScale);
 		}
 	}
 }
@@ -96,6 +112,7 @@ void HanoEditor::initUI()
 void HanoEditor::drawUI()
 {
 	Scene& scene = *m_renderer->getCurrentScene();
+	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
 	ImGui::ShowDemoWindow();
 
@@ -107,7 +124,6 @@ void HanoEditor::drawUI()
 	ImGui::Text("%d vertices, %d indices (%d triangles)", io.MetricsRenderVertices, io.MetricsRenderIndices, io.MetricsRenderIndices / 3);
 	ImGui::Text("%d active windows (%d visible)", io.MetricsActiveWindows, io.MetricsRenderWindows);
 	ImGui::Text("%d active allocations", io.MetricsActiveAllocations);
-	
 
 	if (ImGui::Button("reload shaders"))
 	{
@@ -159,13 +175,7 @@ void HanoEditor::drawUI()
 			ImGui::DragFloat3((std::string("light color") + std::to_string(i)).c_str(), (float*)&light.color, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat((std::string("light intensity") + std::to_string(i)).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
 
-			if (showLightGizmo)
-			{
-				Transform lightTr;
-				lightTr.pos = light.pos;
-				glm::mat4 const lightModel = lightTr.getMatrix();
-				ImGuizmo::DrawCube((float*)&scene.camera.viewMtr, (float*)&scene.camera.projectionMtr, (float*)&lightModel);
-			}
+			//drawList->AddCircleFilled({ screenPos.x, screenPos.y }, 50.0, 0xFFFFFFFF, 30);
 
 			i++;
 		}

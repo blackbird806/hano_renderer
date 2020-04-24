@@ -333,7 +333,7 @@ void Mesh::loadGltf(tinygltf::Model const& model)
 			}
 		}
 
-}
+	}
 	setVertices(vertices);
 	setIndices(indices);
 }

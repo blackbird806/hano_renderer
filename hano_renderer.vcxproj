@@ -71,7 +71,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)GLM_FORCE_LEFT_HANDED</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -89,7 +89,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)GLM_FORCE_LEFT_HANDED</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -111,6 +111,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)source\include\;$(SolutionDir)source\libraries\;%(AdditionalIncludeDirectories);$(SolutionDir)source\include;$(SolutionDir)source\libraries;%VULKAN_SDK%\include</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>GLM_FORCE_LEFT_HANDED</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)libraryBin\;%(AdditionalLibraryDirectories);$(SolutionDir)libraryBin\;%VULKAN_SDK%\lib;$(SolutionDir)libraryBin</AdditionalLibraryDirectories>
@@ -127,6 +128,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BrowseInformation>true</BrowseInformation>
       <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>GLM_FORCE_LEFT_HANDED</PreprocessorDefinitions>
     </ClCompile>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -194,6 +196,7 @@
     <ClInclude Include="source\include\renderer\camera.hpp" />
     <ClInclude Include="source\include\renderer\editorGUI.hpp" />
     <ClInclude Include="source\include\renderer\gltfLoader.hpp" />
+    <ClInclude Include="source\include\renderer\hanoDearImgui.hpp" />
     <ClInclude Include="source\include\renderer\hanoEditor.hpp" />
     <ClInclude Include="source\include\renderer\light.hpp" />
     <ClInclude Include="source\include\renderer\material.hpp" />

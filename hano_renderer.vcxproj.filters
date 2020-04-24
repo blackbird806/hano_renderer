@@ -215,6 +215,9 @@
     <ClInclude Include="source\include\renderer\gltfLoader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\renderer\hanoDearImgui.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\renderer\hanoEditor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -6,6 +6,7 @@ using namespace hano;
 void Camera::setPerspectiveProjection(float fov, glm::vec2 view, float near, float far) noexcept
 {
 	projectionMtr = glm::perspective(glm::radians(fov), view.x/view.y, near, far);
+	//projectionMtr[1][1] *= -1;
 }
 
 void Camera::setOrthographicProjection(glm::vec2 view) noexcept

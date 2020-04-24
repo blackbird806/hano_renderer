@@ -6,5 +6,12 @@
 
 namespace hano
 {
-	Model loadGltfModel(Renderer& renderer, std::filesystem::path const& gltfPath);
+	struct GltfLoadedResources
+	{
+		Mesh mesh;
+		Material material;
+		std::vector<Texture> textures;
+	};
+
+	GltfLoadedResources loadGltfModel(Renderer& renderer, std::filesystem::path const& gltfPath);
 }

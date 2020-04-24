@@ -16,12 +16,12 @@ namespace hano
 
 		glm::mat4 getMatrix() const noexcept
 		{
-			return glm::translate(glm::mat4(), pos) * glm::toMat4(rot) * glm::scale(glm::mat4(), scale);
+			return glm::translate(glm::mat4(), glm::vec3(pos.x, -pos.y, pos.z)) * glm::toMat4(rot) * glm::scale(glm::mat4(), scale);
 		}
 
 		void updateTRS()
 		{
-			trs = glm::translate(glm::mat4(), pos) * glm::toMat4(rot) * glm::scale(glm::mat4(), scale);
+			trs = glm::translate(glm::mat4(), glm::vec3(pos.x, -pos.y, pos.z)) * glm::toMat4(rot) * glm::scale(glm::mat4(), scale);
 		}
 	};
 }

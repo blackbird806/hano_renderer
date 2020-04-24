@@ -1,21 +1,25 @@
-#include "hanoRenderer.hpp"
-#include "renderer/hanoEditor.hpp"
+#include <hanoRenderer.hpp>
+#include <renderer/hanoEditor.hpp>
+#include <renderer/gltfLoader.hpp>
 
 int main()
 {
 	hano::Renderer::Info infos = {
 		.appName = "Render test 1",
-		.windowWidth = 800,
-		.windowHeight = 600
+		.windowWidth = 1280,
+		.windowHeight = 720
 	};
 
 	hano::Renderer renderer(infos);
 
-	hano::Mesh& cube = renderer.loadMesh("assets/gltf/cube/Cube.gltf");
-	hano::Material houseMtrl{ .baseColor = &renderer.loadTexture("assets/textures/back.jpg") };
-	hano::Model simpleCube(cube, houseMtrl);
+	//hano::Mesh& cube = renderer.loadMesh("assets/gltf/cube/Cube.gltf");
+	//hano::Material houseMtrl{ .baseColor = &renderer.loadTexture("assets/textures/back.jpg") };
+
+	auto gltfCube = hano::loadGltfModel(renderer, "assets/gltf/DamagedHelmet.gltf");
+	hano::Model simpleCube(gltfCube.mesh, hano::Material{.baseColor = &gltfCube .textures[0]});
 
 	hano::Scene scene;
+	scene.camera.pos = glm::vec3(0, 0, -10.0f);
 	scene.addModel(simpleCube);
 	simpleCube.transform.pos = glm::vec3(0, 0, 2);
 

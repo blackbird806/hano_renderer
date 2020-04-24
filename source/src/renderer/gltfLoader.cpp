@@ -2,6 +2,7 @@
 #include <tiny/tiny_gltf.h>
 
 #include <renderer/texture.hpp>
+#include <renderer/material.hpp>
 
 namespace
 {
@@ -13,10 +14,10 @@ namespace
 			case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
 			case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:
 				return vk::Filter::eNearest;
-				break;
 			case TINYGLTF_TEXTURE_FILTER_LINEAR:
 			case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
 			case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
+			default:
 				return vk::Filter::eLinear;
 		}
 	}
@@ -25,12 +26,13 @@ namespace
 	{
 		switch (gltfwrapMode)
 		{
-		case TINYGLTF_TEXTURE_WRAP_REPEAT:
-			return vk::SamplerAddressMode::eRepeat;
 		case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
 			return vk::SamplerAddressMode::eClampToEdge;
 		case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
 			return vk::SamplerAddressMode::eMirroredRepeat;
+		case TINYGLTF_TEXTURE_WRAP_REPEAT:
+		default:
+			return vk::SamplerAddressMode::eRepeat;
 		}
 	}
 
@@ -56,7 +58,7 @@ namespace
 		textures.reserve(gltfModel.textures.size());
 
 		for (auto const& gltfTexture : gltfModel.textures) {
-			tinygltf::Image image = gltfModel.images[gltfTexture.source];
+
 			vk::SamplerCreateInfo samplerInfo;
 			if (gltfTexture.sampler == -1) {
 				// No sampler specified, use a default one
@@ -69,28 +71,28 @@ namespace
 			else {
 				samplerInfo = samplers[gltfTexture.sampler];
 			}
-			
-			tinygltf::Image img = gltfModel.images[gltfTexture.source];
 
-			//hano::Texture texture;
+			tinygltf::Image gltfImage = gltfModel.images[gltfTexture.source];
 
-			//textures.push_back(texture);
+			hano::Texture texture;
+			texture.init(renderer.getVkContext(), gltfImage.image, samplerInfo, vk::Format::eR8G8B8A8Unorm, gltfImage.width, gltfImage.height, gltfImage.component);
+			textures.push_back(std::move(texture));
 		}
 		return textures;
 	}
 }
 
 // @Review
-hano::Model hano::loadGltfModel(hano::Renderer& renderer, std::filesystem::path const& gltfPath)
+hano::GltfLoadedResources hano::loadGltfModel(hano::Renderer& renderer, std::filesystem::path const& gltfPath)
 {
 	using namespace tinygltf;
 
-	tinygltf::Model model;
+	tinygltf::Model gltfModel;
 	TinyGLTF loader;
 	std::string err;
 	std::string warn;
 
-	bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, gltfPath.string());
+	bool ret = loader.LoadASCIIFromFile(&gltfModel, &err, &warn, gltfPath.string());
 	//bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, argv[1]); // for binary glTF(.glb)
 
 	if (!warn.empty()) {
@@ -106,7 +108,8 @@ hano::Model hano::loadGltfModel(hano::Renderer& renderer, std::filesystem::path 
 	}
 
 	Mesh mesh(renderer.getVkContext());
-	mesh.loadGltf(model);
+	mesh.loadGltf(gltfModel);
+	auto textures = loadTextures(gltfModel, renderer);
 
-
+	return { .mesh = std::move(mesh), .material = Material{}, .textures = std::move(textures) };
 }

@@ -21,6 +21,6 @@ namespace hano
 #define hano_warn(msg, ...)		hano::log(std::clog, "[warn] " __FUNCTION__":" , __LINE__ , " " msg, __VA_ARGS__, "\n")
 #define hano_error(msg, ...)	hano::log(std::cerr, "[error] " __FUNCTION__":" , __LINE__ , " " msg, __VA_ARGS__, "\n")
 
-#define hano_infof(fmt, ...)		fprintf(stderr, "[info] " fmt "\n", __VA_ARGS__)
+#define hano_infof(fmt, ...)		fprintf(stdout, "[info] " fmt "\n", __VA_ARGS__)
 #define hano_warnf(fmt, ...)		fprintf(stderr, "[warn] " __FUNCTION__":%d " fmt "\n", __LINE__, __VA_ARGS__)
 #define hano_errorf(fmt, ...)		fprintf(stderr, "[error] " __FUNCTION__":%d " fmt "\n", __LINE__, __VA_ARGS__)
