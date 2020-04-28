@@ -109,7 +109,7 @@ GeometryInstance TopLevelAS::createGeometryInstance(
 	// The gInst.transform value only contains 12 values, corresponding to a 4x3 matrix, hence
 	// saving the last row that is anyway always (0,0,0,1). Since the matrix is row-major,
 	// we simply copy the first 12 values of the original 4x4 matrix
-	std::memcpy(geometryInstance.transform, &glm::transpose(transform), sizeof(glm::mat4));
+	std::memcpy(geometryInstance.transform, &glm::transpose(transform), sizeof(geometryInstance.transform));
 	geometryInstance.instanceId = instanceId;
 	geometryInstance.mask = 0xFF; // The visibility mask is always set of 0xFF, but if some instances would need to be ignored in some cases, this flag should be passed by the application.
 	geometryInstance.hitGroupId = hitGroupIndex; // Set the hit group index, that will be used to find the shader code to execute when hitting the geometry.

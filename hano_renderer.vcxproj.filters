@@ -242,6 +242,9 @@
     <ClInclude Include="source\include\renderer\scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\include\renderer\shapes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\include\renderer\texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -2,6 +2,8 @@
 #extension GL_NV_ray_tracing : require
 #extension GL_EXT_nonuniform_qualifier : enable // see : https://github.com/KhronosGroup/GLSL/blob/master/extensions/ext/GL_EXT_nonuniform_qualifier.txt
 
+#define ENABLE_SHADOWS 0
+
 #define NUM_MAX_LIGHTS 4
 
 struct hitPayload
@@ -89,6 +91,7 @@ void main()
 
 	// light
 	vec3 sum = vec3(0.01, 0.01, 0.01);
+	isShadowed = false;
 
 	for (int i = 0; i < pushConsts.nbLights; i++)
 	{
@@ -103,6 +106,7 @@ void main()
 		// shadow cast
 		if (dot(normal, lightDir) > 0)
 		{
+#if ENABLE_SHADOWS
 			float tMin   = 0.001;
 			float tMax   = lightDist;
 			vec3  origin = worldPos;
@@ -121,7 +125,7 @@ void main()
 					tMax,        // ray max range
 					1            // payload (location = 1) isShadowed
 			);
-
+#endif
 			if (isShadowed)
 			{
 				sum += 0.25 * lightColor * lightIntensity;
@@ -137,6 +141,24 @@ void main()
 	vec4 texColor = texture(textureSamplers[gl_InstanceCustomIndexNV], texCoord);
 	// vec3 color = vec3(texCoord.x, texCoord.y, 0.5);
 	// vec3 color = normal;
+
+			// float tMin   = 0.001;
+			// float tMax   = 1000.0;
+			// vec3  origin = worldPos;
+			// vec3  rayDir = reflect(gl_WorldRayDirectionNV, normal);
+			// uint  flags = gl_RayFlagsTerminateOnFirstHitNV | gl_RayFlagsOpaqueNV | gl_RayFlagsSkipClosestHitShaderNV;
+			// traceNV(topLevelAS,  // acceleration structure
+			// 		flags,       // rayFlags
+			// 		0xFF,        // cullMask
+			// 		0,           // sbtRecordOffset
+			// 		0,           // sbtRecordStride
+			// 		0,           // missIndex
+			// 		origin,      // ray origin
+			// 		tMin,        // ray min range
+			// 		rayDir,      // ray direction
+			// 		tMax,        // ray max range
+			// 		0            // payload (location = 1) isShadowed
+			// );
 
 	vec3 color = sum * texColor.xyz;
 

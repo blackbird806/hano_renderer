@@ -20,6 +20,6 @@ void main()
 	coord.x = (phi / M_PI) / 2.0;
 	coord.y = -(theta / M_PI);
 
-	prd.hitValue = texture(envMap, coord).xyz;
+	prd.hitValue = texture(envMap, coord).xyz * 1.4;
 	//prd.hitValue = gl_WorldRayDirectionNV; // cool effect
 }

@@ -43,6 +43,7 @@ namespace hano
 			void createAccelerationStructures(Scene const& scene);
 			void createRaytracingOutImage();
 			void createRaytracingDescriptorSets(Scene const& scene);
+			void createSphereBuffers();
 			void createSceneBuffers();
 			void createRaytracingPipeline();
 			void createShaderBindingTable();
@@ -116,5 +117,7 @@ namespace hano
 			vkh::Buffer m_sceneIndexBuffer;
 			vkh::Buffer m_sceneOffsetsBuffer;
 			vkh::Buffer m_lightBuffer;
+			vkh::Buffer m_sphereBuffer;
+			vkh::Buffer m_sphereAABBBuffer;
 	};
 }

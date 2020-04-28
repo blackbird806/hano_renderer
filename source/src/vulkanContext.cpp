@@ -126,6 +126,7 @@ void VulkanContext::createRtStructures(Scene const& scene_)
 void VulkanContext::createAccelerationStructures(Scene const& scene_)
 {
 	auto nbModels = scene_.getModels().size();
+	auto nbSpheres = scene_.getSpheres().size();
 	std::vector<vkh::GeometryInstance> instances;
 	m_bottomLevelAccelerationStructures.reserve(nbModels);
 	
@@ -138,9 +139,30 @@ void VulkanContext::createAccelerationStructures(Scene const& scene_)
 			bottomAs.generate(command.buffer());
 		}
 		
-		instances.push_back(vkh::TopLevelAS::createGeometryInstance(bottomAs, model.get().transform.getMatrix(), i, 0 /*@TODO*/));
+		instances.push_back(vkh::TopLevelAS::createGeometryInstance(bottomAs, model.get().transform.getMatrix(), i, 0 /* standard hitgroup */));
 		i++;
 	}
+	
+	// add spheres
+	vk::GeometryAABBNV aabb;
+	aabb.setAabbData(m_sphereAABBBuffer.handle.get());
+	aabb.setNumAABBs(static_cast<uint32_t>(nbSpheres));
+	aabb.setStride(sizeof(AABB));
+	aabb.setOffset(0);
+	vk::GeometryDataNV geoData;
+	geoData.setAabbs(aabb);
+	vk::GeometryNV geometry;
+	geometry.setGeometryType(vk::GeometryTypeNV::eAabbs);
+	geometry.setGeometry(geoData);
+	// Consider the geometry opaque for optimization
+	geometry.setFlags(vk::GeometryFlagBitsNV::eOpaque);
+	auto& sphereAs = m_bottomLevelAccelerationStructures.emplace_back(*device, std::vector{ geometry }, true);
+	{
+		vkh::SingleTimeCommands command(*commandPool);
+		sphereAs.generate(command.buffer());
+	}
+
+	instances.push_back(vkh::TopLevelAS::createGeometryInstance(sphereAs, glm::mat4(), instances.size(), 1 /* procedural hitgroup */));
 
 	m_topLevelAccelerationStructure = std::make_unique<vkh::TopLevelAS>(*device, instances.size(), true);
 	{
@@ -182,6 +204,7 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eUniformBuffer, vk::ShaderStageFlagBits::eClosestHitNV }); // light Buffers
 	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eMissNV }); // envmap texture
 	descriptorBindings.push_back({ binding++, (uint32)scene->getModels().size(), vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eClosestHitNV }); // textures
+	descriptorBindings.push_back({ binding++, 1, vk::DescriptorType::eStorageBuffer, vk::ShaderStageFlagBits::eClosestHitNV | vk::ShaderStageFlagBits::eIntersectionNV }); // spheres buffer
 
 	m_rtDescriptorPool = std::make_unique<vkh::DescriptorPool>(*device, descriptorBindings, /*@TODO*/500);
 	m_rtDescriptorSetLayout.init(*device, descriptorBindings);
@@ -249,12 +272,42 @@ void VulkanContext::createRaytracingDescriptorSets(Scene const& scene_)
 		}
 		m_rtDescriptorSets.push(i, 8, std::span(textInfos));
 
+		vk::DescriptorBufferInfo spheresInfo;
+		spheresInfo.buffer = m_sphereBuffer.handle.get();
+		spheresInfo.offset = 0;
+		spheresInfo.range = VK_WHOLE_SIZE;
+		m_rtDescriptorSets.push(i, 9, spheresInfo);
+
 		m_rtDescriptorSets.updateDescriptors(i);
 	}
 }
 
+void VulkanContext::createSphereBuffers()
+{
+	auto const& spheres = scene->getSpheres();
+	m_sphereBuffer.init(*device, spheres.size() * sizeof(Sphere), vk::BufferUsageFlagBits::eStorageBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+	m_sphereAABBBuffer.init(*device, spheres.size() * sizeof(AABB), vk::BufferUsageFlagBits::eStorageBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+	m_sphereBuffer.setDataArray(std::span(spheres));
+
+	// Axis aligned bounding box of each sphere
+	std::vector<AABB> aabbs;
+	aabbs.reserve(spheres.size());
+	for (const auto& s : spheres)
+	{
+		AABB aabb;
+		aabb.min = s.pos - glm::vec3(s.radius);
+		aabb.max = s.pos + glm::vec3(s.radius);
+		aabbs.emplace_back(aabb);
+	}
+
+	m_sphereAABBBuffer.setDataArray(std::span(aabbs));
+	vkh::setObjectName(m_sphereBuffer, "sphereBuffer");
+}
+
 void VulkanContext::createSceneBuffers()
 {
+	createSphereBuffers();
+
 	// Concatenate all the models
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -354,11 +407,17 @@ void VulkanContext::createRaytracingPipeline()
 	vkh::ShaderModule closestHit(*device, "assets/shaders/closestHit.spv", vk::ShaderStageFlagBits::eClosestHitNV);
 	vkh::ShaderModule miss(*device, "assets/shaders/miss.spv", vk::ShaderStageFlagBits::eMissNV);
 	vkh::ShaderModule shadowMiss(*device, "assets/shaders/shadowMiss.spv", vk::ShaderStageFlagBits::eMissNV);
+	
+	// intersections closest hit
+	vkh::ShaderModule closestInt(*device, "assets/shaders/closestHitInt.spv", vk::ShaderStageFlagBits::eClosestHitNV);
+	vkh::ShaderModule intersect(*device, "assets/shaders/intersection.spv", vk::ShaderStageFlagBits::eIntersectionNV);
 
 	pipelineGen.addHitGroup({ raygen }, vk::RayTracingShaderGroupTypeNV::eGeneral);
 	pipelineGen.addHitGroup({ miss }, vk::RayTracingShaderGroupTypeNV::eGeneral);
 	pipelineGen.addHitGroup({ shadowMiss }, vk::RayTracingShaderGroupTypeNV::eGeneral);
 	pipelineGen.addHitGroup({ closestHit }, vk::RayTracingShaderGroupTypeNV::eTrianglesHitGroup);
+	// intersection hit group
+	pipelineGen.addHitGroup({ closestInt, intersect }, vk::RayTracingShaderGroupTypeNV::eProceduralHitGroup);
 
 	vk::PushConstantRange nbLightsConst;
 	nbLightsConst.offset = 0;
@@ -374,7 +433,7 @@ void VulkanContext::createShaderBindingTable()
 	m_sbt = std::make_unique<vkh::ShaderBindingTable>(*device, m_rtPipeline, 
 		std::vector{ vkh::ShaderBindingTable::Entry{ 0, { } } },	// raygenEntries
 		std::vector{ vkh::ShaderBindingTable::Entry{ 1, { } }, vkh::ShaderBindingTable::Entry{ 2, { } } },	// miss
-		std::vector{ vkh::ShaderBindingTable::Entry{ 3, { } } }		// hit
+		std::vector{ vkh::ShaderBindingTable::Entry{ 3, { } }, vkh::ShaderBindingTable::Entry{ 4, { } } }	// hit
 		);
 }
 
@@ -459,7 +518,7 @@ void VulkanContext::reloadShaders()
 void VulkanContext::createEnvMap()
 {
 	// @TODO user defined
-	m_envMap.init(*this, "assets/textures/envmap.jpg");
+	m_envMap.init(*this, "assets/textures/kloppenheim_02_4k.hdr");
 }
 
 std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
@@ -574,6 +633,8 @@ void VulkanContext::destroy()
 	m_sceneIndexBuffer.destroy();
 	m_sceneOffsetsBuffer.destroy();
 	m_sceneVertexBuffer.destroy();
+	m_sphereAABBBuffer.destroy();
+	m_sphereBuffer.destroy();
 
 	m_topLevelAccelerationStructure.reset();
 	m_bottomLevelAccelerationStructures.clear();

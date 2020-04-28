@@ -92,9 +92,14 @@ hano::GltfLoadedResources hano::loadGltfModel(hano::Renderer& renderer, std::fil
 	std::string err;
 	std::string warn;
 
-	bool ret = loader.LoadASCIIFromFile(&gltfModel, &err, &warn, gltfPath.string());
-	//bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, argv[1]); // for binary glTF(.glb)
-
+	bool ret = false;
+	if (gltfPath.extension() == ".gltf")
+		ret = loader.LoadASCIIFromFile(&gltfModel, &err, &warn, gltfPath.string());
+	else if (gltfPath.extension() == ".glb")
+		ret = loader.LoadBinaryFromFile(&gltfModel, &err, &warn, gltfPath.string()); // for binary glTF(.glb)
+	else
+		throw HanoException(std::string("Bad file extension : ") + gltfPath.extension().string());
+	
 	if (!warn.empty()) {
 		hano_warnf("Warn: %s\n", warn.c_str());
 	}

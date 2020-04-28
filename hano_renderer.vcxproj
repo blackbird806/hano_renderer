@@ -205,6 +205,7 @@
     <ClInclude Include="source\include\renderer\renderInfo.hpp" />
     <ClInclude Include="source\include\renderer\resourceManager.hpp" />
     <ClInclude Include="source\include\renderer\scene.hpp" />
+    <ClInclude Include="source\include\renderer\shapes.hpp" />
     <ClInclude Include="source\include\renderer\texture.hpp" />
     <ClInclude Include="source\include\renderer\transform.hpp" />
     <ClInclude Include="source\include\renderer\UniformBuffer.hpp" />

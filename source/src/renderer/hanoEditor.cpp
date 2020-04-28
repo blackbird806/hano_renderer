@@ -8,14 +8,15 @@
 #include <renderer/scene.hpp>
 #include <renderer/camera.hpp>
 
+#include <thread>
+#include <chrono>
+
 using namespace hano;
 
 namespace {
 
 	void editTransform(Camera const& camera, Transform& transform)
 	{
-		glm::mat4 matrix = transform.getMatrix();
-
 		static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
 		static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
 		if (ImGui::IsKeyPressed(90))
@@ -33,23 +34,17 @@ namespace {
 		if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
 			mCurrentGizmoOperation = ImGuizmo::SCALE;
 
-		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-		glm::vec3 eulerRot;
 		glm::vec3 skew;
 		glm::vec4 perspective;
-		//ImGuizmo::DecomposeMatrixToComponents((float*)&matrix, matrixTranslation, matrixRotation, matrixScale);
-		glm::decompose(matrix, transform.scale, transform.rot, transform.pos, skew, perspective);
-		eulerRot = glm::eulerAngles(transform.rot);
-		ImGui::DragFloat3("pos", (float*)&transform.pos);
-		ImGui::DragFloat3("rot", (float*)&eulerRot);
-		ImGui::DragFloat3("scale", (float*)&transform.scale);
-		transform.rot = glm::quat(eulerRot);
-		matrix = transform.getMatrix();
-		//ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, (float*)&eulerRot, matrixScale, (float*)&matrix);
+		ImGui::DragFloat3("pos", glm::value_ptr(transform.pos));
 
-		//transform.pos = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
-		//transform.rot = glm::quat(glm::radians(eulerRot));
-		//transform.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
+		if (ImGui::DragFloat3("rot", glm::value_ptr(transform.eulerRot)))
+		{
+		}
+
+		ImGui::DragFloat3("scale", glm::value_ptr(transform.scale));
+		glm::mat4 modelMatrix;
+		ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(transform.pos), glm::value_ptr(transform.eulerRot), glm::value_ptr(transform.scale), glm::value_ptr(modelMatrix));
 
 		if (mCurrentGizmoOperation != ImGuizmo::SCALE)
 		{
@@ -85,16 +80,14 @@ namespace {
 		ImGui::Checkbox("show transform gizmo", &show_gizmos);
 		if (show_gizmos)
 		{
-			ImGuizmo::Manipulate((float*)&(camera.viewMtr), (float*)&(camera.projectionMtr), mCurrentGizmoOperation, mCurrentGizmoMode, (float*)&matrix, NULL, useSnap ? &snap.x : NULL);
-			//ImGuizmo::DecomposeMatrixToComponents((float*)&matrix, matrixTranslation, matrixRotation, matrixScale);
+			glm::mat4 deltaMatrix;
+			ImGuizmo::Manipulate(glm::value_ptr(camera.viewMtr), glm::value_ptr(camera.projectionMtr), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(modelMatrix), glm::value_ptr(deltaMatrix), useSnap ? &snap.x : NULL);
+			
 			glm::quat rotation;
-
-			glm::decompose(matrix, transform.scale, rotation, transform.pos, skew, perspective);
+			glm::decompose(modelMatrix, transform.scale, rotation, transform.pos, skew, perspective);
 			transform.rot = glm::conjugate(rotation);
-			//transform.pos = glm::make_vec3(matrixTranslation);
-			//transform.rot = glm::quat(glm::radians(glm::make_vec3(matrixRotation)));
-			//transform.scale = glm::make_vec3(matrixScale);
 		}
+		transform.eulerRot = glm::eulerAngles(transform.rot);
 	}
 }
 
@@ -124,6 +117,11 @@ void HanoEditor::drawUI()
 	ImGui::Text("%d vertices, %d indices (%d triangles)", io.MetricsRenderVertices, io.MetricsRenderIndices, io.MetricsRenderIndices / 3);
 	ImGui::Text("%d active windows (%d visible)", io.MetricsActiveWindows, io.MetricsRenderWindows);
 	ImGui::Text("%d active allocations", io.MetricsActiveAllocations);
+
+	static float maxFps = 30.0f;
+	ImGui::DragFloat("max fps", &maxFps, 1.0f, 0.0f, 144.0f);
+
+
 
 	if (ImGui::Button("reload shaders"))
 	{
