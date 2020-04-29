@@ -2,7 +2,7 @@
 #extension GL_NV_ray_tracing : require
 #extension GL_EXT_nonuniform_qualifier : enable // see : https://github.com/KhronosGroup/GLSL/blob/master/extensions/ext/GL_EXT_nonuniform_qualifier.txt
 
-#define ENABLE_SHADOWS 0
+#define ENABLE_SHADOWS 1
 
 #define NUM_MAX_LIGHTS 4
 

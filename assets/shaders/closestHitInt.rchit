@@ -4,6 +4,8 @@
 #extension GL_EXT_scalar_block_layout : enable
 
 #define ENABLE_SHADOWS 0
+#define ENABLE_REFLECTION 1
+#define COMPUTE_LIGHT 0
 #define NUM_MAX_LIGHTS 4
 #define KIND_SPHERE 0
 #define KIND_CUBE 1
@@ -78,10 +80,30 @@ void main()
                  	(maxC == absN.y) ? vec3(0, sign(normal.y), 0) : vec3(0, 0, sign(normal.z));
   	}
 
+	#if ENABLE_REFLECTION
+			float tMin   = 0.001;
+			float tMax   = 1000.0;
+			vec3  origin = worldPos;
+			vec3  rayDir = reflect(gl_WorldRayDirectionNV, normal);
+			uint  flags = gl_RayFlagsTerminateOnFirstHitNV | gl_RayFlagsOpaqueNV;
+			traceNV(topLevelAS,  // acceleration structure
+					flags,       // rayFlags
+					0xFF,        // cullMask
+					0,           // sbtRecordOffset
+					0,           // sbtRecordStride
+					0,           // missIndex
+					origin,      // ray origin
+					tMin,        // ray min range
+					rayDir,      // ray direction
+					tMax,        // ray max range
+					0            // payload (location = 1) isShadowed
+			);
+	#endif
+
 	// light
 	vec3 sum = vec3(0.01, 0.01, 0.01);
+#if COMPUTE_LIGHT
 	isShadowed = false;
-
 	for (int i = 0; i < pushConsts.nbLights; i++)
 	{
 		vec3 lightPos = lights[i].pos;
@@ -92,8 +114,9 @@ void main()
 		float lightDist = length(lightDir);
 		lightDir = normalize(lightDir);
 
+		float U = dot(normal, lightDir);
 		// shadow cast
-		if (dot(normal, lightDir) > 0)
+		if (U > 0)
 		{
 #if ENABLE_SHADOWS
 			float tMin   = 0.001;
@@ -114,19 +137,21 @@ void main()
 					tMax,        // ray max range
 					1            // payload (location = 1) isShadowed
 			);
-#endif
+#endif // ENABLE_SHADOWS
 			if (isShadowed)
 			{
 				sum += 0.25 * lightColor * lightIntensity;
 			}
 			else
 			{
-				sum += max(dot(normal, lightDir), 0.2) * lightColor * lightIntensity;
+				sum += max(U, 0.2) * lightColor * lightIntensity;
 			}
 		}
 	}
+#endif // COMPUTE_LIGHT
+
 	// ---
 
-	vec3 color = sum * vec3(1.0, 0.0, 0.0);
-	prd.hitValue = vec3(1.0, 0.0, 0.0);
+	vec3 color = sum + vec3(0.0, 0.0, 0.1);
+	prd.hitValue += color;
 }

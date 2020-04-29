@@ -1,6 +1,7 @@
 #include <hanoRenderer.hpp>
 #include <renderer/hanoEditor.hpp>
 #include <renderer/gltfLoader.hpp>
+#include <random>
 
 int main()
 {
@@ -17,14 +18,22 @@ int main()
 	hano::Model cube(cubeMesh, houseMtrl);
 
 	auto gltfCube = hano::loadGltfModel(renderer, "assets/gltf/DamagedHelmet.gltf");
-	hano::Model simpleCube(gltfCube.mesh, hano::Material{.baseColor = &gltfCube .textures[0]});
+	hano::Model simpleCube(gltfCube.mesh, hano::Material{.baseColor = &gltfCube.textures[0]});
 
 	hano::Scene scene;
 	scene.camera.pos = glm::vec3(0, 0, -10.0f);
 	scene.addModel(simpleCube);
 	scene.addModel(cube);
-	scene.addSphere(hano::Sphere{ glm::vec3(5.0f, 3.0f, -3.0f), 0.5f });
-	scene.addSphere(hano::Sphere{ glm::vec3(0.0f, 0.0f, 0.0f), 2.5f });
+	std::random_device rd{};
+	std::mt19937       gen{ rd() };
+	std::normal_distribution<float>       xzd{ 1.f, 2.f };
+	std::normal_distribution<float>       yd{ 1.f, 2.f };
+	std::uniform_real_distribution<float> radd{ .1f, .7f };
+
+	for (int i = 0; i < 20; i++)
+	{
+		scene.addSphere(hano::Sphere{ glm::vec3(xzd(gen), yd(gen), xzd(gen)), radd(gen) });
+	}
 	simpleCube.transform.pos = glm::vec3(0, 0, 2);
 
 	scene.addLight(hano::PointLight{ 1.0f, glm::vec3(2.0f, 1.0f, -2.0f), glm::vec3(1.0f, 1.0f, 1.0f) });

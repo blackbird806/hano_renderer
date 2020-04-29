@@ -357,15 +357,20 @@ void VulkanContext::createSceneBuffers()
 	m_cameraUbo.setData(camMtr);
 }
 
+// @Review
 void VulkanContext::updateTlas(vk::CommandBuffer commandBuffer)
 {
 	auto const nbModels = scene->getModels().size();
-	std::vector<vkh::GeometryInstance> instances(nbModels);
+	std::vector<vkh::GeometryInstance> instances(nbModels + 1);
 	for (uint32 i = 0; i < nbModels; i++)
 	{
 		instances[i] = vkh::TopLevelAS::createGeometryInstance(m_bottomLevelAccelerationStructures[i], 
 			scene->getModels()[i].get().transform.getMatrix(), i, 0 /*@TODO*/);
 	}
+
+	// last blas represent the procedural shapes
+	instances.back() = vkh::TopLevelAS::createGeometryInstance(m_bottomLevelAccelerationStructures.back(),
+		glm::mat4(), instances.size()-1, 1);
 
 	m_topLevelAccelerationStructure->update(commandBuffer, instances);
 }
