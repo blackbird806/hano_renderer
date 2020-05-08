@@ -36,7 +36,7 @@ Swapchain::Swapchain(Device const& idevice, bool vsync, Swapchain* oldSwapchain)
 	createInfo.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
-	createInfo.oldSwapchain = oldSwapchain ? oldSwapchain->handle : nullptr;
+	createInfo.oldSwapchain = oldSwapchain ? oldSwapchain->handle.get() : nullptr;
 
 	if (device.graphicsFamilyIndex() != device.presentFamilyIndex())
 	{
@@ -53,27 +53,15 @@ Swapchain::Swapchain(Device const& idevice, bool vsync, Swapchain* oldSwapchain)
 		createInfo.pQueueFamilyIndices = nullptr; // Optional
 	}
 
-	VKH_CHECK(
-		device.handle.createSwapchainKHR(&createInfo, nullptr, &handle),
-	"failed to create swapchain !");
+	handle = device.handle.createSwapchainKHRUnique(createInfo, device.allocator);
 
 	minImageCount = details.capabilities.minImageCount;
 	format = surfaceFormat.format;
-	images = device.handle.getSwapchainImagesKHR(handle);
+	images = device.handle.getSwapchainImagesKHR(handle.get());
 	imageViews.reserve(images.size());
 
 	for (const auto image : images)
 		imageViews.emplace_back(device, image, format, vk::ImageAspectFlagBits::eColor);
-}
-
-Swapchain::~Swapchain()
-{
-	if (handle)
-	{
-		// images must be destroyed before the swapchain
-		imageViews.clear();
-		device.handle.destroySwapchainKHR(handle, device.allocator);
-	}
 }
 
 Swapchain::SupportDetails Swapchain::querySwapchainSupport(vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface)

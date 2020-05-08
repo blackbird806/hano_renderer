@@ -101,15 +101,15 @@ hano::GltfLoadedResources hano::loadGltfModel(hano::Renderer& renderer, std::fil
 		throw HanoException(std::string("Bad file extension : ") + gltfPath.extension().string());
 	
 	if (!warn.empty()) {
-		hano_warnf("Warn: %s\n", warn.c_str());
+		hano_warn("{}", warn);
 	}
 
 	if (!err.empty()) {
-		hano_errorf("Err: %s\n", err.c_str());
+		hano_error("{}", err);
 	}
 
 	if (!ret) {
-		throw HanoException("Failed to parse glTF\n");
+		throw HanoException("Failed to parse glTF");
 	}
 
 	Mesh mesh(renderer.getVkContext());

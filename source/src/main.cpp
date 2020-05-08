@@ -26,11 +26,11 @@ int main()
 	scene.addModel(cube);
 	std::random_device rd{};
 	std::mt19937       gen{ rd() };
-	std::normal_distribution<float>       xzd{ 1.f, 2.f };
-	std::normal_distribution<float>       yd{ 1.f, 2.f };
+	std::normal_distribution<float>       xzd{ 1.f, 20.f };
+	std::normal_distribution<float>       yd{ 1.f, 20.f };
 	std::uniform_real_distribution<float> radd{ .1f, .7f };
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		scene.addSphere(hano::Sphere{ glm::vec3(xzd(gen), yd(gen), xzd(gen)), radd(gen) });
 	}

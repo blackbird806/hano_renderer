@@ -9,8 +9,6 @@ namespace hano::vkh
 {
 	struct CommandBuffers
 	{
-		VULKAN_NON_COPIABLE_NON_MOVABLE(CommandBuffers);
-
 		CommandBuffers(CommandPool const& pool, uint32 size)
 			: commandPool(pool)
 		{
@@ -53,8 +51,6 @@ namespace hano::vkh
 
 	struct SingleTimeCommands
 	{
-		VULKAN_NON_COPIABLE_NON_MOVABLE(SingleTimeCommands);
-		
 		SingleTimeCommands(CommandPool& pool)
 			: commandPool(pool), commandBuffers(pool, 1)
 		{

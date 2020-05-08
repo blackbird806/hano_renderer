@@ -4,8 +4,8 @@
 #extension GL_EXT_scalar_block_layout : enable
 
 #define ENABLE_SHADOWS 0
-#define ENABLE_REFLECTION 1
-#define COMPUTE_LIGHT 0
+#define COMPUTE_LIGHT 1
+#define ENABLE_REFLECTION 0
 #define NUM_MAX_LIGHTS 4
 #define KIND_SPHERE 0
 #define KIND_CUBE 1
@@ -153,5 +153,5 @@ void main()
 	// ---
 
 	vec3 color = sum + vec3(0.0, 0.0, 0.1);
-	prd.hitValue += color;
+	prd.hitValue = color;
 }

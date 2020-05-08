@@ -8,6 +8,7 @@
 #include <renderer/scene.hpp>
 #include <renderer/camera.hpp>
 
+#include <fmt/format.h>
 #include <thread>
 #include <chrono>
 
@@ -121,14 +122,12 @@ void HanoEditor::drawUI()
 	static float maxFps = 30.0f;
 	ImGui::DragFloat("max fps", &maxFps, 1.0f, 0.0f, 144.0f);
 
-
-
 	if (ImGui::Button("reload shaders"))
 	{
 		m_renderer->reloadShaders();
 	}
 
-	if (ImGui::DragFloat3("camPos", (float*)&scene.camera.pos))
+	if (ImGui::DragFloat3("camPos", (float*)&scene.camera.pos, 0.2f))
 	{
 		scene.camera.updateViewMtr();
 	}
@@ -142,11 +141,19 @@ void HanoEditor::drawUI()
 	static int selected_index = 0;
 	for (int i = 0; auto & model : scene.getModels())
 	{
-		if (ImGui::RadioButton((std::string("model ") + std::to_string(i)).c_str(), selected_index == i))
+		if (ImGui::RadioButton(fmt::format("model {}", i).c_str(), selected_index == i))
 		{
 			selected_index = i;
 		}
 		i++;
+
+		//glm::vec2 screenPos = glm::project(model.get().transform.pos, model.get().transform.getMatrix(), scene.camera.projectionMtr, 
+		//glm::vec4(0.0f, 0.0f,
+		//	m_renderer->getWindowWidth(), m_renderer->getWindowHeight()));
+		glm::vec2 screenPos = scene.camera.projectionMtr * scene.camera.viewMtr * model.get().transform.getMatrix() * glm::vec4(model.get().transform.pos, 1.0f);
+		screenPos.x *= m_renderer->getWindowWidth() + m_renderer->getWindowWidth() / 2;
+		screenPos.y *= m_renderer->getWindowHeight() - m_renderer->getWindowHeight() / 2;
+		drawList->AddCircleFilled({ screenPos.x , screenPos.y }, 20.0, 0xFFFFFFFF, 30);
 	}
 
 	auto& selectedModel = scene.getModels()[selected_index].get();
@@ -169,15 +176,20 @@ void HanoEditor::drawUI()
 
 		for (int i = 0; auto & light : scene.lights)
 		{
-			ImGui::DragFloat3((std::string("light pos") + std::to_string(i)).c_str(), (float*)&light.pos);
-			ImGui::DragFloat3((std::string("light color") + std::to_string(i)).c_str(), (float*)&light.color, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat((std::string("light intensity") + std::to_string(i)).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
-
-			//drawList->AddCircleFilled({ screenPos.x, screenPos.y }, 50.0, 0xFFFFFFFF, 30);
+			ImGui::DragFloat3(fmt::format("light pos {}: ", i).c_str(), (float*)&light.pos);
+			ImGui::ColorEdit3(fmt::format("light color {}: ", i).c_str(), (float*)&light.color);
+			ImGui::DragFloat(fmt::format("light intensity {}: ", i).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
 
 			i++;
 		}
 	}
 
 	ImGui::End();
+
+	static bool x_open = true;
+	if (x_open)
+	{
+		ImGui::Begin("yee", &x_open);
+		ImGui::End();
+	}
 }

@@ -17,8 +17,6 @@ namespace hano::vkh
 	
 	struct Device
 	{
-		VULKAN_NON_COPIABLE_NON_MOVABLE(Device);
-
 		Device(vk::PhysicalDevice physDevice, Surface const& isurface, std::vector<const char*> irequiredExtensions, vk::AllocationCallbacks* alloc);
 		~Device();
 		

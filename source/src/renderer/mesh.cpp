@@ -43,7 +43,7 @@ void Mesh::setVertices(std::vector<Vertex> const& vertices)
 {
 	if (vertices.empty())
 	{
-		hano_warnf("trying to create mesh without vertices !");
+		hano_warn("trying to create mesh without vertices !");
 		return;
 	}
 
@@ -225,15 +225,15 @@ void Mesh::loadFromGltfFile(std::filesystem::path const& gltfPath)
 	//bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, argv[1]); // for binary glTF(.glb)
 
 	if (!warn.empty()) {
-		hano_warnf("Warn: %s\n", warn.c_str());
+		hano_warn("{}", warn.c_str());
 	}
 
 	if (!err.empty()) {
-		hano_errorf("Err: %s\n", err.c_str());
+		hano_error("{}", err.c_str());
 	}
 
 	if (!ret) {
-		throw HanoException("Failed to parse glTF\n");
+		throw HanoException("Failed to parse glTF");
 	}
 
 	loadGltf(model);
@@ -328,7 +328,7 @@ void Mesh::loadGltf(tinygltf::Model const& model)
 				break;
 			}
 			default:
-				hano_error_stream << "Index component type " << accessor.componentType << " not supported!" << std::endl;
+				hano_error("Index component type {} not supported!", accessor.componentType);
 				return;
 			}
 		}

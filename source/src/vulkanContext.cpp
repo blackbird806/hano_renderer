@@ -536,7 +536,7 @@ std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
 
 	inFlightFence.wait(noTimeout);
 
-	auto result = device->handle.acquireNextImageKHR(swapchain->handle, noTimeout, imageAvailableSemaphore, nullptr);
+	auto result = device->handle.acquireNextImageKHR(swapchain->handle.get(), noTimeout, imageAvailableSemaphore, nullptr);
 	swapchainImageIndex = result.value;
 	m_result = result.result;
 
@@ -550,7 +550,7 @@ std::optional<vk::CommandBuffer> VulkanContext::beginFrame()
 	} 
 	else if (result.result != vk::Result::eSuccess)
 	{
-		throw HanoException(std::string("failed to acquire next image (") + to_string(result.result) + ")");
+		throw HanoException(fmt::format("failed to acquire next image ({})", result.result));
 	}
 
 	commandBuffer = commandBuffers->begin(swapchainImageIndex);
@@ -584,7 +584,7 @@ void VulkanContext::endFrame()
 	
 	device->graphicsQueue().submit({ submitInfo }, inFlightFence.handle.get());
 
-	vk::SwapchainKHR swapchains[] = { swapchain->handle };
+	vk::SwapchainKHR swapchains[] = { swapchain->handle.get() };
 	vk::PresentInfoKHR presentInfo = {};
 	presentInfo.waitSemaphoreCount = std::size(signalSemaphores);
 	presentInfo.pWaitSemaphores = signalSemaphores;

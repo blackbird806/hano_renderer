@@ -137,6 +137,8 @@
   <ItemGroup>
     <ClCompile Include="source\include\renderer\model.cpp" />
     <ClCompile Include="source\include\vulkanHelpers\vkhGraphicsPipeline.cpp" />
+    <ClCompile Include="source\libraries\fmt\src\format.cc" />
+    <ClCompile Include="source\libraries\fmt\src\os.cc" />
     <ClCompile Include="source\libraries\imguizmo\ImCurveEdit.cpp" />
     <ClCompile Include="source\libraries\imguizmo\ImGradient.cpp" />
     <ClCompile Include="source\libraries\imguizmo\ImGuizmo.cpp" />

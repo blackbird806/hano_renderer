@@ -14,10 +14,7 @@ namespace hano::vkh
 	
 	struct Swapchain
 	{
-		VULKAN_NON_COPIABLE_NON_MOVABLE(Swapchain);
-
 		Swapchain(Device const& idevice, bool vsync, Swapchain* oldSwapChain = nullptr);
-		~Swapchain();
 		
 		struct SupportDetails
 		{
@@ -34,7 +31,7 @@ namespace hano::vkh
 		
 		Device const& device;
 		uint32 minImageCount;
-		vk::SwapchainKHR handle;
+		vk::UniqueSwapchainKHR handle;
 		vk::Format format;
 		vk::Extent2D extent;
 		std::vector<vk::Image> images;
