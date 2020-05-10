@@ -99,12 +99,13 @@ void main()
 		vec3 lightColor = lights[i].color;
 		float lightIntensity = lights[i].intensity;
 		
-		vec3 lightDir = lightPos - worldPos;
-		float lightDist = length(lightDir);
-		lightDir = normalize(lightDir);
+		const vec3 lightDir = normalize(lightPos - worldPos);
+		const float lightDist = length(lightDir);
+
+		const float U = dot(normal, lightDir);
 
 		// shadow cast
-		if (dot(normal, lightDir) > 0)
+		if (U > 0)
 		{
 #if ENABLE_SHADOWS
 			float tMin   = 0.001;
@@ -132,7 +133,7 @@ void main()
 			}
 			else
 			{
-				sum += max(dot(normal, lightDir), 0.2) * lightColor * lightIntensity;
+				sum += max(U, 0.2) * lightColor * lightIntensity;
 			}
 		}
 	}

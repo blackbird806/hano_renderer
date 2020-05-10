@@ -71,7 +71,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)GLM_FORCE_LEFT_HANDED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)GLM_FORCE_LEFT_HANDED;;GLM_FORCE_DEPTH_ZERO_TO_ONE</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -89,7 +89,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)GLM_FORCE_LEFT_HANDED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)GLM_FORCE_LEFT_HANDED;GLM_FORCE_DEPTH_ZERO_TO_ONE</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -111,7 +111,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)source\include\;$(SolutionDir)source\libraries\;%(AdditionalIncludeDirectories);$(SolutionDir)source\include;$(SolutionDir)source\libraries;%VULKAN_SDK%\include</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GLM_FORCE_LEFT_HANDED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLM_FORCE_LEFT_HANDED;;GLM_FORCE_DEPTH_ZERO_TO_ONE</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)libraryBin\;%(AdditionalLibraryDirectories);$(SolutionDir)libraryBin\;%VULKAN_SDK%\lib;$(SolutionDir)libraryBin</AdditionalLibraryDirectories>
@@ -128,7 +128,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BrowseInformation>true</BrowseInformation>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GLM_FORCE_LEFT_HANDED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLM_FORCE_LEFT_HANDED;;GLM_FORCE_DEPTH_ZERO_TO_ONE</PreprocessorDefinitions>
     </ClCompile>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>

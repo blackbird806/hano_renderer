@@ -1,5 +1,4 @@
 #include <renderer/hanoEditor.hpp>
-#include <vulkan/vulkan.hpp>
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>
 #include <glm/glm.hpp>
@@ -9,8 +8,6 @@
 #include <renderer/camera.hpp>
 
 #include <fmt/format.h>
-#include <thread>
-#include <chrono>
 
 using namespace hano;
 
@@ -41,6 +38,7 @@ namespace {
 
 		if (ImGui::DragFloat3("rot", glm::value_ptr(transform.eulerRot)))
 		{
+			transform.rot = glm::quat(glm::radians(transform.eulerRot));
 		}
 
 		ImGui::DragFloat3("scale", glm::value_ptr(transform.scale));
@@ -61,7 +59,7 @@ namespace {
 		ImGui::Checkbox("snap ", &useSnap);
 		ImGui::SameLine();
 
-		glm::vec3 snap;
+		static glm::vec3 snap;
 		switch (mCurrentGizmoOperation)
 		{
 		case ImGuizmo::TRANSLATE:
@@ -82,13 +80,13 @@ namespace {
 		if (show_gizmos)
 		{
 			glm::mat4 deltaMatrix;
-			ImGuizmo::Manipulate(glm::value_ptr(camera.viewMtr), glm::value_ptr(camera.projectionMtr), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(modelMatrix), glm::value_ptr(deltaMatrix), useSnap ? &snap.x : NULL);
+			glm::mat4 gizmoProj = camera.projectionMtr;
+			gizmoProj[1][1] *= -1; // imguizmo uses openGL coordSystem
+			ImGuizmo::Manipulate(glm::value_ptr(camera.viewMtr), glm::value_ptr(gizmoProj), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(modelMatrix), glm::value_ptr(deltaMatrix), useSnap ? &snap.x : NULL);
 			
-			glm::quat rotation;
-			glm::decompose(modelMatrix, transform.scale, rotation, transform.pos, skew, perspective);
-			transform.rot = glm::conjugate(rotation);
+			ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(modelMatrix), glm::value_ptr(transform.pos), glm::value_ptr(transform.eulerRot), glm::value_ptr(transform.scale));
+			transform.rot = glm::quat(glm::radians(transform.eulerRot));
 		}
-		transform.eulerRot = glm::eulerAngles(transform.rot);
 	}
 }
 
@@ -108,7 +106,21 @@ void HanoEditor::drawUI()
 	Scene& scene = *m_renderer->getCurrentScene();
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
-	ImGui::ShowDemoWindow();
+	static bool show_demo = true;
+	if (show_demo)
+	{
+		ImGui::ShowDemoWindow(&show_demo);
+	}
+
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("Windows"))
+		{
+			if (ImGui::MenuItem("demo", nullptr, &show_demo)) {}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
 
 	ImGui::Begin("scene");
 
@@ -118,9 +130,6 @@ void HanoEditor::drawUI()
 	ImGui::Text("%d vertices, %d indices (%d triangles)", io.MetricsRenderVertices, io.MetricsRenderIndices, io.MetricsRenderIndices / 3);
 	ImGui::Text("%d active windows (%d visible)", io.MetricsActiveWindows, io.MetricsRenderWindows);
 	ImGui::Text("%d active allocations", io.MetricsActiveAllocations);
-
-	static float maxFps = 30.0f;
-	ImGui::DragFloat("max fps", &maxFps, 1.0f, 0.0f, 144.0f);
 
 	if (ImGui::Button("reload shaders"))
 	{
@@ -150,10 +159,10 @@ void HanoEditor::drawUI()
 		//glm::vec2 screenPos = glm::project(model.get().transform.pos, model.get().transform.getMatrix(), scene.camera.projectionMtr, 
 		//glm::vec4(0.0f, 0.0f,
 		//	m_renderer->getWindowWidth(), m_renderer->getWindowHeight()));
-		glm::vec2 screenPos = scene.camera.projectionMtr * scene.camera.viewMtr * model.get().transform.getMatrix() * glm::vec4(model.get().transform.pos, 1.0f);
-		screenPos.x *= m_renderer->getWindowWidth() + m_renderer->getWindowWidth() / 2;
-		screenPos.y *= m_renderer->getWindowHeight() - m_renderer->getWindowHeight() / 2;
-		drawList->AddCircleFilled({ screenPos.x , screenPos.y }, 20.0, 0xFFFFFFFF, 30);
+		//glm::vec2 screenPos = scene.camera.projectionMtr * scene.camera.viewMtr * model.get().transform.getMatrix() * glm::vec4(model.get().transform.pos, 1.0f);
+		//screenPos.x *= m_renderer->getWindowWidth() + m_renderer->getWindowWidth() / 2;
+		//screenPos.y *= m_renderer->getWindowHeight() - m_renderer->getWindowHeight() / 2;
+		//drawList->AddCircleFilled({ screenPos.x , screenPos.y }, 20.0, 0xFFFFFFFF, 30);
 	}
 
 	auto& selectedModel = scene.getModels()[selected_index].get();
@@ -163,33 +172,23 @@ void HanoEditor::drawUI()
 	{
 		if (ImGui::Button("AddLight"))
 		{
-			scene.lights.push_back(PointLight{});
+			scene.lights.push_back(PointLight{ .intensity = 1.0f, .color = glm::vec3(1.0f, 1.0f, 1.0f) });
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("RemoveLight"))
 		{
 			scene.lights.pop_back();
 		}
-		ImGui::SameLine();
-		static bool showLightGizmo = true;
-		ImGui::Checkbox("show light gizmo", &showLightGizmo);
 
 		for (int i = 0; auto & light : scene.lights)
 		{
-			ImGui::DragFloat3(fmt::format("light pos {}: ", i).c_str(), (float*)&light.pos);
-			ImGui::ColorEdit3(fmt::format("light color {}: ", i).c_str(), (float*)&light.color);
-			ImGui::DragFloat(fmt::format("light intensity {}: ", i).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
-
+			ImGui::DragFloat3(fmt::format("light pos {}", i).c_str(), (float*)&light.pos);
+			ImGui::ColorEdit3(fmt::format("light color {}", i).c_str(), (float*)&light.color);
+			ImGui::DragFloat(fmt::format("light intensity {}", i).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
+			ImGui::Text("\n");
 			i++;
 		}
 	}
 
 	ImGui::End();
-
-	static bool x_open = true;
-	if (x_open)
-	{
-		ImGui::Begin("yee", &x_open);
-		ImGui::End();
-	}
 }
