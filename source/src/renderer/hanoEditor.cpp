@@ -147,6 +147,7 @@ void HanoEditor::drawUI()
 		scene.camera.setPerspectiveProjection(cameraFov, glm::vec2(m_renderer->getWindowWidth(), m_renderer->getWindowHeight()), 0.01f, 1000.0f);
 	}
 
+	ImGui::Text("models :");
 	static int selected_index = 0;
 	for (int i = 0; auto & model : scene.getModels())
 	{
@@ -155,14 +156,6 @@ void HanoEditor::drawUI()
 			selected_index = i;
 		}
 		i++;
-
-		//glm::vec2 screenPos = glm::project(model.get().transform.pos, model.get().transform.getMatrix(), scene.camera.projectionMtr, 
-		//glm::vec4(0.0f, 0.0f,
-		//	m_renderer->getWindowWidth(), m_renderer->getWindowHeight()));
-		//glm::vec2 screenPos = scene.camera.projectionMtr * scene.camera.viewMtr * model.get().transform.getMatrix() * glm::vec4(model.get().transform.pos, 1.0f);
-		//screenPos.x *= m_renderer->getWindowWidth() + m_renderer->getWindowWidth() / 2;
-		//screenPos.y *= m_renderer->getWindowHeight() - m_renderer->getWindowHeight() / 2;
-		//drawList->AddCircleFilled({ screenPos.x , screenPos.y }, 20.0, 0xFFFFFFFF, 30);
 	}
 
 	auto& selectedModel = scene.getModels()[selected_index].get();
@@ -189,6 +182,6 @@ void HanoEditor::drawUI()
 			i++;
 		}
 	}
-
+	
 	ImGui::End();
 }

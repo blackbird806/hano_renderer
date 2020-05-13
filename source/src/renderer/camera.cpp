@@ -11,7 +11,7 @@ void Camera::setPerspectiveProjection(float fov, glm::vec2 view, float near, flo
 							0.0f, -1.0f, 0.0f, 0.0f,
 							0.0f, 0.0f, 0.5f, 0.0f,
 							0.0f, 0.0f, 0.5f, 1.0f);
-	//projectionMtr = clip * projectionMtr;
+	//projectionMtr = clip * projectionMtr; 
 }
 
 void Camera::setOrthographicProjection(glm::vec2 view) noexcept
@@ -21,6 +21,5 @@ void Camera::setOrthographicProjection(glm::vec2 view) noexcept
 
 void Camera::updateViewMtr() noexcept
 {
-	//viewMtr = glm::lookAt(pos, glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	viewMtr = glm::lookAt(pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
