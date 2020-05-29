@@ -9,7 +9,7 @@ void VulkanContext::init(GLFWwindow* window, VulkanConfig const& config)
 	m_window = window;
 	instance = std::make_unique<vkh::Instance>(config.appName, config.engineName,
 		std::vector(c_vulkanValidationLayers.begin(), c_vulkanValidationLayers.end()),
-		vkAllocator, window);
+		vkAllocator);
 
 	surface = std::make_unique<vkh::Surface>(*instance, window, vkAllocator);
 	device = std::make_unique<vkh::Device>(getSuitableDevice(), *surface, std::vector(c_vulkanDefaultDeviceRequiredExtentions.begin(), c_vulkanDefaultDeviceRequiredExtentions.end()), vkAllocator);
@@ -180,7 +180,7 @@ void VulkanContext::createRaytracingOutImage()
 		m_rtOutputImages[i].init(*device, swapchain->extent, swapchain->format, vk::MemoryPropertyFlagBits::eDeviceLocal,
 			vk::ImageTiling::eOptimal,
 			vk::ImageUsageFlagBits::eColorAttachment
-			| vk::ImageUsageFlagBits::eSampled
+			//| vk::ImageUsageFlagBits::eSampled
 			| vk::ImageUsageFlagBits::eStorage
 			| vk::ImageUsageFlagBits::eTransferSrc);
 

@@ -3,7 +3,7 @@
 
 using namespace hano::vkh;
 
-Surface::Surface(Instance& inst, GLFWwindow* window, vk::AllocationCallbacks* alloc): instance(inst), allocator(alloc)
+Surface::Surface(Instance& inst, GLFWwindow* window_, vk::AllocationCallbacks* alloc): instance(inst), allocator(alloc), window(window_)
 {
 	assert(window);
 	VkSurfaceKHR tmpSurface;

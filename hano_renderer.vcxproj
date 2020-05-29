@@ -151,6 +151,7 @@
     <ClCompile Include="source\libraries\imgui\imgui_widgets.cpp" />
     <ClCompile Include="source\libraries\tiny\tiny.cpp" />
     <ClCompile Include="source\src\core\hanoFile.cpp" />
+    <ClCompile Include="source\src\core\logger.cpp" />
     <ClCompile Include="source\src\hanoRenderer.cpp" />
     <ClCompile Include="source\src\main.cpp" />
     <ClCompile Include="source\src\renderer\camera.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="source\src\renderer\ResourceManager.cpp" />
     <ClCompile Include="source\src\renderer\scene.cpp" />
     <ClCompile Include="source\src\renderer\texture.cpp" />
+    <ClCompile Include="source\src\renderer\UILogger.cpp" />
     <ClCompile Include="source\src\vulkanContext.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhAccelerationStructure.cpp" />
     <ClCompile Include="source\src\vulkanHelpers\nvRaytracing\vkhBottomLevelAS.cpp" />
@@ -198,7 +200,7 @@
     <ClInclude Include="source\include\renderer\camera.hpp" />
     <ClInclude Include="source\include\renderer\editorGUI.hpp" />
     <ClInclude Include="source\include\renderer\gltfLoader.hpp" />
-    <ClInclude Include="source\include\renderer\hanoDearImgui.hpp" />
+    <ClInclude Include="source\include\renderer\UILogger.hpp" />
     <ClInclude Include="source\include\renderer\hanoEditor.hpp" />
     <ClInclude Include="source\include\renderer\light.hpp" />
     <ClInclude Include="source\include\renderer\material.hpp" />

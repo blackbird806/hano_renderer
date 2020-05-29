@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
-#include <glfw/glfw3.h>
 
 #include "core/hanoConfig.hpp"
 #include "vkhUtility.hpp"
@@ -13,7 +12,7 @@ namespace hano::vkh
 	
 	struct Instance
 	{
-		Instance(const char* appName, const char* engineName, std::vector<const char*> ivalidationLayers, vk::AllocationCallbacks* alloc, GLFWwindow* win);
+		Instance(const char* appName, const char* engineName, std::vector<const char*> validationLayers_, vk::AllocationCallbacks* alloc);
 
 		HANO_NODISCARD bool validationLayersEnabled() const noexcept;
 
@@ -23,9 +22,6 @@ namespace hano::vkh
 		std::vector<vk::ExtensionProperties> extensions;
 		std::vector<const char*> validationLayers;
 
-		// @Review
-		GLFWwindow* window;
-		
 		private:
 		
 		bool checkValidationLayerSupport();

@@ -22,7 +22,7 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	: vkContext(&vkContext_), customEditor(nullptr)
 {
 	auto const& device = *vkContext->device;
-	auto const& window = vkContext->surface->instance.window;
+	auto const& window = vkContext->surface->window;
 
 	// Initialise descriptor pool and render pass for ImGui.
 	std::vector<vkh::DescriptorBinding> const descriptorBindings = {

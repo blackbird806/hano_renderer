@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <renderer/scene.hpp>
 #include <renderer/camera.hpp>
-
+#include <renderer/UILogger.hpp> 
 #include <fmt/format.h>
 
 using namespace hano;
@@ -106,17 +106,29 @@ void HanoEditor::drawUI()
 	Scene& scene = *m_renderer->getCurrentScene();
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
+	UILogger& logger = UILogger::Instance();
+
 	static bool show_demo = true;
+	static bool show_logger = true;
+
 	if (show_demo)
-	{
 		ImGui::ShowDemoWindow(&show_demo);
+	if (show_logger)
+		logger.draw("Logger", &show_logger);
+
+	if (ImGui::Button("testLog"))
+	{
+		hano_info("salut la {}", "compagnie");
+		hano_warn("warn test {}", 45);
+		hano_error("error test {}", 45.2);
 	}
 
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("Windows"))
 		{
-			if (ImGui::MenuItem("demo", nullptr, &show_demo)) {}
+			ImGui::MenuItem("demo", nullptr, &show_demo);
+			ImGui::MenuItem("logger", nullptr, &show_logger);
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
@@ -166,11 +178,13 @@ void HanoEditor::drawUI()
 		if (ImGui::Button("AddLight"))
 		{
 			scene.lights.push_back(PointLight{ .intensity = 1.0f, .color = glm::vec3(1.0f, 1.0f, 1.0f) });
+			hano_info("added point light");
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("RemoveLight"))
 		{
 			scene.lights.pop_back();
+			hano_info("removed point light");
 		}
 
 		for (int i = 0; auto & light : scene.lights)

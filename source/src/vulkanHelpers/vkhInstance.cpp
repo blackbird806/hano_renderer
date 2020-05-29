@@ -1,3 +1,4 @@
+#include <glfw/glfw3.h>
 #include <vulkanHelpers/vkhInstance.hpp>
 
 using namespace hano::vkh;
@@ -18,10 +19,9 @@ std::vector<const char*> hano::vkh::getGlfwRequiredExtensions(bool validationLay
 	return extensions;
 }
 
-Instance::Instance(const char* appName, const char* engineName, std::vector<const char*> validationLayers_, vk::AllocationCallbacks* alloc, GLFWwindow* win)
-	: allocator(alloc), validationLayers(validationLayers_), window(win)
+Instance::Instance(const char* appName, const char* engineName, std::vector<const char*> validationLayers_, vk::AllocationCallbacks* alloc)
+	: allocator(alloc), validationLayers(validationLayers_)
 {
-	assert(window);
 	// disable validation layers if none provided
 	if (validationLayersEnabled() && !checkValidationLayerSupport())
 		throw hano::HanoException("validation layers requested, but not available!");

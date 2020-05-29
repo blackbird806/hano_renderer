@@ -17,7 +17,7 @@ Swapchain::Swapchain(Device const& idevice, bool vsync, Swapchain* oldSwapchain)
 	}
 
 	const auto& surface = device.surface;
-	const auto& window = surface.instance.window;
+	const auto& window = surface.window;
 
 	const auto surfaceFormat = chooseSwapSurfaceFormat(details.formats);
 	const auto presentMode = chooseSwapPresentMode(details.presentModes, vsync);

@@ -17,12 +17,12 @@ int main()
 	hano::Material houseMtrl{ .baseColor = &renderer.loadTexture("assets/textures/back.jpg") };
 	hano::Model cube(cubeMesh, houseMtrl);
 
-	auto gltfCube = hano::loadGltfModel(renderer, "assets/gltf/DamagedHelmet.gltf");
-	hano::Model simpleCube(gltfCube.mesh, hano::Material{.baseColor = &gltfCube.textures[0]});
+	/*auto gltfModel = hano::loadGltfModel(renderer, "assets/gltf/DamagedHelmet.gltf");
+	hano::Model simpleCube(gltfModel.mesh, hano::Material{.baseColor = &gltfModel.textures[0]});*/
 
 	hano::Scene scene;
 	scene.camera.pos = glm::vec3(0, 0, -10.0f);
-	scene.addModel(simpleCube);
+	//scene.addModel(simpleCube);
 	scene.addModel(cube);
 	std::random_device rd{};
 	std::mt19937       gen{ rd() };
@@ -34,7 +34,7 @@ int main()
 	{
 		scene.addSphere(hano::Sphere{ glm::vec3(xzd(gen), yd(gen), xzd(gen)), radd(gen) });
 	}
-	simpleCube.transform.pos = glm::vec3(1, 0, 2);
+	//simpleCube.transform.pos = glm::vec3(1, 0, 2);
 	cube.transform.pos = glm::vec3(-1, 0, 2);
 
 	scene.addLight(hano::PointLight{ 1.0f, glm::vec3(2.0f, 1.0f, -2.0f), glm::vec3(1.0f, 1.0f, 1.0f) });
