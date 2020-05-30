@@ -174,74 +174,76 @@ void HanoEditor::drawUI()
 		{
 			ImGui::MenuItem("demo", nullptr, &show_demo);
 			ImGui::MenuItem("logger", nullptr, &show_logger);
-			ImGui::MenuItem("scene", nullptr, &show_logger);
+			ImGui::MenuItem("scene", nullptr, &show_scene);
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
 	}
 
-	ImGui::Begin("scene", &show_scene);
-
-	ImGuiIO& io = ImGui::GetIO();
-	ImGui::Text("Dear ImGui %s", ImGui::GetVersion());
-	ImGui::Text("Application average %.4f ms/frame (%.2f FPS)", 1000.0f / io.Framerate, io.Framerate);
-	ImGui::Text("%d vertices, %d indices (%d triangles)", io.MetricsRenderVertices, io.MetricsRenderIndices, io.MetricsRenderIndices / 3);
-	ImGui::Text("%d active windows (%d visible)", io.MetricsActiveWindows, io.MetricsRenderWindows);
-	ImGui::Text("%d active allocations", io.MetricsActiveAllocations);
-
-	if (ImGui::Button("reload shaders"))
+	if (show_scene)
 	{
-		m_renderer->reloadShaders();
-	}
+		ImGui::Begin("scene", &show_scene);
+		ImGuiIO& io = ImGui::GetIO();
+		ImGui::Text("Dear ImGui %s", ImGui::GetVersion());
+		ImGui::Text("Application average %.4f ms/frame (%.2f FPS)", 1000.0f / io.Framerate, io.Framerate);
+		ImGui::Text("%d vertices, %d indices (%d triangles)", io.MetricsRenderVertices, io.MetricsRenderIndices, io.MetricsRenderIndices / 3);
+		ImGui::Text("%d active windows (%d visible)", io.MetricsActiveWindows, io.MetricsRenderWindows);
+		ImGui::Text("%d active allocations", io.MetricsActiveAllocations);
 
-	if (ImGui::DragFloat3("camPos", (float*)&scene.camera.pos, 0.2f))
-	{
-		scene.camera.updateViewMtr();
-	}
-
-	static float cameraFov = 45.0f;
-	if (ImGui::DragFloat("fov", &cameraFov))
-	{
-		scene.camera.setPerspectiveProjection(cameraFov, glm::vec2(m_renderer->getWindowWidth(), m_renderer->getWindowHeight()), 0.01f, 1000.0f);
-	}
-
-	ImGui::Text("models :");
-	static int selected_index = 0;
-	for (int i = 0; auto & model : scene.getModels())
-	{
-		if (ImGui::RadioButton(fmt::format("model {}", i).c_str(), selected_index == i))
+		if (ImGui::Button("reload shaders"))
 		{
-			selected_index = i;
-		}
-		i++;
-	}
-
-	auto& selectedModel = scene.getModels()[selected_index].get();
-	editTransform(scene.camera, selectedModel.transform);
-
-	if (ImGui::CollapsingHeader("Lights"))
-	{
-		if (ImGui::Button("AddLight"))
-		{
-			scene.lights.push_back(PointLight{ .intensity = 1.0f, .color = glm::vec3(1.0f, 1.0f, 1.0f) });
-			hano_info("added point light");
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("RemoveLight"))
-		{
-			scene.lights.pop_back();
-			hano_info("removed point light");
+			m_renderer->reloadShaders();
 		}
 
-		for (int i = 0; auto & light : scene.lights)
+		if (ImGui::DragFloat3("camPos", (float*)&scene.camera.pos, 0.2f))
 		{
-			ImGui::DragFloat3(fmt::format("light pos {}", i).c_str(), (float*)&light.pos);
-			ImGui::ColorEdit3(fmt::format("light color {}", i).c_str(), (float*)&light.color);
-			ImGui::DragFloat(fmt::format("light intensity {}", i).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
-			ImGui::Text("\n");
+			scene.camera.updateViewMtr();
+		}
+
+		static float cameraFov = 45.0f;
+		if (ImGui::DragFloat("fov", &cameraFov))
+		{
+			scene.camera.setPerspectiveProjection(cameraFov, glm::vec2(m_renderer->getWindowWidth(), m_renderer->getWindowHeight()), 0.01f, 1000.0f);
+		}
+
+		ImGui::Text("models :");
+		static int selected_index = 0;
+		for (int i = 0; auto & model : scene.getModels())
+		{
+			if (ImGui::RadioButton(fmt::format("model {}", i).c_str(), selected_index == i))
+			{
+				selected_index = i;
+			}
 			i++;
 		}
+
+		auto& selectedModel = scene.getModels()[selected_index].get();
+		editTransform(scene.camera, selectedModel.transform);
+
+		if (ImGui::CollapsingHeader("Lights"))
+		{
+			if (ImGui::Button("AddLight"))
+			{
+				scene.lights.push_back(PointLight{ .intensity = 1.0f, .color = glm::vec3(1.0f, 1.0f, 1.0f) });
+				hano_info("added point light");
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("RemoveLight"))
+			{
+				scene.lights.pop_back();
+				hano_info("removed point light");
+			}
+
+			for (int i = 0; auto & light : scene.lights)
+			{
+				ImGui::DragFloat3(fmt::format("light pos {}", i).c_str(), (float*)&light.pos);
+				ImGui::ColorEdit3(fmt::format("light color {}", i).c_str(), (float*)&light.color);
+				ImGui::DragFloat(fmt::format("light intensity {}", i).c_str(), (float*)&light.intensity, 0.01f, 0.0f, 1.0f);
+				ImGui::Text("\n");
+				i++;
+			}
+		}
+
+		ImGui::End();
 	}
-	
-	ImGui::End();
 }
