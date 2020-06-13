@@ -2,6 +2,8 @@
 #include <renderer/hanoEditor.hpp>
 #include <renderer/gltfLoader.hpp>
 #include <random>
+#include <chrono>
+#include <thread>
 
 int main()
 {
@@ -17,12 +19,14 @@ int main()
 	hano::Material houseMtrl{ .baseColor = &renderer.loadTexture("assets/textures/back.jpg") };
 	hano::Model cube(cubeMesh, houseMtrl);
 
-	/*auto gltfModel = hano::loadGltfModel(renderer, "assets/gltf/DamagedHelmet.gltf");
-	hano::Model simpleCube(gltfModel.mesh, hano::Material{.baseColor = &gltfModel.textures[0]});*/
+	//auto gltfModel = hano::loadGltfModel(renderer, "assets/gltf/DamagedHelmet.gltf");
+	hano::Mesh& spawnMesh = renderer.loadMesh("assets/obj/house.obj");
+	hano::Material spawnMtrl{ .baseColor = &renderer.loadTexture("assets/textures/house-RGBA.png") };
+	hano::Model simpleCube(spawnMesh, spawnMtrl);
 
 	hano::Scene scene;
 	scene.camera.pos = glm::vec3(0, 0, -10.0f);
-	//scene.addModel(simpleCube);
+	scene.addModel(simpleCube);
 	scene.addModel(cube);
 	std::random_device rd{};
 	std::mt19937       gen{ rd() };
@@ -44,9 +48,23 @@ int main()
 	hano::HanoEditor editor(renderer);
 	renderer.setEditorGUI(editor);
 
+	auto last = std::chrono::steady_clock::now();
+
 	while (renderer.isRunning())
 	{
+		using namespace std::chrono_literals;
+
+		auto before = std::chrono::steady_clock::now();
 		renderer.renderFrame();
+		auto after = std::chrono::steady_clock::now();
+		auto deltaTime = after - before;
+		std::chrono::duration<double, std::milli> deltaMs = deltaTime;
+		std::chrono::duration<double, std::milli> const targetFrameTime = 16.66ms;
+
+		if (deltaMs < targetFrameTime)
+		{
+			std::this_thread::sleep_for(targetFrameTime - deltaMs);
+		}
 	}
 
 	renderer.waitIdle();

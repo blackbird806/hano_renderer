@@ -34,6 +34,8 @@ namespace hano
 			Texture& loadTexture(std::filesystem::path const& texturePath);
 
 			void setRenderScene(Scene& scene);
+			void updateRenderScene();
+
 			void setEditorGUI(CustomEditorGUI& editor);
 			void renderFrame();
 

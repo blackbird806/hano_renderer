@@ -29,7 +29,7 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 		{0, 1, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlags()},
 	};
 
-	descriptorPool = std::make_unique<vkh::DescriptorPool>(device, descriptorBindings, 30);
+	descriptorPool = std::make_unique<vkh::DescriptorPool>(device, descriptorBindings, 30 /* @Review pool size */);
 	renderPass = std::make_unique<vkh::RenderPass>(*vkContext->swapchain, *vkContext->depthBuffer, false, false);
 
 	// Initialise ImGui
@@ -40,9 +40,10 @@ EditorGUI::EditorGUI(VulkanContext const& vkContext_)
 	// No ini file.
 	//io.IniFilename = nullptr;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		// Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+	
+	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;			// Enable Multi-Viewport / Platform Windows
 
 	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
 	ImGuiStyle& style = ImGui::GetStyle();

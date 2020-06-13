@@ -59,7 +59,7 @@ struct fmt::formatter<hano::SourceLocation> {
 	}
 };
 
-#define HANO_GET_LOCATION SourceLocation{ (uint)__LINE__, __FUNCTION__, __FILE__}
+#define HANO_GET_LOCATION ::hano::SourceLocation{ (uint32_t)__LINE__, __FUNCTION__, __FILE__}
 
 #define hano_info(msg, ...)		::hano::Logger::Instance().log_info(HANO_GET_LOCATION, fmt::format("[info] " msg, __VA_ARGS__))
 #define hano_warn(msg, ...)		::hano::Logger::Instance().log_warn(HANO_GET_LOCATION, fmt::format("[warn] {} " msg, HANO_GET_LOCATION, __VA_ARGS__))

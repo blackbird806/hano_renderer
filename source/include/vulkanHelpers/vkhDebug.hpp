@@ -51,7 +51,7 @@ namespace hano::vkh
 		setObjectName(object.handle, name, object.device->handle);
 #endif
 	}
-
+	
 	template<VkhHandleWithMemory T>
 	void setObjectName(T const& object, const char* name)
 	{

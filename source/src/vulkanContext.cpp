@@ -143,7 +143,7 @@ void VulkanContext::createAccelerationStructures(Scene const& scene_)
 		i++;
 	}
 	
-	// add spheres
+	// add spheres and cubes
 	vk::GeometryAABBNV aabb;
 	aabb.setAabbData(m_sphereAABBBuffer.handle.get());
 	aabb.setNumAABBs(static_cast<uint32_t>(nbSpheres));
@@ -603,7 +603,7 @@ void VulkanContext::endFrame()
 
 	if (m_result != vk::Result::eSuccess)
 	{
-		throw HanoException(std::string("failed to present next image (") + to_string(m_result) + ")");
+		throw HanoException(fmt::format("failed to present next image ({})", to_string(m_result)));
 	}
 
 	m_currentFrame = (m_currentFrame + 1) % m_inFlightFences.size();
