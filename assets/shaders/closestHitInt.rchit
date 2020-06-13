@@ -3,7 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable // see : https://github.com/KhronosGroup/GLSL/blob/master/extensions/ext/GL_EXT_nonuniform_qualifier.txt
 #extension GL_EXT_scalar_block_layout : enable
 
-#define ENABLE_SHADOWS 1
+#define ENABLE_SHADOWS 0
 #define COMPUTE_LIGHT 1
 #define ENABLE_REFLECTION 0
 #define NUM_MAX_LIGHTS 4
@@ -96,7 +96,7 @@ void main()
 					tMin,        // ray min range
 					rayDir,      // ray direction
 					tMax,        // ray max range
-					0            // payload (location = 1) isShadowed
+					0            // payload (location = 0) hitPayload
 			);
 	#endif
 
@@ -110,9 +110,9 @@ void main()
 		vec3 lightColor = lights[i].color;
 		float lightIntensity = lights[i].intensity;
 		
-		vec3 lightDir = lightPos - worldPos;
-		float lightDist = length(lightDir);
-		lightDir = normalize(lightDir);
+		const vec3 lightOffset = lightPos - worldPos;
+		const vec3 lightDir = normalize(lightOffset);
+		const float lightDist = length(lightOffset);
 
 		float U = dot(normal, lightDir);
 		// shadow cast

@@ -63,9 +63,32 @@ vec2 Mix(vec2 a, vec2 b, vec2 c, vec3 barycentrics)
 	return a * barycentrics.x + b * barycentrics.y + c * barycentrics.z;
 }
 
-vec3 Mix(vec3 a, vec3 b, vec3 c, vec3 barycentrics) 
+vec3 Mix(vec3 a, vec3 b, vec3 c, vec3 barycentrics)
 {
-    return a * barycentrics.x + b * barycentrics.y + c * barycentrics.z;
+	return a * barycentrics.x + b * barycentrics.y + c * barycentrics.z;
+}
+
+// used to avoid self intersection
+// see : raytracing gems 6.2.2.4
+vec3 offsetRay(vec3 p, vec3 n)
+{
+	const float origin = 1.0 / 32.0;
+	const float floatScale = 1.0 / 65536.0;
+	const float intScale = 256.0;
+
+	const ivec3 ofI = ivec3(n.x * intScale, n.y * intScale, n.z * intScale);
+
+	vec3 pI = vec3(
+		float(int(p.x) + ( p.x < 0 ? -ofI.x : ofI.x)),
+		float(int(p.y) + ( p.y < 0 ? -ofI.y : ofI.y)),
+		float(int(p.z) + ( p.z < 0 ? -ofI.z : ofI.z))
+	);
+
+	return vec3(
+		abs(p.x) < origin ? p.x + floatScale * n.x : pI.x,
+		abs(p.y) < origin ? p.y + floatScale * n.y : pI.y,
+		abs(p.z) < origin ? p.z + floatScale * n.z : pI.z
+	);
 }
 
 void main()
@@ -83,11 +106,14 @@ void main()
 	const mat4 model = mat4(gl_ObjectToWorldNV);
 	
 	// Transforming the normal to world space
-	normal = normalize(vec3(inverse(transpose(model)) * vec4(normal, 0.0)));
+	const mat4 modelIt = inverse(transpose(model));
+	normal = normalize(vec3(modelIt * vec4(normal, 0.0)));
+	normal = normalize(vec3(model * vec4(normal, 0.0)));
 	const vec2 texCoord = Mix(v0.texCoord, v1.texCoord, v2.texCoord, barycentrics);
 
-	vec3 worldPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_HitTNV; // may have precision issues with far hitpoints
-  	// vec3 worldPos = v0.pos * barycentrics.x + v1.pos * barycentrics.y + v2.pos * barycentrics.z;
+	// vec3 worldPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_HitTNV; // may have precision issues with far hitpoints due to floating point approximation
+  	vec3 worldPos = v0.pos * barycentrics.x + v1.pos * barycentrics.y + v2.pos * barycentrics.z;
+	worldPos = vec3(model * vec4(worldPos, 1.0));
 
 	// light
 	vec3 sum = vec3(0.01, 0.01, 0.01);
@@ -99,8 +125,9 @@ void main()
 		vec3 lightColor = lights[i].color;
 		float lightIntensity = lights[i].intensity;
 		
-		const vec3 lightDir = normalize(lightPos - worldPos);
-		const float lightDist = length(lightDir);
+		const vec3 lightOffset = lightPos - worldPos;
+		const vec3 lightDir = normalize(lightOffset);
+		const float lightDist = length(lightOffset);
 
 		const float U = dot(normal, lightDir);
 
@@ -110,6 +137,7 @@ void main()
 #if ENABLE_SHADOWS
 			float tMin   = 0.001;
 			float tMax   = lightDist;
+			// vec3  origin = offsetRay(worldPos, normal);
 			vec3  origin = worldPos;
 			vec3  rayDir = lightDir;
 			uint  flags = gl_RayFlagsTerminateOnFirstHitNV | gl_RayFlagsOpaqueNV | gl_RayFlagsSkipClosestHitShaderNV;
